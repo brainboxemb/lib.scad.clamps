@@ -1,0 +1,16 @@
+# Local/editor files
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Generated build output
+bld/
+out/
+
+# OS files
+.DS_Store
+Thumbs.db
