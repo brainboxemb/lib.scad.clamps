@@ -20,8 +20,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y openscad xvfb
 
-      - name: Render design images
-        run: xvfb-run -a ./scripts/render-openscad-design.sh
+      - name: Render OpenSCAD design images
+        run: xvfb-run -a bash ./scripts/render-openscad-design.sh
 
       - name: Upload generated design images
         uses: actions/upload-artifact@v4
