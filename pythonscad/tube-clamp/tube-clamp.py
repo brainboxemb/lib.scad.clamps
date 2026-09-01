@@ -71,6 +71,9 @@ design_view = os.environ.get("DESIGN_VIEW", "final")
 if design_view == "01-ring":
     show(full_ring())
 elif design_view == "02-opening":
-    show(opening_cutter())
+    show(
+        full_ring().color("lightgray")
+        + opening_cutter().color([1, 0.25, 0.15, 0.55])
+    )
 else:
     show(tube_clamp())

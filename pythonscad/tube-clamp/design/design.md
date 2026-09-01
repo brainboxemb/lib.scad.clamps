@@ -85,7 +85,9 @@ def opening_cutter():
     ).translate([0, 0, -EPS])
 ```
 
-![Opening cutter](img/02-opening.png)
+The design view shows the ring together with the opening cutter so the subtraction is visible directly.
+
+![Ring with opening cutter](img/02-opening.png)
 
 ## 3. Final clamp
 

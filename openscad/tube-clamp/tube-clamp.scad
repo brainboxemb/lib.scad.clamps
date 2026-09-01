@@ -83,13 +83,13 @@ module tube_clamp(
 
 module render_design_view() {
     if (design_view == "01-ring") {
+    full_ring();
+} else if (design_view == "02-opening") {
+    color("lightgray")
         full_ring();
-    } else if (design_view == "02-opening") {
-        color("lightgray") full_ring();
-        color("tomato", 0.72) opening_cutter();
-    } else {
-        tube_clamp();
-    }
-}
 
-render_design_view();
+    color([1, 0.25, 0.15, 0.55])
+        opening_cutter();
+} else {
+    tube_clamp();
+}
