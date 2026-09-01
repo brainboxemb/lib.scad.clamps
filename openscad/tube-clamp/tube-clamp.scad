@@ -16,20 +16,8 @@ $fn = 120;
 
 EPS = 0.05;
 
-function clamp_inner_radius(tube_diameter, clearance) = (tube_diameter + clearance) / 2;
-function clamp_outer_radius(tube_diameter, clearance, wall_thickness) =
-    clamp_inner_radius(tube_diameter, clearance) + wall_thickness;
-
-module sector_2d(radius, angle, segments = 48) {
-    start_angle = -angle / 2;
-    step = angle / segments;
-    polygon(points = concat(
-        [[0, 0]],
-        [for (i = [0:segments])
-            [radius * cos(start_angle + i * step),
-             radius * sin(start_angle + i * step)]]
-    ));
-}
+function clamp_inner_radius() = (tube_diameter + clearance) / 2;
+function clamp_outer_radius() = clamp_inner_radius() + wall_thickness;
 
 module full_ring(
     tube_diameter = tube_diameter,
@@ -55,10 +43,16 @@ module opening_cutter(
     clearance = clearance
 ) {
     outer_r = clamp_outer_radius(tube_diameter, clearance, wall_thickness);
+    cutter_r = outer_r + 2 * wall_thickness + 1;
+    half_angle = opening_angle / 2;
 
     translate([0, 0, -EPS])
         linear_extrude(height = clamp_width + 2 * EPS)
-            sector_2d(outer_r + 2 * wall_thickness + 1, opening_angle);
+            polygon(points = [
+                [0, 0],
+                [cutter_r * cos(-half_angle), cutter_r * sin(-half_angle)],
+                [cutter_r * cos( half_angle), cutter_r * sin( half_angle)]
+            ]);
 }
 
 module tube_clamp(

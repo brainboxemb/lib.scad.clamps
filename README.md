@@ -129,6 +129,23 @@ itself, not `design/img/*.png`.
 If `main` changes while a render is running, the workflow refuses to push stale
 generated output.
 
+## Implementation parity
+
+The OpenSCAD and PythonSCAD versions should follow the same design structure
+without forcing both languages into the same syntax.
+
+The comparison therefore keeps these elements aligned where practical:
+
+- parameter names and default values;
+- small shared constants such as `EPS`;
+- helper names such as `clamp_inner_radius` and `clamp_outer_radius`;
+- geometry names such as `full_ring`, `opening_cutter` and `tube_clamp`;
+- construction order and design views.
+
+Language-native constructs remain different where appropriate: OpenSCAD uses
+functions for scalar calculations and modules for geometry, while PythonSCAD
+uses Python functions returning geometry objects.
+
 ## Implementation comparison
 
 The purpose of maintaining both implementations is not to generate one
