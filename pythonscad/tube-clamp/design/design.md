@@ -7,13 +7,28 @@ version.
 
 ## Parameters
 
-| Parameter | Default | Meaning |
-| --- | ---: | --- |
-| `tube_diameter` | 20 mm | Nominal outside diameter of the tube. |
-| `clearance` | 0.0 mm | Extra diametral space around the tube. |
-| `wall_thickness` | 3 mm | Radial thickness of the clamp. |
-| `clamp_width` | 16 mm | Width along the tube axis. |
-| `opening_angle` | 60° | Angle of the clamp opening. |
+The model parameters are regular Python variables:
+
+```python
+tube_diameter = 20
+clearance = 0.0
+wall_thickness = 3
+clamp_width = 16
+opening_angle = 60
+```
+
+Only the documentation view needs to be overridden by the render workflow, so
+`design_view` is exposed through `add_parameter()`:
+
+```python
+design_view = add_parameter(
+    "design_view",
+    "final",
+    options=["final", "01-ring", "02-opening"],
+)
+```
+
+The workflow can then select a view with `-D`.
 
 ## 1. Ring
 
@@ -63,3 +78,11 @@ return full_ring(...) - opening_cutter(...)
 ```
 
 ![Final clamp](img/03-final.png)
+
+## Design views
+
+The render workflow uses the same `-D` mechanism as OpenSCAD:
+
+```bash
+pythonscad --trust-python   -D 'design_view="02-opening"'   tube-clamp.py
+```

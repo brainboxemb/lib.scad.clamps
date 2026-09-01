@@ -3,7 +3,6 @@
 The geometry intentionally mirrors the OpenSCAD implementation.
 """
 
-import os
 from math import radians, tan
 
 from pythonscad import *
@@ -13,6 +12,12 @@ clearance = 0.0
 wall_thickness = 3
 clamp_width = 16
 opening_angle = 60
+
+design_view = add_parameter(
+    "design_view",
+    "final",
+    options=["final", "01-ring", "02-opening"],
+)
 
 EPS = 0.05
 
@@ -104,7 +109,6 @@ def tube_clamp(
     )
 
 
-design_view = os.environ.get("DESIGN_VIEW", "final")
 
 if design_view == "01-ring":
     show(
