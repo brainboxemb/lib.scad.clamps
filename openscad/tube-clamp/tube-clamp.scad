@@ -36,22 +36,27 @@ module full_ring(
 }
 
 module opening_cutter(
-    tube_diameter = tube_diameter,
-    wall_thickness = wall_thickness,
-    clamp_width = clamp_width,
-    opening_angle = opening_angle,
-    clearance = clearance
+    tube_diameter,
+    clearance,
+    wall_thickness,
+    clamp_width,
+    opening_angle
 ) {
-    outer_r = clamp_outer_radius(tube_diameter, clearance, wall_thickness);
-    cutter_r = outer_r + 2 * wall_thickness + 1;
-    half_angle = opening_angle / 2;
+    outer_r = clamp_outer_radius(
+        tube_diameter,
+        clearance,
+        wall_thickness
+    );
+
+    cutter_length = outer_r + 10;
+    cutter_half_width = cutter_length * tan(opening_angle / 2);
 
     translate([0, 0, -EPS])
         linear_extrude(height = clamp_width + 2 * EPS)
             polygon(points = [
                 [0, 0],
-                [cutter_r * cos(-half_angle), cutter_r * sin(-half_angle)],
-                [cutter_r * cos( half_angle), cutter_r * sin( half_angle)]
+                [cutter_length, -cutter_half_width],
+                [cutter_length,  cutter_half_width]
             ]);
 }
 
@@ -83,15 +88,37 @@ module tube_clamp(
 
 module render_design_view() {
     if (design_view == "01-ring") {
-        full_ring();
+        full_ring(
+            tube_diameter,
+            clearance,
+            wall_thickness,
+            clamp_width
+        );
     } else if (design_view == "02-opening") {
         color("lightgray")
-            full_ring();
+            full_ring(
+                tube_diameter,
+                clearance,
+                wall_thickness,
+                clamp_width
+            );
 
         color([1, 0.25, 0.15, 0.55])
-            opening_cutter();
+            opening_cutter(
+                tube_diameter,
+                clearance,
+                wall_thickness,
+                clamp_width,
+                opening_angle
+            );
     } else {
-        tube_clamp();
+        tube_clamp(
+            tube_diameter,
+            clearance,
+            wall_thickness,
+            clamp_width,
+            opening_angle
+        );
     }
 }
 

@@ -2,29 +2,7 @@
 
 ## Purpose
 
-Reusable open tube clamp built from a cylindrical ring with an angular opening.
-
-## Shared conventions
-
-Both implementations use the same parameter names, helper names and small
-constants where the languages allow it. For example, both use:
-
-```text
-tube_diameter
-clearance
-wall_thickness
-clamp_width
-opening_angle
-EPS
-clamp_inner_radius
-clamp_outer_radius
-full_ring
-opening_cutter
-tube_clamp
-```
-
-The language syntax itself is not forced to match: OpenSCAD geometry is built
-with modules, while PythonSCAD geometry is returned from Python functions.
+Reusable open tube clamp built from a cylindrical ring with a triangular cutter.
 
 ## Parameters
 
@@ -56,47 +34,33 @@ difference() {
 
 ## 2. Opening
 
-The opening does not need a curved sector model. A triangular wedge is enough:
-its two long edges define the opening angle and its outer points extend beyond
-the clamp radius.
+The cutter starts as a simple triangle with its point at the center of the ring.
 
 ```scad
-half_angle = opening_angle / 2;
+cutter_length = outer_r + 10;
+cutter_half_width = cutter_length * tan(opening_angle / 2);
 
 polygon(points = [
     [0, 0],
-    [cutter_r * cos(-half_angle), cutter_r * sin(-half_angle)],
-    [cutter_r * cos( half_angle), cutter_r * sin( half_angle)]
+    [cutter_length, -cutter_half_width],
+    [cutter_length,  cutter_half_width]
 ]);
 ```
 
-That triangle is extruded through the clamp width and used as the cutter.
-
-The design view shows the ring together with the opening cutter so the subtraction is visible directly.
+The triangle is extruded through the clamp width. The design view shows the
+ring and cutter together.
 
 ![Ring with opening cutter](img/02-opening.png)
 
 ## 3. Final clamp
 
-The final clamp is the ring minus the opening wedge.
+The final clamp subtracts the triangular cutter from the ring.
 
 ```scad
 difference() {
-    full_ring();
-    opening_cutter();
+    full_ring(...);
+    opening_cutter(...);
 }
 ```
 
 ![Final clamp](img/03-final.png)
-
-## Design views
-
-The documentation images come from the same `tube-clamp.scad` file.
-
-The render script selects the required view with `design_view`:
-
-```bash
-openscad -D 'design_view="02-opening"' ...
-```
-
-Available views are `01-ring`, `02-opening` and `final`.

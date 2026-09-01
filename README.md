@@ -131,20 +131,21 @@ generated output.
 
 ## Implementation parity
 
-The OpenSCAD and PythonSCAD versions should follow the same design structure
-without forcing both languages into the same syntax.
+The OpenSCAD and PythonSCAD implementations use the same geometric construction
+and the same parameter flow wherever practical.
 
-The comparison therefore keeps these elements aligned where practical:
+Both versions:
 
-- parameter names and default values;
-- small shared constants such as `EPS`;
-- helper names such as `clamp_inner_radius` and `clamp_outer_radius`;
-- geometry names such as `full_ring`, `opening_cutter` and `tube_clamp`;
-- construction order and design views.
+- use the same parameter names and defaults;
+- use the same `EPS` constant;
+- pass design parameters explicitly into geometry modules/functions;
+- use the same radius helpers;
+- build the same full ring;
+- build the opening from the same simple triangular cutter;
+- expose the same design views.
 
-Language-native constructs remain different where appropriate: OpenSCAD uses
-functions for scalar calculations and modules for geometry, while PythonSCAD
-uses Python functions returning geometry objects.
+The languages still use their natural constructs: OpenSCAD geometry is grouped
+in modules, while PythonSCAD geometry is returned from Python functions.
 
 ## Implementation comparison
 

@@ -1,11 +1,10 @@
 """Tube clamp - PythonSCAD implementation.
 
-The structure intentionally mirrors the OpenSCAD implementation so both
-versions can be compared directly.
+The geometry intentionally mirrors the OpenSCAD implementation.
 """
 
 import os
-from math import cos, pi, sin
+from math import radians, tan
 
 from pythonscad import *
 
@@ -18,17 +17,29 @@ opening_angle = 60
 EPS = 0.05
 
 
-def clamp_inner_radius():
+def clamp_inner_radius(tube_diameter, clearance):
     return (tube_diameter + clearance) / 2
 
 
-def clamp_outer_radius():
-    return clamp_inner_radius() + wall_thickness
+def clamp_outer_radius(tube_diameter, clearance, wall_thickness):
+    return clamp_inner_radius(tube_diameter, clearance) + wall_thickness
 
 
-def full_ring():
-    inner_r = clamp_inner_radius()
-    outer_r = clamp_outer_radius()
+def full_ring(
+    tube_diameter,
+    clearance,
+    wall_thickness,
+    clamp_width,
+):
+    inner_r = clamp_inner_radius(
+        tube_diameter,
+        clearance,
+    )
+    outer_r = clamp_outer_radius(
+        tube_diameter,
+        clearance,
+        wall_thickness,
+    )
 
     return (
         cylinder(h=clamp_width, r=outer_r, fn=120)
@@ -40,21 +51,28 @@ def full_ring():
     )
 
 
-def opening_cutter():
-    outer_r = clamp_outer_radius()
-    cutter_r = outer_r + 2 * wall_thickness + 1
-    half_angle = opening_angle / 2
+def opening_cutter(
+    tube_diameter,
+    clearance,
+    wall_thickness,
+    clamp_width,
+    opening_angle,
+):
+    outer_r = clamp_outer_radius(
+        tube_diameter,
+        clearance,
+        wall_thickness,
+    )
+
+    cutter_length = outer_r + 10
+    cutter_half_width = cutter_length * tan(
+        radians(opening_angle / 2)
+    )
 
     points = [
         [0, 0],
-        [
-            cutter_r * cos(-half_angle * pi / 180),
-            cutter_r * sin(-half_angle * pi / 180),
-        ],
-        [
-            cutter_r * cos(half_angle * pi / 180),
-            cutter_r * sin(half_angle * pi / 180),
-        ],
+        [cutter_length, -cutter_half_width],
+        [cutter_length,  cutter_half_width],
     ]
 
     return polygon(points).linear_extrude(
@@ -62,18 +80,64 @@ def opening_cutter():
     ).translate([0, 0, -EPS])
 
 
-def tube_clamp():
-    return full_ring() - opening_cutter()
+def tube_clamp(
+    tube_diameter,
+    clearance,
+    wall_thickness,
+    clamp_width,
+    opening_angle,
+):
+    return (
+        full_ring(
+            tube_diameter,
+            clearance,
+            wall_thickness,
+            clamp_width,
+        )
+        - opening_cutter(
+            tube_diameter,
+            clearance,
+            wall_thickness,
+            clamp_width,
+            opening_angle,
+        )
+    )
 
 
 design_view = os.environ.get("DESIGN_VIEW", "final")
 
 if design_view == "01-ring":
-    show(full_ring())
+    show(
+        full_ring(
+            tube_diameter,
+            clearance,
+            wall_thickness,
+            clamp_width,
+        )
+    )
 elif design_view == "02-opening":
     show(
-        full_ring().color("lightgray")
-        + opening_cutter().color([1, 0.25, 0.15, 0.55])
+        full_ring(
+            tube_diameter,
+            clearance,
+            wall_thickness,
+            clamp_width,
+        ).color("lightgray")
+        + opening_cutter(
+            tube_diameter,
+            clearance,
+            wall_thickness,
+            clamp_width,
+            opening_angle,
+        ).color([1, 0.25, 0.15, 0.55])
     )
 else:
-    show(tube_clamp())
+    show(
+        tube_clamp(
+            tube_diameter,
+            clearance,
+            wall_thickness,
+            clamp_width,
+            opening_angle,
+        )
+    )
