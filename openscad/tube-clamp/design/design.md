@@ -2,67 +2,148 @@
 
 ## Purpose
 
-This implementation is the OpenSCAD reference implementation of a simple, printable open tube clamp.
+This is the OpenSCAD implementation of the reusable open tube-clamp design.
 
-The first design deliberately focuses on the clamp body only. Mounting feet, screw lugs and project-specific attachment geometry are excluded so that the core clamp geometry can be reused by later clamp types.
+The part starts as a cylindrical ring around the target tube and removes an
+angular sector to create the snap opening. The implementation is intentionally
+small so the geometry can be compared directly with the PythonSCAD version.
 
-## Functional design
-
-The clamp is an extruded annular body with a sector removed to create a snap opening.
-
-The design is controlled by five parameters:
+## Functional parameters
 
 | Parameter | Default | Meaning |
 | --- | ---: | --- |
 | `tube_diameter` | 20 mm | Nominal outside diameter of the tube. |
 | `clearance` | 0.0 mm | Diametral extra space around the tube. |
 | `wall_thickness` | 3 mm | Radial thickness of the clamp body. |
-| `clamp_width` | 16 mm | Width of the clamp along the tube axis. |
+| `clamp_width` | 16 mm | Width along the tube axis. |
 | `opening_angle` | 60° | Angular sector removed from the ring. |
 
-The initial geometry intentionally does **not** define material-specific snap behaviour. Clearance and opening angle are exposed because they will need physical verification for different materials, printers and tube surfaces.
+## Geometry construction
 
-## Construction
+The implementation is built from three essential operations:
 
-### 1. Full ring
+```text
+full ring
+   ↓
+opening cutter
+   ↓
+ring - cutter
+   ↓
+final tube clamp
+```
 
-The base is a cylindrical ring using the nominal tube diameter plus optional clearance for the inner diameter.
+The code excerpts below intentionally show only the essential construction.
+The complete implementation remains in [`tube-clamp.scad`](../tube-clamp.scad).
+
+## 1. Full ring
+
+The clamp body starts as the difference between an outer cylinder and an inner
+cylinder.
+
+The inner radius is derived from the tube diameter and clearance. The outer
+radius adds the required wall thickness.
+
+```scad
+module full_ring() {
+    difference() {
+        cylinder(h = clamp_width, r = outer_radius);
+
+        translate([0, 0, -0.05])
+            cylinder(
+                h = clamp_width + 0.1,
+                r = inner_radius
+            );
+    }
+}
+```
+
+The slight Z extension on the inner cylinder prevents coincident faces during
+the subtraction.
 
 ![Full ring](img/01-ring.png)
 
-### 2. Opening sector
+## 2. Opening cutter
 
-A radial sector is used as the cutting volume. Keeping this as a separate construction primitive makes the design intent visible and makes the opening angle directly controllable.
+A sector-shaped solid is used to remove the opening from the ring.
 
-![Opening sector](img/02-opening.png)
+Conceptually:
 
-### 3. Final clamp
+```scad
+module opening_cutter() {
+    linear_extrude(height = clamp_width + 0.1)
+        polygon(opening_sector_points(...));
+}
+```
 
-The sector is subtracted from the full ring to create the open snap clamp.
+The sector angle is controlled by `opening_angle`. Keeping the opening as a
+separate cutter makes the intent explicit and allows this construction step to
+be rendered independently for the design documentation.
+
+![Opening cutter](img/02-opening.png)
+
+## 3. Final clamp
+
+The final clamp is simply the ring minus the opening cutter:
+
+```scad
+module tube_clamp() {
+    difference() {
+        full_ring();
+        opening_cutter();
+    }
+}
+```
+
+This is the core design relationship. Future mounting features should be added
+around this reusable clamp body rather than changing the meaning of the basic
+ring/opening construction.
 
 ![Final clamp](img/03-final.png)
 
 ## Design views
 
-The same `tube-clamp.scad` file is used for both the production geometry and design documentation. The variable `design_view` selects the requested view and can be overridden from the OpenSCAD command line with `-D`.
+The same OpenSCAD source file is also used to generate the documentation
+images.
 
-Supported values:
+The render workflow passes a `design_view` value through `-D`, for example:
 
-- `final`
-- `01-ring`
-- `02-opening`
+```bash
+openscad   -D 'design_view="01-ring"'   -o design/img/01-ring.png   tube-clamp.scad
+```
 
-This avoids separate `.scad` files for documentation renders.
+Supported documentation views are:
 
-## Current design boundaries
+```text
+01-ring
+02-opening
+final
+```
 
-This first part intentionally excludes:
+This avoids maintaining separate `.scad` files purely for documentation.
 
-- mounting holes;
-- mounting feet;
-- screw-tightened split geometry;
-- ribs or local reinforcement;
-- chamfers and lead-in features;
-- empirical compensation for print material or process.
+## Keeping design and code in sync
 
-Those features should be added only when they are part of the reusable clamp design, or implemented as a separate clamp type when they change the functional concept.
+`design.md` is part of the design, not an after-the-fact description.
+
+For every meaningful geometry change:
+
+1. update `tube-clamp.scad`;
+2. update the relevant construction explanation and code excerpt in this file;
+3. regenerate the design images;
+4. review source, documentation and image changes together.
+
+The GitHub design workflow regenerates the PNG files automatically and commits
+them only when their contents changed. The Markdown design explanation remains
+an intentional source change and should be updated together with the code.
+
+## Verification target
+
+The OpenSCAD and PythonSCAD implementations should ultimately be verified for
+equivalent:
+
+- nominal bounding box;
+- inner tube diameter;
+- outer diameter;
+- clamp width;
+- opening angle;
+- exported mesh volume within a defined tolerance.

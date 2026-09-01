@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     container:
-      image: ghcr.io/brainboxemb/scad-toolchain:v0.1.1
+      image: ghcr.io/brainboxemb/scad-toolchain:v0.1.2
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}

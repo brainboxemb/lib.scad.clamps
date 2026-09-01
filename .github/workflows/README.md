@@ -8,7 +8,7 @@ OpenSCAD and PythonSCAD.
 The job runs inside the pinned shared toolchain container:
 
 ```text
-ghcr.io/brainboxemb/scad-toolchain:v0.1.1
+ghcr.io/brainboxemb/scad-toolchain:v0.1.2
 ```
 
 The version is intentionally explicit. Toolchain upgrades should be deliberate

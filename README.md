@@ -54,7 +54,7 @@ Design automation runs in the shared, explicitly versioned SCAD toolchain
 container:
 
 ```text
-ghcr.io/brainboxemb/scad-toolchain:v0.1.1
+ghcr.io/brainboxemb/scad-toolchain:v0.1.2
 ```
 
 The version is pinned deliberately. A toolchain upgrade is an explicit
@@ -62,6 +62,36 @@ repository change so generated CAD output cannot silently change because a
 moving `latest` image changed.
 
 The container provides both OpenSCAD and PythonSCAD.
+
+## Toolchain requirement
+
+The design workflow currently pins:
+
+```text
+ghcr.io/brainboxemb/scad-toolchain:v0.1.2
+```
+
+This version includes Git in the container because the design workflow may
+commit changed generated PNG files back to the repository.
+
+## Design documentation convention
+
+Each implementation keeps a `design/design.md` next to its source.
+
+A design document should capture:
+
+- the intent of the part;
+- the important parameters;
+- the essential geometry/construction steps;
+- small code excerpts that explain those steps;
+- generated images showing the same steps.
+
+The design document is expected to change together with meaningful geometry
+changes. Source code and design documentation should therefore be reviewed as
+one change.
+
+Generated PNG files under `design/img/` are refreshed by GitHub Actions and
+committed only when their contents change.
 
 ## Design documentation
 
