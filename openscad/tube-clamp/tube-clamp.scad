@@ -20,18 +20,33 @@ function clamp_inner_radius(tube_diameter, clearance) = (tube_diameter + clearan
 function clamp_outer_radius(tube_diameter, clearance, wall_thickness) = clamp_inner_radius(tube_diameter, clearance) + wall_thickness;
 
 module full_ring(
-    tube_diameter = tube_diameter,
-    wall_thickness = wall_thickness,
-    clamp_width = clamp_width,
-    clearance = clearance
+    tube_diameter,
+    clearance,
+    wall_thickness,
+    clamp_width
 ) {
-    inner_r = clamp_inner_radius(tube_diameter, clearance);
-    outer_r = clamp_outer_radius(tube_diameter, clearance, wall_thickness);
+    inner_r = clamp_inner_radius(
+        tube_diameter,
+        clearance
+    );
+
+    outer_r = clamp_outer_radius(
+        tube_diameter,
+        clearance,
+        wall_thickness
+    );
 
     difference() {
-        cylinder(h = clamp_width, r = outer_r);
+        cylinder(
+            h = clamp_width,
+            r = outer_r
+        );
+
         translate([0, 0, -EPS])
-            cylinder(h = clamp_width + 2 * EPS, r = inner_r);
+            cylinder(
+                h = clamp_width + 2 * EPS,
+                r = inner_r
+            );
     }
 }
 
@@ -49,10 +64,13 @@ module opening_cutter(
     );
 
     cutter_length = outer_r + 10;
-    cutter_half_width = cutter_length * tan(opening_angle / 2);
+    cutter_half_width =
+        cutter_length * tan(opening_angle / 2);
 
     translate([0, 0, -EPS])
-        linear_extrude(height = clamp_width + 2 * EPS)
+        linear_extrude(
+            height = clamp_width + 2 * EPS
+        )
             polygon(points = [
                 [0, 0],
                 [cutter_length, -cutter_half_width],
@@ -61,27 +79,35 @@ module opening_cutter(
 }
 
 module tube_clamp(
-    tube_diameter = tube_diameter,
-    wall_thickness = wall_thickness,
-    clamp_width = clamp_width,
-    opening_angle = opening_angle,
-    clearance = clearance
+    tube_diameter,
+    clearance,
+    wall_thickness,
+    clamp_width,
+    opening_angle
 ) {
     assert(tube_diameter > 0, "tube_diameter must be > 0");
+    assert(clearance >= 0, "clearance must be >= 0");
     assert(wall_thickness > 0, "wall_thickness must be > 0");
     assert(clamp_width > 0, "clamp_width must be > 0");
-    assert(opening_angle > 0 && opening_angle < 180,
-        "opening_angle must be between 0 and 180 degrees");
-    assert(clearance >= 0, "clearance must be >= 0");
+    assert(
+        opening_angle > 0 && opening_angle < 180,
+        "opening_angle must be between 0 and 180 degrees"
+    );
 
     difference() {
-        full_ring(tube_diameter, wall_thickness, clamp_width, clearance);
+        full_ring(
+            tube_diameter,
+            clearance,
+            wall_thickness,
+            clamp_width
+        );
+
         opening_cutter(
             tube_diameter,
+            clearance,
             wall_thickness,
             clamp_width,
-            opening_angle,
-            clearance
+            opening_angle
         );
     }
 }

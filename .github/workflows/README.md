@@ -42,3 +42,9 @@ git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
 This is scoped to the ephemeral CI container and prevents Git's dubious
 ownership protection from rejecting the mounted checkout.
+
+## Render error handling
+
+OpenSCAD can emit `ERROR:` messages while still returning exit code `0`.
+The design render script therefore checks both the process exit code and the
+captured render log. Any `ERROR:` line causes the workflow to fail.
