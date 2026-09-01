@@ -16,8 +16,8 @@ $fn = 120;
 
 EPS = 0.05;
 
-function clamp_inner_radius() = (tube_diameter + clearance) / 2;
-function clamp_outer_radius() = clamp_inner_radius() + wall_thickness;
+function clamp_inner_radius(tube_diameter, clearance) = (tube_diameter + clearance) / 2;
+function clamp_outer_radius(tube_diameter, clearance, wall_thickness) = clamp_inner_radius(tube_diameter, clearance) + wall_thickness;
 
 module full_ring(
     tube_diameter = tube_diameter,
@@ -83,13 +83,16 @@ module tube_clamp(
 
 module render_design_view() {
     if (design_view == "01-ring") {
-    full_ring();
-} else if (design_view == "02-opening") {
-    color("lightgray")
         full_ring();
+    } else if (design_view == "02-opening") {
+        color("lightgray")
+            full_ring();
 
-    color([1, 0.25, 0.15, 0.55])
-        opening_cutter();
-} else {
-    tube_clamp();
+        color([1, 0.25, 0.15, 0.55])
+            opening_cutter();
+    } else {
+        tube_clamp();
+    }
 }
+
+render_design_view();
