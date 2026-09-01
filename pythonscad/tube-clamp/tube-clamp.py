@@ -4,7 +4,9 @@ PythonSCAD implementation of the same open tube-clamp design as the
 OpenSCAD reference implementation.
 """
 
+import os
 from math import cos, pi, sin
+
 from pythonscad import *
 
 TUBE_DIAMETER = 20
@@ -35,7 +37,12 @@ def full_ring(
     outer_radius = inner_radius + wall_thickness
 
     outer = cylinder(h=clamp_width, r=outer_radius, fn=120)
-    inner = cylinder(h=clamp_width + 0.1, r=inner_radius, fn=120).translate([0, 0, -0.05])
+    inner = cylinder(
+        h=clamp_width + 0.1,
+        r=inner_radius,
+        fn=120,
+    ).translate([0, 0, -0.05])
+
     return outer - inner
 
 
@@ -48,8 +55,14 @@ def opening_cutter(
 ):
     inner_radius = (tube_diameter + clearance) / 2
     outer_radius = inner_radius + wall_thickness
-    points = _sector_points(outer_radius + 2 * wall_thickness + 1, opening_angle)
-    return polygon(points).linear_extrude(height=clamp_width + 0.1).translate([0, 0, -0.05])
+    points = _sector_points(
+        outer_radius + 2 * wall_thickness + 1,
+        opening_angle,
+    )
+
+    return polygon(points).linear_extrude(
+        height=clamp_width + 0.1
+    ).translate([0, 0, -0.05])
 
 
 def tube_clamp(
@@ -70,7 +83,12 @@ def tube_clamp(
     if clearance < 0:
         raise ValueError("clearance must be >= 0")
 
-    return full_ring(tube_diameter, wall_thickness, clamp_width, clearance) - opening_cutter(
+    return full_ring(
+        tube_diameter,
+        wall_thickness,
+        clamp_width,
+        clearance,
+    ) - opening_cutter(
         tube_diameter,
         wall_thickness,
         clamp_width,
@@ -79,4 +97,16 @@ def tube_clamp(
     )
 
 
-show(tube_clamp())
+def design_object(view):
+    """Return the geometry used for a generated design-document view."""
+    if view == "01-ring":
+        return full_ring()
+    if view == "02-opening":
+        return opening_cutter()
+    if view in ("final", "03-final"):
+        return tube_clamp()
+
+    raise ValueError(f"Unknown DESIGN_VIEW: {view}")
+
+
+show(design_object(os.environ.get("DESIGN_VIEW", "final")))

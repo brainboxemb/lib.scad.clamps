@@ -2,9 +2,12 @@
 
 ## Purpose
 
-This is the PythonSCAD implementation of the same reusable open tube-clamp design as the OpenSCAD implementation.
+This is the PythonSCAD implementation of the same reusable open tube-clamp
+design as the OpenSCAD implementation.
 
-The geometry and public parameters are intentionally kept equivalent so that the two implementation approaches can be compared without changing the intended part.
+The geometry and public parameters are intentionally kept equivalent so that
+the two implementation approaches can be compared without changing the
+intended part.
 
 ## Functional parameters
 
@@ -20,23 +23,39 @@ The geometry and public parameters are intentionally kept equivalent so that the
 
 PythonSCAD treats the solids as Python objects:
 
-1. create the outer cylinder;
-2. subtract the inner cylinder to obtain the full ring;
-3. generate the opening sector points in Python;
+1. create the outer and inner cylinder;
+2. subtract them to obtain the full ring;
+3. generate the opening-sector points in Python;
 4. extrude that sector into a cutter;
 5. subtract the cutter from the ring.
 
-This mirrors the geometric construction of the OpenSCAD implementation while allowing the implementation style itself to be compared.
+### 1. Full ring
 
-## Images
+![Full ring](img/01-ring.png)
 
-Generated PythonSCAD design images belong in `design/img/`.
+### 2. Opening cutter
 
-The first repository version does not yet automate PythonSCAD PNG generation. That is intentionally separated from the OpenSCAD rendering workflow until the PythonSCAD command-line installation and invocation used in CI has been fixed and verified.
+![Opening cutter](img/02-opening.png)
+
+### 3. Final clamp
+
+![Final clamp](img/03-final.png)
+
+The images above are generated from `tube-clamp.py` by the design workflow.
+`DESIGN_VIEW` selects the geometry shown during a documentation render.
+
+## Generated design files
+
+Files under `design/img/` are generated files, but they intentionally remain in
+the normal Git repository because they are part of the design documentation.
+
+The GitHub workflow regenerates them using the pinned SCAD toolchain container
+and commits them only when their contents changed.
 
 ## Verification target
 
-The OpenSCAD and PythonSCAD implementations should ultimately be checked for equivalent:
+The OpenSCAD and PythonSCAD implementations should ultimately be checked for
+equivalent:
 
 - nominal bounding box;
 - inner tube diameter;

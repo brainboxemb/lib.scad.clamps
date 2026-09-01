@@ -1,30 +1,87 @@
-name: DSG - OpenSCAD design images
+name: DSG - Update design images
 
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
-      - "openscad/**"
-      - "scripts/render-openscad-design.sh"
+      - "openscad/**/*.scad"
+      - "pythonscad/**/*.py"
+      - "openscad/**/design/*.md"
+      - "pythonscad/**/design/*.md"
+      - "scripts/render-design-images.sh"
       - ".github/workflows/dsg-openscad.yml"
+
+permissions:
+  contents: write
+  packages: read
+
+concurrency:
+  group: dsg-update-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   render-design-images:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+
+    container:
+      image: ghcr.io/brainboxemb/scad-toolchain:v0.1.1
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Install OpenSCAD
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y openscad xvfb
-
-      - name: Render OpenSCAD design images
-        run: xvfb-run -a bash ./scripts/render-openscad-design.sh
-
-      - name: Upload generated design images
-        uses: actions/upload-artifact@v4
         with:
-          name: dsg-openscad-tube-clamp
-          path: openscad/tube-clamp/design/img/*.png
+          fetch-depth: 0
+
+      - name: Show toolchain
+        run: scad-toolchain-info
+
+      - name: Render design images
+        run: bash ./scripts/render-design-images.sh
+
+      - name: Show generated changes
+        run: |
+          git status --short -- \
+            openscad/tube-clamp/design/img \
+            pythonscad/tube-clamp/design/img
+
+      - name: Commit changed design images
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          IMAGE_PATHS=(
+            "openscad/tube-clamp/design/img"
+            "pythonscad/tube-clamp/design/img"
+          )
+
+          if git diff --quiet -- "${IMAGE_PATHS[@]}" && \
+             [[ -z "$(git ls-files --others --exclude-standard -- "${IMAGE_PATHS[@]}")" ]]; then
+            echo "Design images are already up to date."
+            exit 0
+          fi
+
+          # Do not overwrite results based on an obsolete main commit.
+          git fetch origin main
+          if [[ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]]; then
+            echo "main changed while design images were rendering; refusing to commit stale output."
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -- "${IMAGE_PATHS[@]}"
+
+          if git diff --cached --quiet; then
+            echo "No staged design image changes."
+            exit 0
+          fi
+
+          git commit -m "Update generated design images"
+          git push origin HEAD:main
