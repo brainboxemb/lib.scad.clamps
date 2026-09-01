@@ -40,6 +40,9 @@ jobs:
       - name: Show toolchain
         run: scad-toolchain-info
 
+      - name: Configure Git safe directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: Render design images
         run: bash ./scripts/render-design-images.sh
 

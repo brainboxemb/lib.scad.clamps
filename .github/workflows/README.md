@@ -27,3 +27,18 @@ is not part of the path trigger.
 
 If `main` changes while rendering is in progress, the workflow refuses to push
 stale generated output.
+
+## Git ownership inside the container
+
+GitHub checks out the repository on the runner and mounts that workspace into
+the toolchain container. The checkout owner and the container user can differ.
+
+Before running Git commands, the workflow therefore marks the mounted workspace
+as a trusted Git directory:
+
+```bash
+git config --global --add safe.directory "$GITHUB_WORKSPACE"
+```
+
+This is scoped to the ephemeral CI container and prevents Git's dubious
+ownership protection from rejecting the mounted checkout.
