@@ -40,19 +40,19 @@ echo
 echo "== PythonSCAD design images =="
 
 DESIGN_VIEW="01-ring" \
-pythonscad "${common_args[@]}" \
+xvfb-run -a pythonscad "${common_args[@]}" \
   --trust-python \
   -o "$PYTHONSCAD_OUT/01-ring.png" \
   "$PYTHONSCAD_SOURCE"
 
 DESIGN_VIEW="02-opening" \
-pythonscad "${common_args[@]}" \
+xvfb-run -a pythonscad "${common_args[@]}" \
   --trust-python \
   -o "$PYTHONSCAD_OUT/02-opening.png" \
   "$PYTHONSCAD_SOURCE"
 
 DESIGN_VIEW="final" \
-pythonscad "${common_args[@]}" \
+xvfb-run -a pythonscad "${common_args[@]}" \
   --trust-python \
   -o "$PYTHONSCAD_OUT/03-final.png" \
   "$PYTHONSCAD_SOURCE"

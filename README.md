@@ -7,6 +7,12 @@ The repository is organized by implementation technology first. Each concrete
 clamp keeps its source, design documentation and generated design images
 together.
 
+## Project status
+
+Experimental library for developing and comparing reusable clamp designs in OpenSCAD and PythonSCAD. The current focus is the first `tube-clamp` implementation and the supporting design/render workflow.
+
+The model, code and documentation are being developed with the assistance of ChatGPT.
+
 ## Structure
 
 ```text

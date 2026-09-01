@@ -27,6 +27,9 @@ passing `design_view` through OpenSCAD's `-D` command-line option.
 The PythonSCAD implementation uses the `DESIGN_VIEW` environment variable to
 select the equivalent documentation view before PythonSCAD executes the model.
 
+PNG rendering is executed through `xvfb-run -a` because PythonSCAD needs an X
+server / OpenGL context for offscreen rendering in the headless CI container.
+
 ## Compatibility wrapper
 
 `render-openscad-design.sh` is retained as a compatibility wrapper and forwards
