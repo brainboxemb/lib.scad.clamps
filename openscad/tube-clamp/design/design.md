@@ -33,6 +33,18 @@ the public API.
 | `opening_angle` | 60° | Angular size of the open section. |
 | `EPS` | 0.05 mm | Small overlap used for robust boolean subtraction. |
 
+## Surface resolution
+
+OpenSCAD uses a normal global render setting:
+
+```scad
+$fn = 120;
+```
+
+The resolution is intentionally not part of the `tube_clamp(...)` API. A
+consumer can override `$fn` in its own OpenSCAD context when a different render
+quality is desired.
+
 ## Public geometry
 
 The final clamp is exposed through:
@@ -118,7 +130,8 @@ module _full_ring(
     difference() {
         cylinder(
             h = clamp_width,
-            r = outer_r
+            r = outer_r,
+            $fn = 120
         );
 
         translate([0, 0, -EPS])

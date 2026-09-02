@@ -245,3 +245,22 @@ import:
 ```python
 from tube_clamp import render_tube_clamp
 ```
+
+## Surface resolution
+
+Surface resolution is not part of the clamp API.
+
+OpenSCAD uses:
+
+```scad
+$fn = 120;
+```
+
+PythonSCAD uses the equivalent global special variable:
+
+```python
+fn = 120
+```
+
+This keeps both implementations aligned without passing render quality through
+the geometry API.

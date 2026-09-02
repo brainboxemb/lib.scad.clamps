@@ -32,6 +32,24 @@ Internal construction functions start with `_`.
 | `opening_angle` | 60° | Angular size of the open section. |
 | `EPS` | 0.05 mm | Small overlap used for robust boolean subtraction. |
 
+## Surface resolution
+
+PythonSCAD uses the global special variable:
+
+```python
+fn = 120
+```
+
+This is the PythonSCAD equivalent of OpenSCAD's:
+
+```scad
+$fn = 120;
+```
+
+The cylinder primitives therefore do not need an explicit `fn=` argument. The
+surface resolution remains a render/model setting rather than part of the
+public `tube_clamp(...)` API.
+
 ## Public geometry
 
 The public function builds the same two-part boolean construction as OpenSCAD:
@@ -119,12 +137,12 @@ def _full_ring(
         cylinder(
             h=clamp_width,
             r=outer_r,
-            fn=120,
+            global `fn` setting,
         )
         - cylinder(
             h=clamp_width + 2 * EPS,
             r=inner_r,
-            fn=120,
+            global `fn` setting,
         ).translate([0, 0, -EPS])
     )
 ```

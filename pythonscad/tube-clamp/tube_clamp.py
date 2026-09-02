@@ -2,12 +2,9 @@ from math import radians, tan
 
 from pythonscad import *
 
-__all__ = [
-    "tube_clamp",
-    "render_tube_clamp",
-]
 
 EPS = 0.05
+fn = 120
 
 
 # -----------------------------------------------------------------------------
@@ -134,12 +131,10 @@ def _full_ring(
         cylinder(
             h=clamp_width,
             r=outer_r,
-            fn=120,
         )
         - cylinder(
             h=clamp_width + 2 * EPS,
             r=inner_r,
-            fn=120,
         ).translate([0, 0, -EPS])
     )
 
