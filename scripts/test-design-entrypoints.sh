@@ -44,6 +44,7 @@ if [[ ! -s "$TMP_DIR/design-openscad.stl" ]]; then
 fi
 
 run_checked "PythonSCAD design final" \
+  env PYTHONPATH="$ROOT_DIR/pythonscad/tube-clamp${PYTHONPATH:+:$PYTHONPATH}" \
   xvfb-run -a pythonscad \
   --trust-python \
   --render \

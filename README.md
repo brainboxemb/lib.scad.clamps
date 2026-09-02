@@ -232,3 +232,16 @@ pythonscad/tube-clamp/
 
 These are the normal end-product previews for the module. The separate
 construction-step images remain under `design/img/`.
+
+## PythonSCAD design imports
+
+PythonSCAD does not provide `__file__` in the executed design script. The design
+entrypoint therefore contains no path-discovery code.
+
+The render/test scripts add the module directory to `PYTHONPATH` before
+starting PythonSCAD, after which `design/render.py` can use a normal public
+import:
+
+```python
+from tube_clamp import render_tube_clamp
+```
