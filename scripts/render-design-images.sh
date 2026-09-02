@@ -3,11 +3,10 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-OPENSCAD_SOURCE="$ROOT_DIR/openscad/tube-clamp/design/render.scad"
+OPENSCAD_SOURCE="$ROOT_DIR/openscad/tube-clamp/tube_clamp_render.scad"
 OPENSCAD_OUT="$ROOT_DIR/openscad/tube-clamp/design/img"
 
-PYTHONSCAD_SOURCE="$ROOT_DIR/pythonscad/tube-clamp/design/render.py"
-PYTHONSCAD_LIB="$ROOT_DIR/pythonscad/tube-clamp"
+PYTHONSCAD_SOURCE="$ROOT_DIR/pythonscad/tube-clamp/tube_clamp_render.py"
 PYTHONSCAD_OUT="$ROOT_DIR/pythonscad/tube-clamp/design/img"
 
 mkdir -p "$OPENSCAD_OUT" "$PYTHONSCAD_OUT"
@@ -73,7 +72,6 @@ echo
 echo "== PythonSCAD design images =="
 
 run_checked "PythonSCAD 01-ring" \
-  env PYTHONPATH="$PYTHONSCAD_LIB${PYTHONPATH:+:$PYTHONPATH}" \
   xvfb-run -a pythonscad "${common_args[@]}" \
   --trust-python \
   -D 'design_view="01-ring"' \
@@ -81,7 +79,6 @@ run_checked "PythonSCAD 01-ring" \
   "$PYTHONSCAD_SOURCE"
 
 run_checked "PythonSCAD 02-opening" \
-  env PYTHONPATH="$PYTHONSCAD_LIB${PYTHONPATH:+:$PYTHONPATH}" \
   xvfb-run -a pythonscad "${common_args[@]}" \
   --trust-python \
   -D 'design_view="02-opening"' \
@@ -89,7 +86,6 @@ run_checked "PythonSCAD 02-opening" \
   "$PYTHONSCAD_SOURCE"
 
 run_checked "PythonSCAD 03-final" \
-  env PYTHONPATH="$PYTHONSCAD_LIB${PYTHONPATH:+:$PYTHONPATH}" \
   xvfb-run -a pythonscad "${common_args[@]}" \
   --trust-python \
   -D 'design_view="final"' \

@@ -36,7 +36,7 @@ run_checked "OpenSCAD design final" \
   --render \
   -D 'design_view="final"' \
   -o "$TMP_DIR/design-openscad.stl" \
-  "$ROOT_DIR/openscad/tube-clamp/design/render.scad"
+  "$ROOT_DIR/openscad/tube-clamp/tube_clamp_render.scad"
 
 if [[ ! -s "$TMP_DIR/design-openscad.stl" ]]; then
   echo "ERROR: OpenSCAD design entrypoint produced no STL" >&2
@@ -44,13 +44,12 @@ if [[ ! -s "$TMP_DIR/design-openscad.stl" ]]; then
 fi
 
 run_checked "PythonSCAD design final" \
-  env PYTHONPATH="$ROOT_DIR/pythonscad/tube-clamp${PYTHONPATH:+:$PYTHONPATH}" \
   xvfb-run -a pythonscad \
   --trust-python \
   --render \
   -D 'design_view="final"' \
   -o "$TMP_DIR/design-pythonscad.stl" \
-  "$ROOT_DIR/pythonscad/tube-clamp/design/render.py"
+  "$ROOT_DIR/pythonscad/tube-clamp/tube_clamp_render.py"
 
 if [[ ! -s "$TMP_DIR/design-pythonscad.stl" ]]; then
   echo "ERROR: PythonSCAD design entrypoint produced no STL" >&2

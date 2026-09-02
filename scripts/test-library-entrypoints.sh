@@ -3,8 +3,8 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-OPENSCAD_OUT="$ROOT_DIR/openscad/tube-clamp/tube-clamp.png"
-PYTHONSCAD_OUT="$ROOT_DIR/pythonscad/tube-clamp/tube-clamp.png"
+OPENSCAD_OUT="$ROOT_DIR/openscad/tube-clamp/tube_clamp.png"
+PYTHONSCAD_OUT="$ROOT_DIR/pythonscad/tube-clamp/tube_clamp.png"
 
 mkdir -p \
   "$(dirname "$OPENSCAD_OUT")" \
@@ -49,7 +49,7 @@ run_checked "OpenSCAD tube-clamp" \
   --projection=o \
   --imgsize=1200,900 \
   -o "$OPENSCAD_OUT" \
-  "$ROOT_DIR/openscad/tube-clamp/tube-clamp.scad"
+  "$ROOT_DIR/openscad/tube-clamp/tube_clamp.scad"
 
 if [[ ! -s "$OPENSCAD_OUT" ]]; then
   echo "ERROR: OpenSCAD tube-clamp produced no verification PNG" >&2

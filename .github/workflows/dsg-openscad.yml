@@ -59,8 +59,8 @@ jobs:
           git status --short -- \
             openscad/tube-clamp/design/img \
             pythonscad/tube-clamp/design/img \
-            openscad/tube-clamp/tube-clamp.png \
-            pythonscad/tube-clamp/tube-clamp.png
+            openscad/tube-clamp/tube_clamp.png \
+            pythonscad/tube-clamp/tube_clamp.png
 
       - name: Commit changed design images
         if: github.ref == 'refs/heads/main'
@@ -71,8 +71,8 @@ jobs:
           IMAGE_PATHS=(
             "openscad/tube-clamp/design/img"
             "pythonscad/tube-clamp/design/img"
-            "openscad/tube-clamp/tube-clamp.png"
-            "pythonscad/tube-clamp/tube-clamp.png"
+            "openscad/tube-clamp/tube_clamp.png"
+            "pythonscad/tube-clamp/tube_clamp.png"
           )
 
           if git diff --quiet -- "${IMAGE_PATHS[@]}" && \

@@ -1,4 +1,4 @@
-use <../tube-clamp.scad>
+use <tube_clamp.scad>
 
 design_view = is_undef(design_view) ? "final" : design_view;
 

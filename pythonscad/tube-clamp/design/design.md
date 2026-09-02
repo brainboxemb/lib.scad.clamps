@@ -50,5 +50,5 @@ Opening the library file itself in PythonSCAD renders the default public view:
 show(render_tube_clamp())
 ```
 
-The separate `design/render.py` entrypoint is still used by the documentation
+The separate `design/tube_clamp_render.py` entrypoint is still used by the documentation
 workflow for selecting specific design views.

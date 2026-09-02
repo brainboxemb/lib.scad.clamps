@@ -14,7 +14,7 @@ Private construction modules/functions start with `_`.
 The design renderer calls only the public render API:
 
 ```scad
-use <../tube-clamp.scad>
+use <../tube_clamp.scad>
 
 render_tube_clamp(
     mode = design_view

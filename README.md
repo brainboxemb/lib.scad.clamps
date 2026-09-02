@@ -19,13 +19,13 @@ The model, code and documentation are being developed with the assistance of Cha
 lib.scad.clamps/
 ├── openscad/
 │   └── tube-clamp/
-│       ├── tube-clamp.scad
+│       ├── tube_clamp.scad
 │       └── design/
 │           ├── design.md
 │           └── img/
 ├── pythonscad/
 │   └── tube-clamp/
-│       ├── tube-clamp.py
+│       ├── tube_clamp.py
 │       └── design/
 │           ├── design.md
 │           └── img/
@@ -158,13 +158,13 @@ entrypoints only translate `design_view` into a public `render_tube_clamp(...)`
 call:
 
 ```text
-openscad/tube-clamp/design/render.scad
-pythonscad/tube-clamp/design/render.py
+openscad/tube-clamp/tube_clamp_tube_clamp_render.scad
+pythonscad/tube-clamp/tube_clamp_tube_clamp_render.py
 ```
 
-Opening `tube-clamp.scad` directly still shows a useful preview, and its
+Opening `tube_clamp.scad` directly still shows a useful preview, and its
 `design_view` value can be changed through the OpenSCAD Customizer. Projects
-using it as a library can use `use <tube-clamp.scad>` so the top-level preview
+using it as a library can use `use <tube_clamp.scad>` so the top-level preview
 is ignored.
 
 ## Implementation parity
@@ -212,7 +212,7 @@ implementations.
 
 The workflow tests both the standalone library file and the separate design
 render entrypoint. This is intentional: if PythonSCAD import behavior causes the
-library's top-level `show()` to interfere with `design/render.py`, the design
+library's top-level `show()` to interfere with `design/tube_clamp_render.py`, the design
 entrypoint test will expose that immediately.
 
 ## Module previews
@@ -222,12 +222,12 @@ to the library source itself:
 
 ```text
 openscad/tube-clamp/
-├── tube-clamp.scad
-└── tube-clamp.png
+├── tube_clamp.scad
+└── tube_clamp.png
 
 pythonscad/tube-clamp/
 ├── tube_clamp.py
-└── tube-clamp.png
+└── tube_clamp.png
 ```
 
 These are the normal end-product previews for the module. The separate
@@ -239,7 +239,7 @@ PythonSCAD does not provide `__file__` in the executed design script. The design
 entrypoint therefore contains no path-discovery code.
 
 The render/test scripts add the module directory to `PYTHONPATH` before
-starting PythonSCAD, after which `design/render.py` can use a normal public
+starting PythonSCAD, after which `design/tube_clamp_render.py` can use a normal public
 import:
 
 ```python
