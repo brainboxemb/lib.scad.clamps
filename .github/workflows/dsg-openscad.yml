@@ -11,6 +11,8 @@ on:
       - "openscad/**/design/*.md"
       - "pythonscad/**/design/*.md"
       - "scripts/render-design-images.sh"
+      - "scripts/test-library-entrypoints.sh"
+      - "scripts/test-design-entrypoints.sh"
       - ".github/workflows/dsg-openscad.yml"
 
 permissions:
@@ -43,6 +45,12 @@ jobs:
       - name: Configure Git safe directory
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
+      - name: Test standalone library entrypoints
+        run: bash ./scripts/test-library-entrypoints.sh
+
+      - name: Test design render entrypoints
+        run: bash ./scripts/test-design-entrypoints.sh
+
       - name: Render design images
         run: bash ./scripts/render-design-images.sh
 
@@ -50,7 +58,9 @@ jobs:
         run: |
           git status --short -- \
             openscad/tube-clamp/design/img \
-            pythonscad/tube-clamp/design/img
+            pythonscad/tube-clamp/design/img \
+            openscad/tube-clamp/tube-clamp.png \
+            pythonscad/tube-clamp/tube-clamp.png
 
       - name: Commit changed design images
         if: github.ref == 'refs/heads/main'
@@ -61,6 +71,8 @@ jobs:
           IMAGE_PATHS=(
             "openscad/tube-clamp/design/img"
             "pythonscad/tube-clamp/design/img"
+            "openscad/tube-clamp/tube-clamp.png"
+            "pythonscad/tube-clamp/tube-clamp.png"
           )
 
           if git diff --quiet -- "${IMAGE_PATHS[@]}" && \

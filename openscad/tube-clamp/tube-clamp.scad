@@ -1,36 +1,134 @@
-// lib.scad.clamps - tube-clamp
-// OpenSCAD implementation
-
-/* [Tube clamp] */
-tube_diameter = 20;      // [4:0.5:100]
-wall_thickness = 3;      // [1:0.25:10]
-clamp_width = 16;        // [2:1:60]
-opening_angle = 60;      // [10:1:140]
-clearance = 0.0;         // [0:0.05:2]
-
-/* [Design view] */
-design_view = "final";  // [final,01-ring,02-opening]
-
-/* [Quality] */
 $fn = 120;
-
 EPS = 0.05;
 
-function clamp_inner_radius(tube_diameter, clearance) = (tube_diameter + clearance) / 2;
-function clamp_outer_radius(tube_diameter, clearance, wall_thickness) = clamp_inner_radius(tube_diameter, clearance) + wall_thickness;
+/* [View] */
+design_view = "final"; // [final,01-ring,02-opening]
 
-module full_ring(
+/* [Clamp] */
+tube_diameter = 20;
+clearance = 0.0;
+wall_thickness = 3;
+clamp_width = 16;
+opening_angle = 60;
+
+
+// -----------------------------------------------------------------------------
+// Public API
+// -----------------------------------------------------------------------------
+
+module tube_clamp(
+    tube_diameter,
+    clearance,
+    wall_thickness,
+    clamp_width,
+    opening_angle
+) {
+    assert(tube_diameter > 0, "tube_diameter must be > 0");
+    assert(clearance >= 0, "clearance must be >= 0");
+    assert(wall_thickness > 0, "wall_thickness must be > 0");
+    assert(clamp_width > 0, "clamp_width must be > 0");
+    assert(
+        opening_angle > 0 && opening_angle < 180,
+        "opening_angle must be between 0 and 180 degrees"
+    );
+
+    difference() {
+        _full_ring(
+            tube_diameter,
+            clearance,
+            wall_thickness,
+            clamp_width
+        );
+
+        _opening_cutter(
+            tube_diameter,
+            clearance,
+            wall_thickness,
+            clamp_width,
+            opening_angle
+        );
+    }
+}
+
+
+module render_tube_clamp(
+    mode = "final",
+    tube_diameter = 20,
+    clearance = 0.0,
+    wall_thickness = 3,
+    clamp_width = 16,
+    opening_angle = 60
+) {
+    if (mode == "01-ring") {
+        _full_ring(
+            tube_diameter,
+            clearance,
+            wall_thickness,
+            clamp_width
+        );
+    } else if (mode == "02-opening") {
+        color("lightgray")
+            _full_ring(
+                tube_diameter,
+                clearance,
+                wall_thickness,
+                clamp_width
+            );
+
+        color([1, 0.25, 0.15, 0.55])
+            _opening_cutter(
+                tube_diameter,
+                clearance,
+                wall_thickness,
+                clamp_width,
+                opening_angle
+            );
+    } else {
+        tube_clamp(
+            tube_diameter,
+            clearance,
+            wall_thickness,
+            clamp_width,
+            opening_angle
+        );
+    }
+}
+
+
+// -----------------------------------------------------------------------------
+// Private implementation
+// -----------------------------------------------------------------------------
+
+function _clamp_inner_radius(
+    tube_diameter,
+    clearance
+) =
+    (tube_diameter + clearance) / 2;
+
+
+function _clamp_outer_radius(
+    tube_diameter,
+    clearance,
+    wall_thickness
+) =
+    _clamp_inner_radius(
+        tube_diameter,
+        clearance
+    ) + wall_thickness;
+
+
+module _full_ring(
     tube_diameter,
     clearance,
     wall_thickness,
     clamp_width
 ) {
-    inner_r = clamp_inner_radius(
+    inner_r = _clamp_inner_radius(
         tube_diameter,
         clearance
     );
 
-    outer_r = clamp_outer_radius(
+    outer_r = _clamp_outer_radius(
         tube_diameter,
         clearance,
         wall_thickness
@@ -50,14 +148,15 @@ module full_ring(
     }
 }
 
-module opening_cutter(
+
+module _opening_cutter(
     tube_diameter,
     clearance,
     wall_thickness,
     clamp_width,
     opening_angle
 ) {
-    outer_r = clamp_outer_radius(
+    outer_r = _clamp_outer_radius(
         tube_diameter,
         clearance,
         wall_thickness
@@ -78,74 +177,16 @@ module opening_cutter(
             ]);
 }
 
-module tube_clamp(
-    tube_diameter,
-    clearance,
-    wall_thickness,
-    clamp_width,
-    opening_angle
-) {
-    assert(tube_diameter > 0, "tube_diameter must be > 0");
-    assert(clearance >= 0, "clearance must be >= 0");
-    assert(wall_thickness > 0, "wall_thickness must be > 0");
-    assert(clamp_width > 0, "clamp_width must be > 0");
-    assert(
-        opening_angle > 0 && opening_angle < 180,
-        "opening_angle must be between 0 and 180 degrees"
-    );
 
-    difference() {
-        full_ring(
-            tube_diameter,
-            clearance,
-            wall_thickness,
-            clamp_width
-        );
+// -----------------------------------------------------------------------------
+// Direct-open preview
+// -----------------------------------------------------------------------------
 
-        opening_cutter(
-            tube_diameter,
-            clearance,
-            wall_thickness,
-            clamp_width,
-            opening_angle
-        );
-    }
-}
-
-module render_design_view() {
-    if (design_view == "01-ring") {
-        full_ring(
-            tube_diameter,
-            clearance,
-            wall_thickness,
-            clamp_width
-        );
-    } else if (design_view == "02-opening") {
-        color("lightgray")
-            full_ring(
-                tube_diameter,
-                clearance,
-                wall_thickness,
-                clamp_width
-            );
-
-        color([1, 0.25, 0.15, 0.55])
-            opening_cutter(
-                tube_diameter,
-                clearance,
-                wall_thickness,
-                clamp_width,
-                opening_angle
-            );
-    } else {
-        tube_clamp(
-            tube_diameter,
-            clearance,
-            wall_thickness,
-            clamp_width,
-            opening_angle
-        );
-    }
-}
-
-render_design_view();
+render_tube_clamp(
+    mode = design_view,
+    tube_diameter = tube_diameter,
+    clearance = clearance,
+    wall_thickness = wall_thickness,
+    clamp_width = clamp_width,
+    opening_angle = opening_angle
+);

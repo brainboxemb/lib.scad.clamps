@@ -1,91 +1,54 @@
 # Tube clamp — PythonSCAD design
 
-## Purpose
+## API
 
-PythonSCAD implementation of the same tube clamp geometry as the OpenSCAD
-version.
-
-## Parameters
-
-The model parameters are regular Python variables:
+The library exposes:
 
 ```python
-tube_diameter = 20
-clearance = 0.0
-wall_thickness = 3
-clamp_width = 16
-opening_angle = 60
+tube_clamp(...)
+render_tube_clamp(mode="final", ...)
 ```
 
-PythonSCAD makes values supplied with `-D name=value` available as Python
-globals before the script executes.
+Private construction functions start with `_`.
 
-The design view therefore uses the injected value when present and falls back
-to `final` when the file is opened without a command-line define:
+The design renderer imports only the public render API:
 
 ```python
-design_view = globals().get("design_view", "final")
+from tube_clamp import render_tube_clamp
+
+show(
+    render_tube_clamp(
+        mode=design_view,
+    )
+)
 ```
 
 ## 1. Ring
 
-The base shape is an outer cylinder minus an inner cylinder.
-
-```python
-return (
-    cylinder(h=clamp_width, r=outer_r, fn=120)
-    - cylinder(
-        h=clamp_width + 2 * EPS,
-        r=inner_r,
-        fn=120,
-    ).translate([0, 0, -EPS])
-)
-```
+`render_tube_clamp(mode="01-ring")`
 
 ![Full ring](img/01-ring.png)
 
 ## 2. Opening
 
-The cutter is the same simple triangle used by the OpenSCAD implementation.
-
-```python
-cutter_length = outer_r + 10
-cutter_half_width = cutter_length * tan(
-    radians(opening_angle / 2)
-)
-
-points = [
-    [0, 0],
-    [cutter_length, -cutter_half_width],
-    [cutter_length,  cutter_half_width],
-]
-```
-
-The triangle is extruded through the clamp width. The design view shows the
-ring and cutter together.
+`render_tube_clamp(mode="02-opening")`
 
 ![Ring with opening cutter](img/02-opening.png)
 
 ## 3. Final clamp
 
-The final clamp subtracts the triangular cutter from the ring.
-
-```python
-return full_ring(...) - opening_cutter(...)
-```
+`render_tube_clamp(mode="final")`
 
 ![Final clamp](img/03-final.png)
 
-## Design views
 
-The render workflow selects the same design view with the same `-D` pattern
-used by OpenSCAD:
+## Standalone preview
 
-```bash
-pythonscad --trust-python \
-  -D 'design_view="02-opening"' \
-  tube-clamp.py
+Opening the library file itself in PythonSCAD renders the default public view:
+
+```python
+show(render_tube_clamp())
 ```
 
-PythonSCAD injects `design_view` into the Python globals before executing the
-script.
+The separate `design/render.py` entrypoint is still used by the documentation
+workflow for selecting specific design views.

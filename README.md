@@ -129,6 +129,44 @@ itself, not `design/img/*.png`.
 If `main` changes while a render is running, the workflow refuses to push stale
 generated output.
 
+## Library and design rendering
+
+Each implementation exposes two public operations:
+
+```text
+tube_clamp(...)
+render_tube_clamp(...)
+```
+
+`tube_clamp(...)` is the reusable geometry API.
+
+`render_tube_clamp(...)` is also part of the public API. It provides the
+standard construction/debug views while keeping the private geometry helpers
+private.
+
+Internal helpers use a leading underscore:
+
+```text
+_clamp_inner_radius(...)
+_clamp_outer_radius(...)
+_full_ring(...)
+_opening_cutter(...)
+```
+
+The design workflow does not call these private helpers directly. Its separate
+entrypoints only translate `design_view` into a public `render_tube_clamp(...)`
+call:
+
+```text
+openscad/tube-clamp/design/render.scad
+pythonscad/tube-clamp/design/render.py
+```
+
+Opening `tube-clamp.scad` directly still shows a useful preview, and its
+`design_view` value can be changed through the OpenSCAD Customizer. Projects
+using it as a library can use `use <tube-clamp.scad>` so the top-level preview
+is ignored.
+
 ## Implementation parity
 
 The OpenSCAD and PythonSCAD implementations use the same geometric construction
@@ -157,3 +195,40 @@ The purpose of maintaining both implementations is not to generate one
 language from the other. They implement the same intended geometry independently
 so OpenSCAD and PythonSCAD can be compared for readability, parametrization,
 development workflow and automated verification.
+
+## Standalone preview behavior
+
+Both implementations deliberately show a default clamp when their library file
+is opened directly.
+
+OpenSCAD uses a top-level `render_tube_clamp(...)` call. PythonSCAD uses:
+
+```python
+show(render_tube_clamp())
+```
+
+This keeps the direct-open behavior conceptually similar between the two
+implementations.
+
+The workflow tests both the standalone library file and the separate design
+render entrypoint. This is intentional: if PythonSCAD import behavior causes the
+library's top-level `show()` to interfere with `design/render.py`, the design
+entrypoint test will expose that immediately.
+
+## Module previews
+
+Each implementation also generates a standard preview of the final module next
+to the library source itself:
+
+```text
+openscad/tube-clamp/
+├── tube-clamp.scad
+└── tube-clamp.png
+
+pythonscad/tube-clamp/
+├── tube_clamp.py
+└── tube-clamp.png
+```
+
+These are the normal end-product previews for the module. The separate
+construction-step images remain under `design/img/`.

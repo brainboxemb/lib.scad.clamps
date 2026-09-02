@@ -1,11 +1,19 @@
 from math import radians, tan
+
 from pythonscad import *
 
-__all__ = ["tube_clamp", "render_tube_clamp"]
+__all__ = [
+    "tube_clamp",
+    "render_tube_clamp",
+]
 
 EPS = 0.05
 
+
+# -----------------------------------------------------------------------------
 # Public API
+# -----------------------------------------------------------------------------
+
 def tube_clamp(
     tube_diameter,
     clearance,
@@ -13,11 +21,13 @@ def tube_clamp(
     clamp_width,
     opening_angle,
 ):
-    assert tube_diameter > 0
-    assert clearance >= 0
-    assert wall_thickness > 0
-    assert clamp_width > 0
-    assert 0 < opening_angle < 180
+    assert tube_diameter > 0, "tube_diameter must be > 0"
+    assert clearance >= 0, "clearance must be >= 0"
+    assert wall_thickness > 0, "wall_thickness must be > 0"
+    assert clamp_width > 0, "clamp_width must be > 0"
+    assert 0 < opening_angle < 180, (
+        "opening_angle must be between 0 and 180 degrees"
+    )
 
     return (
         _full_ring(
@@ -78,13 +88,29 @@ def render_tube_clamp(
     )
 
 
+# -----------------------------------------------------------------------------
 # Private implementation
-def _clamp_inner_radius(tube_diameter, clearance):
+# -----------------------------------------------------------------------------
+
+def _clamp_inner_radius(
+    tube_diameter,
+    clearance,
+):
     return (tube_diameter + clearance) / 2
 
 
-def _clamp_outer_radius(tube_diameter, clearance, wall_thickness):
-    return _clamp_inner_radius(tube_diameter, clearance) + wall_thickness
+def _clamp_outer_radius(
+    tube_diameter,
+    clearance,
+    wall_thickness,
+):
+    return (
+        _clamp_inner_radius(
+            tube_diameter,
+            clearance,
+        )
+        + wall_thickness
+    )
 
 
 def _full_ring(
@@ -93,7 +119,11 @@ def _full_ring(
     wall_thickness,
     clamp_width,
 ):
-    inner_r = _clamp_inner_radius(tube_diameter, clearance)
+    inner_r = _clamp_inner_radius(
+        tube_diameter,
+        clearance,
+    )
+
     outer_r = _clamp_outer_radius(
         tube_diameter,
         clearance,
@@ -101,7 +131,11 @@ def _full_ring(
     )
 
     return (
-        cylinder(h=clamp_width, r=outer_r, fn=120)
+        cylinder(
+            h=clamp_width,
+            r=outer_r,
+            fn=120,
+        )
         - cylinder(
             h=clamp_width + 2 * EPS,
             r=inner_r,
@@ -138,8 +172,5 @@ def _opening_cutter(
         height=clamp_width + 2 * EPS
     ).translate([0, 0, -EPS])
 
-
-# Direct-open demo
-if __name__ == "__main__":
-    design_view = globals().get("design_view", "final")
-    show(render_tube_clamp(mode=design_view))
+# Standalone preview
+show(render_tube_clamp())

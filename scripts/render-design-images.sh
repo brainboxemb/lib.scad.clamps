@@ -3,10 +3,10 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-OPENSCAD_SOURCE="$ROOT_DIR/openscad/tube-clamp/tube-clamp.scad"
+OPENSCAD_SOURCE="$ROOT_DIR/openscad/tube-clamp/design/render.scad"
 OPENSCAD_OUT="$ROOT_DIR/openscad/tube-clamp/design/img"
 
-PYTHONSCAD_SOURCE="$ROOT_DIR/pythonscad/tube-clamp/tube-clamp.py"
+PYTHONSCAD_SOURCE="$ROOT_DIR/pythonscad/tube-clamp/design/render.py"
 PYTHONSCAD_OUT="$ROOT_DIR/pythonscad/tube-clamp/design/img"
 
 mkdir -p "$OPENSCAD_OUT" "$PYTHONSCAD_OUT"
