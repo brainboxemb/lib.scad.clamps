@@ -45,6 +45,16 @@ The resolution is intentionally not part of the `tube_clamp(...)` API. A
 consumer can override `$fn` in its own OpenSCAD context when a different render
 quality is desired.
 
+The render entrypoint also sets the same resolution in its own render context:
+
+```scad
+$fn = 120;
+```
+
+This is necessary because `use <tube_clamp.scad>` exposes modules and functions,
+but does not apply the library file's top-level `$fn` assignment to the render
+entrypoint.
+
 ## Public geometry
 
 The final clamp is exposed through:

@@ -264,3 +264,7 @@ fn = 120
 
 This keeps both implementations aligned without passing render quality through
 the geometry API.
+
+The standalone library files and the separate render entrypoints each set the
+same global resolution in their own execution context, so module previews and
+design-step renders use the same surface quality.

@@ -50,6 +50,15 @@ The cylinder primitives therefore do not need an explicit `fn=` argument. The
 surface resolution remains a render/model setting rather than part of the
 public `tube_clamp(...)` API.
 
+The render entrypoint also sets the same resolution in its own render context:
+
+```python
+fn = 120
+```
+
+This keeps the documentation renders at the same resolution as the standalone
+module preview.
+
 ## Public geometry
 
 The public function builds the same two-part boolean construction as OpenSCAD:
