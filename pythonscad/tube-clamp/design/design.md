@@ -17,18 +17,15 @@ clamp_width = 16
 opening_angle = 60
 ```
 
-Only the documentation view needs to be overridden by the render workflow, so
-`design_view` is exposed through `add_parameter()`:
+PythonSCAD makes values supplied with `-D name=value` available as Python
+globals before the script executes.
+
+The design view therefore uses the injected value when present and falls back
+to `final` when the file is opened without a command-line define:
 
 ```python
-design_view = add_parameter(
-    "design_view",
-    "final",
-    options=["final", "01-ring", "02-opening"],
-)
+design_view = globals().get("design_view", "final")
 ```
-
-The workflow can then select a view with `-D`.
 
 ## 1. Ring
 
@@ -81,8 +78,14 @@ return full_ring(...) - opening_cutter(...)
 
 ## Design views
 
-The render workflow uses the same `-D` mechanism as OpenSCAD:
+The render workflow selects the same design view with the same `-D` pattern
+used by OpenSCAD:
 
 ```bash
-pythonscad --trust-python   -D 'design_view="02-opening"'   tube-clamp.py
+pythonscad --trust-python \
+  -D 'design_view="02-opening"' \
+  tube-clamp.py
 ```
+
+PythonSCAD injects `design_view` into the Python globals before executing the
+script.

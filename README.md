@@ -144,7 +144,9 @@ Both versions:
 - build the opening from the same simple triangular cutter;
 - expose the same design views.
 
-PythonSCAD uses `add_parameter()` only for values that need to be overridden externally by the design workflow, currently `design_view`. That value can be selected with the same `-D name=value` mechanism used by OpenSCAD.
+PythonSCAD receives the workflow's `-D name=value` defines as Python
+globals before the script executes. The implementation reads `design_view`
+from `globals()` and provides `final` as the normal interactive fallback.
 
 The languages still use their natural constructs: OpenSCAD geometry is grouped
 in modules, while PythonSCAD geometry is returned from Python functions.

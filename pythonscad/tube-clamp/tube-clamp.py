@@ -13,11 +13,7 @@ wall_thickness = 3
 clamp_width = 16
 opening_angle = 60
 
-design_view = add_parameter(
-    "design_view",
-    "final",
-    options=["final", "01-ring", "02-opening"],
-)
+design_view = globals().get("design_view", "final")
 
 EPS = 0.05
 
