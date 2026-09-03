@@ -333,6 +333,15 @@ main          source, design documentation and tests
 verification generated functional verification evidence
 ```
 
+
+The verification suite covers three consumer paths:
+
+```text
+OpenSCAD    -> OpenSCAD library
+PythonSCAD  -> PythonSCAD library
+PythonSCAD  -> OpenSCAD library via osuse()
+```
+
 ## PythonSCAD module imports
 
 PythonSCAD uses normal Python module imports. Its official examples show adding
@@ -364,6 +373,5 @@ GitHub Actions runs.
 
 ## Development guide
 
-Repository-wide development and API conventions are documented in
-[`CHATGPT.md`](CHATGPT.md). This includes the OpenSCAD/PythonSCAD API model,
-naming conventions, design documentation rules and verification workflow.
+Repository architecture, workflow rules and persistent ChatGPT handoff
+context are documented in [`CHATGPT.md`](CHATGPT.md).

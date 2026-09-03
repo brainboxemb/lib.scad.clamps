@@ -9,7 +9,8 @@ test/
 ├── openscad/
 │   └── tube_clamp_api.scad
 └── pythonscad/
-    └── tube_clamp_api.py
+    ├── tube_clamp_api.py
+    └── tube_clamp_openscad_api.py
 ```
 
 Both files act as external consumers of the library. Each creates three clamps
@@ -57,3 +58,13 @@ sys.path.append("\\path\\to\\python\\site-packages-dir")
 
 In this repository the path is resolved relative to the repository root before
 `TubeClamp` is imported.
+
+
+## PythonSCAD -> OpenSCAD interoperability
+
+`tube_clamp_openscad_api.py` is a third consumer test. It runs under
+PythonSCAD, loads `openscad/tube-clamp/tube_clamp.scad` using `osuse()`, and
+then calls the OpenSCAD public API through the returned handle.
+
+This verifies that the OpenSCAD implementation is usable not only from
+OpenSCAD, but also as an OpenSCAD library consumed by PythonSCAD.
