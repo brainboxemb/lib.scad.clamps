@@ -12,7 +12,7 @@ rendering and calculations all use the same object.
 clamp = tube_clamp_create(...);
 
 tube_clamp_build(clamp);
-tube_clamp_render(clamp, mode = "02-opening");
+tube_clamp_render(clamp, view = VIEW_OPENING);
 
 inner_r = tube_clamp_inner_radius(clamp);
 outer_r = tube_clamp_outer_radius(clamp);
@@ -64,6 +64,40 @@ Internally `_opening_cutter(clamp)` is subtracted from `_full_ring(clamp)`.
 
 ![Final clamp](img/03-final.png)
 
+## View selection
+
+Render views use enum-style constants instead of string comparisons:
+
+```scad
+VIEW_FINAL = 0;
+VIEW_RING = 1;
+VIEW_OPENING = 2;
+
+VIEW_CONFIG = [
+    [VIEW_FINAL,   "Final clamp"],
+    [VIEW_RING,    "Full ring"],
+    [VIEW_OPENING, "Opening cutter"]
+];
+```
+
+The enum value is also the configuration-array index. The label helper checks
+that this contract remains valid:
+
+```scad
+function tube_clamp_view_label(view) =
+    assert(
+        VIEW_CONFIG[view][0] == view,
+        "VIEW_CONFIG index/value mismatch"
+    )
+    VIEW_CONFIG[view][1];
+```
+
+The Customizer uses the same numeric values:
+
+```scad
+design_view = 0; // [0:Final clamp, 1:Full ring, 2:Opening cutter]
+```
+
 ## Rendering
 
 Construction views use the same object:
@@ -71,7 +105,7 @@ Construction views use the same object:
 ```scad
 tube_clamp_render(
     clamp,
-    mode = "02-opening"
+    view = VIEW_OPENING
 );
 ```
 

@@ -290,10 +290,26 @@ Both implementations use one clamp object as the public data model:
 ```text
 tube_clamp_create(...)        -> create clamp object
 tube_clamp_build(clamp)             -> generate final geometry
-tube_clamp_render(clamp, ...) -> render a design/debug view
+tube_clamp_render(clamp, view=...) -> render a design/debug view
 tube_clamp_inner_radius(clamp)
 tube_clamp_outer_radius(clamp)
 ```
 
 This keeps future calculations and additional clamp parameters from expanding
 every helper function signature.
+
+
+### PythonSCAD API
+
+PythonSCAD uses a native class API rather than reproducing the OpenSCAD
+factory/functions literally:
+
+```python
+clamp = TubeClamp(...)
+clamp.build()
+clamp.render(view=VIEW_OPENING)
+clamp.inner_radius
+clamp.outer_radius
+```
+
+The constructor remains the complete parametric input surface for the model.

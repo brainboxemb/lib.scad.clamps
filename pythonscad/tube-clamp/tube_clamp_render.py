@@ -1,16 +1,15 @@
 from pythonscad import *
 
-from tube_clamp import tube_clamp_create, tube_clamp_render
+from tube_clamp import TubeClamp, VIEW_FINAL
 
 fn = 120
 
-design_view = globals().get("design_view", "final")
+design_view = globals().get("design_view", VIEW_FINAL)
 
-clamp = tube_clamp_create()
+clamp = TubeClamp()
 
 show(
-    tube_clamp_render(
-        clamp,
-        mode=design_view,
+    clamp.render(
+        view=design_view,
     )
 )

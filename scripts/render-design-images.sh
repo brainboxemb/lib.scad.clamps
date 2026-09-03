@@ -52,19 +52,19 @@ echo "== OpenSCAD design images =="
 
 run_checked "OpenSCAD 01-ring" \
   openscad --enable=object-function "${common_args[@]}" \
-  -D 'design_view="01-ring"' \
+  -D 'design_view=1' \
   -o "$OPENSCAD_OUT/01-ring.png" \
   "$OPENSCAD_SOURCE"
 
 run_checked "OpenSCAD 02-opening" \
   openscad --enable=object-function "${common_args[@]}" \
-  -D 'design_view="02-opening"' \
+  -D 'design_view=2' \
   -o "$OPENSCAD_OUT/02-opening.png" \
   "$OPENSCAD_SOURCE"
 
 run_checked "OpenSCAD 03-final" \
   openscad --enable=object-function "${common_args[@]}" \
-  -D 'design_view="final"' \
+  -D 'design_view=0' \
   -o "$OPENSCAD_OUT/03-final.png" \
   "$OPENSCAD_SOURCE"
 
@@ -74,21 +74,21 @@ echo "== PythonSCAD design images =="
 run_checked "PythonSCAD 01-ring" \
   xvfb-run -a pythonscad "${common_args[@]}" \
   --trust-python \
-  -D 'design_view="01-ring"' \
+  -D 'design_view=1' \
   -o "$PYTHONSCAD_OUT/01-ring.png" \
   "$PYTHONSCAD_SOURCE"
 
 run_checked "PythonSCAD 02-opening" \
   xvfb-run -a pythonscad "${common_args[@]}" \
   --trust-python \
-  -D 'design_view="02-opening"' \
+  -D 'design_view=2' \
   -o "$PYTHONSCAD_OUT/02-opening.png" \
   "$PYTHONSCAD_SOURCE"
 
 run_checked "PythonSCAD 03-final" \
   xvfb-run -a pythonscad "${common_args[@]}" \
   --trust-python \
-  -D 'design_view="final"' \
+  -D 'design_view=0' \
   -o "$PYTHONSCAD_OUT/03-final.png" \
   "$PYTHONSCAD_SOURCE"
 

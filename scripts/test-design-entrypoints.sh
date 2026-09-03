@@ -34,7 +34,7 @@ echo "== Design render entrypoints =="
 run_checked "OpenSCAD design final" \
   openscad --enable=object-function \
   --render \
-  -D 'design_view="final"' \
+  -D 'design_view=0' \
   -o "$TMP_DIR/design-openscad.stl" \
   "$ROOT_DIR/openscad/tube-clamp/tube_clamp_render.scad"
 
@@ -47,7 +47,7 @@ run_checked "PythonSCAD design final" \
   xvfb-run -a pythonscad \
   --trust-python \
   --render \
-  -D 'design_view="final"' \
+  -D 'design_view=0' \
   -o "$TMP_DIR/design-pythonscad.stl" \
   "$ROOT_DIR/pythonscad/tube-clamp/tube_clamp_render.py"
 

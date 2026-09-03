@@ -2,8 +2,25 @@ $fn = 120;
 
 EPS = 0.05;
 
+VIEW_FINAL = 0;
+VIEW_RING = 1;
+VIEW_OPENING = 2;
+
+VIEW_CONFIG = [
+    [VIEW_FINAL,   "Final clamp"],
+    [VIEW_RING,    "Full ring"],
+    [VIEW_OPENING, "Opening cutter"]
+];
+
+function tube_clamp_view_label(view) =
+    assert(
+        VIEW_CONFIG[view][0] == view,
+        "VIEW_CONFIG index/value mismatch"
+    )
+    VIEW_CONFIG[view][1];
+
 /* [View] */
-design_view = "final"; // [final,01-ring,02-opening]
+design_view = 0; // [0:Final clamp, 1:Full ring, 2:Opening cutter]
 
 /* [Tube clamp] */
 tube_diameter = 20;
@@ -49,10 +66,10 @@ module tube_clamp_build(clamp) {
     }
 }
 
-module tube_clamp_render(clamp, mode = "final") {
-    if (mode == "01-ring") {
+module tube_clamp_render(clamp, view = VIEW_FINAL) {
+    if (view == VIEW_RING) {
         _full_ring(clamp);
-    } else if (mode == "02-opening") {
+    } else if (view == VIEW_OPENING) {
         _full_ring(clamp);
         color([1, 0, 0, 0.35])
             _opening_cutter(clamp);
@@ -99,4 +116,4 @@ clamp = tube_clamp_create(
     opening_angle = opening_angle
 );
 
-tube_clamp_render(clamp, mode = design_view);
+tube_clamp_render(clamp, view = design_view);
