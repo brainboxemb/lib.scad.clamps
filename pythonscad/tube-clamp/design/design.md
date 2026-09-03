@@ -1,33 +1,39 @@
 # Tube clamp — PythonSCAD design
 
-## Purpose
+## Design idea
 
-The PythonSCAD implementation remains as the parallel comparison implementation
-for this existing library.
+This PythonSCAD implementation is retained as the comparison implementation of
+the same `tube-clamp` design.
 
-The geometry now follows the same next design step as OpenSCAD: the C-shaped
-clip gets a flat mounting foot and a simple sloped transition. No screw holes
-or mounting-head variants are added yet.
+The geometry follows the same visual construction sequence as the OpenSCAD
+version:
 
-## Constructor
+1. complete tube ring;
+2. triangular snap-opening cutter;
+3. C-shaped clip body;
+4. flat mounting foot;
+5. sloped transition from foot to round clip;
+6. complete clamp;
+7. profile view.
+
+No screw holes or other mounting variants are part of this step yet.
+
+## Mounting parameters
 
 ```python
-clamp = TubeClamp(
-    tube_diameter=20,
-    clearance=0.0,
-    wall_thickness=3,
-    clamp_width=16,
-    opening_angle=60,
-    foot_length=40,
-    foot_thickness=4,
-    foot_transition_width=30,
-    foot_transition_height=8,
-)
+foot_length: float = 40
+foot_thickness: float = 4
+foot_transition_width: float = 30
+foot_transition_height: float = 8
 ```
 
-## 1. Full ring
+- `foot_length` controls the total length of the flat mounting surface;
+- `foot_thickness` controls how thick that flat foot is;
+- `foot_transition_width` controls how wide the transition starts on the foot;
+- `foot_transition_height` controls how far the transition reaches toward the
+  round clip.
 
-Derived tube dimensions remain normal class properties:
+## 1. Full ring
 
 ```python
 @property
@@ -35,24 +41,12 @@ def inner_radius(self):
     return (self.tube_diameter + self.clearance) / 2
 ```
 
-The ring is moved in front of the mounting foot while keeping a small physical
-overlap:
-
-```python
-@property
-def _center_x(self):
-    return (
-        self.foot_thickness
-        + self.outer_radius
-        - FOOT_OVERLAP
-    )
-```
-
 ![Full ring](img/01-ring.png)
 
 ## 2. Opening cutter
 
-The same triangular opening construction is retained:
+The construction view keeps the ring light gray and shows the triangular cutter
+in transparent red.
 
 ```python
 cutter_half_width = cutter_length * tan(
@@ -60,14 +54,9 @@ cutter_half_width = cutter_length * tan(
 )
 ```
 
-The construction view shows the complete ring in light gray and the cutter in
-transparent red.
-
-![Ring with opening cutter](img/02-opening.png)
+![Opening cutter](img/02-opening.png)
 
 ## 3. Clip body
-
-The original C-shaped geometry remains available as a separate design view:
 
 ```python
 def _clip_body(self):
@@ -81,8 +70,27 @@ def _clip_body(self):
 
 ## 4. Flat mounting foot
 
-The foot is a rectangular mounting body plus an extruded trapezoidal
-transition:
+The foot is shown separately before any transition is added.
+
+```python
+def _flat_foot(self):
+    return cube([
+        self.foot_thickness,
+        self.foot_length,
+        self.clamp_width,
+    ]).translate([
+        0,
+        -self.foot_length / 2,
+        0,
+    ])
+```
+
+![Flat mounting foot](img/04-foot.png)
+
+## 5. Sloped transition
+
+The existing clip and foot are gray while the newly added transition supports
+are transparent red.
 
 ```python
 points = [
@@ -93,8 +101,12 @@ points = [
 ]
 ```
 
-The final model first unions the outer ring and mounting foot. The bore and
-opening are then cut from the complete body:
+The tube bore is subtracted from the transition so it becomes two side supports
+instead of a solid block.
+
+![Sloped transition](img/05-transition.png)
+
+## 6. Complete clamp
 
 ```python
 outer_body = (
@@ -109,12 +121,17 @@ return (
 )
 ```
 
-This leaves the tube path open while turning the transition into two sloped
-side supports.
+![Complete clamp](img/06-final.png)
 
-![Final clamp with flat foot](img/04-final.png)
+## 7. Profile view
 
-## View selection
+The render workflow looks directly along the clamp width. This makes the
+foot thickness and transition geometry easier to understand than an isometric
+view alone.
+
+![Side/profile view](img/07-side-view.png)
+
+## Views
 
 ```python
 class View(StrEnum):
@@ -122,7 +139,11 @@ class View(StrEnum):
     RING = "Full ring"
     OPENING = "Opening cutter"
     CLIP_BODY = "Clip body"
+    FOOT = "Mounting foot"
+    TRANSITION = "Foot transition"
+    SIDE = "Side view"
 ```
 
-The languages keep equivalent design stages while using their own natural API
-style.
+OpenSCAD remains the primary implementation direction for future reusable
+libraries. This PythonSCAD version is maintained as the existing technology
+comparison.

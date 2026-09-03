@@ -1,45 +1,70 @@
 # Tube clamp — OpenSCAD design
 
-## Purpose
+## Design idea
 
-The clamp is evolving from a bare C-shaped ring into a reusable mounting clip.
+The tube clamp is built up in a few visually separate steps.
 
-The first mounting feature is deliberately simple: a flat foot behind the clip
-with a solid transition toward the circular body. The tube bore is then cut
-through that transition, leaving two sloped side supports.
+The starting point is a C-shaped snap clip around the tube. A flat mounting
+foot is then placed behind that clip. The foot provides the surface that can
+later be attached to another part.
 
-No screw holes or mounting-head details are part of this step yet.
+A direct 90-degree connection between the flat foot and the round clip would
+look abrupt and would concentrate material in a small area. Therefore two
+sloped side transitions connect the foot to the round outside of the clip.
 
-## API shape
+At this stage the mounting foot is deliberately simple. There are no screw
+holes, countersinks, nut traps or mounting variants yet.
 
-```scad
-clamp = tube_clamp_create(...);
+The intended profile is roughly:
 
-tube_clamp_build(clamp);
-tube_clamp_render(clamp, view = TUBE_CLAMP_VIEW_OPENING);
-
-inner_r = tube_clamp_inner_radius(clamp);
-outer_r = tube_clamp_outer_radius(clamp);
+```text
+             opening
+                >
+        .----------------.
+      .'                  '.
+     /        tube          \
+    |          ○             |
+     \                      /
+      '.__              __.'
+          \            /
+           \          /       sloped transitions
+            |        |
+            |        |        flat mounting foot
+            |________|
 ```
 
-The mounting geometry is part of the same clamp object:
+The following renders show those construction steps separately.
+
+## Parameters introduced by the mounting foot
+
+The clamp itself keeps its existing tube parameters. Four parameters now
+describe the basic mounting geometry:
 
 ```scad
-clamp = tube_clamp_create(
-    tube_diameter = 20,
-    wall_thickness = 3,
-    clamp_width = 16,
-    opening_angle = 60,
-    foot_length = 40,
-    foot_thickness = 4,
-    foot_transition_width = 30,
-    foot_transition_height = 8
-);
+foot_length = 40;
+foot_thickness = 4;
+foot_transition_width = 30;
+foot_transition_height = 8;
 ```
 
-## 1. Full ring
+Their meaning is:
 
-Radius calculations remain independent of the mounting foot:
+- `foot_length` — total length of the flat mounting surface, measured along
+  the tube circumference direction;
+- `foot_thickness` — distance from the mounting surface to the front face of
+  the flat foot;
+- `foot_transition_width` — width of the area on the foot from which the two
+  sloped transitions start;
+- `foot_transition_height` — how far those transitions extend from the flat
+  foot toward the round clip.
+
+The final profile render at the end is especially useful for judging these
+dimensions together.
+
+## 1. Start with a complete ring
+
+The tube dimensions are derived from the requested tube diameter, clearance and
+wall thickness.
 
 ```scad
 function tube_clamp_inner_radius(clamp) =
@@ -50,21 +75,14 @@ function tube_clamp_outer_radius(clamp) =
     + clamp.wall_thickness;
 ```
 
-The ring is positioned in front of the mounting surface so its outside overlaps
-the foot slightly.
-
-```scad
-function _tube_clamp_center_x(clamp) =
-    clamp.foot_thickness
-    + tube_clamp_outer_radius(clamp)
-    - FOOT_OVERLAP;
-```
-
 ![Full ring](img/01-ring.png)
 
-## 2. Opening cutter
+## 2. Define the snap opening
 
-The snap opening remains the same simple triangular cutter:
+The opening is still made with the deliberately simple triangular cutter.
+
+The ring stays neutral gray while the material to be removed is shown in
+transparent red.
 
 ```scad
 cutter_length = outer_r + 10;
@@ -72,14 +90,14 @@ cutter_half_width =
     cutter_length * tan(clamp.opening_angle / 2);
 ```
 
-The cutter starts at the ring center and opens away from the mounting foot.
+![Opening cutter](img/02-opening.png)
 
-![Ring with opening cutter](img/02-opening.png)
+## 3. The C-shaped clip body
 
-## 3. Clip body
+After subtracting the opening cutter, the basic snap clip is visible without
+any mounting geometry.
 
-Before adding mounting geometry, the ring and opening can still be inspected as
-the original C-shaped clip body:
+This is the part we already had before adding the mounting foot.
 
 ```scad
 module _clip_body(clamp) {
@@ -92,10 +110,40 @@ module _clip_body(clamp) {
 
 ![Clip body](img/03-clip-body.png)
 
-## 4. Flat mounting foot
+## 4. Add the flat mounting foot
 
-The foot itself is a flat rectangular body. A trapezoidal transition connects
-its front face to the circular outside of the clip:
+The first new mounting feature is just a rectangular foot.
+
+It is intentionally shown on its own here so `foot_length` and
+`foot_thickness` are not hidden by the round clip.
+
+```scad
+module _flat_foot(clamp) {
+    translate([
+        0,
+        -clamp.foot_length / 2,
+        0
+    ])
+        cube([
+            clamp.foot_thickness,
+            clamp.foot_length,
+            clamp.clamp_width
+        ]);
+}
+```
+
+![Flat mounting foot](img/04-foot.png)
+
+## 5. Connect foot and clip with sloped sides
+
+The next step joins the flat foot to the circular body.
+
+In this render the existing clip and foot are gray. The **new transition
+material is transparent red**, so it is immediately visible what this step
+adds.
+
+The transition starts wide on the foot and narrows where it meets the round
+clip.
 
 ```scad
 polygon(points = [
@@ -106,8 +154,16 @@ polygon(points = [
 ]);
 ```
 
-The final geometry is built as one outer body first. The tube bore and opening
-are subtracted afterwards:
+The tube bore is removed from this transition as well. That leaves two sloped
+supports rather than a solid block behind the tube.
+
+![Sloped transition](img/05-transition.png)
+
+## 6. Complete clamp
+
+For the final part, the outside ring, flat foot and transition are first joined
+into one body. The tube bore and snap opening are then removed from that
+combined body.
 
 ```scad
 difference() {
@@ -121,26 +177,63 @@ difference() {
 }
 ```
 
-Because the bore also cuts through the transition, the center remains open and
-the transition becomes two simple sloped side supports.
+The result is still the same snap clip at the front, but it now has a flat
+surface behind it that can form the basis for later mounting features.
 
-![Final clamp with flat foot](img/04-final.png)
+![Complete clamp](img/06-final.png)
 
-## View selection
+## 7. Profile view
+
+The final render looks straight along the clamp width. This removes the
+perspective effect and makes the relationship between the round clip, sloped
+transitions and flat foot much easier to judge.
+
+Use this image when changing:
+
+- `foot_thickness`;
+- `foot_transition_width`;
+- `foot_transition_height`;
+- the overlap between the round clip and the foot.
+
+![Side/profile view](img/07-side-view.png)
+
+## Public API
+
+The mounting parameters remain part of the same OpenSCAD object:
+
+```scad
+clamp = tube_clamp_create(
+    tube_diameter = 20,
+    clearance = 0.0,
+    wall_thickness = 3,
+    clamp_width = 16,
+    opening_angle = 60,
+    foot_length = 40,
+    foot_thickness = 4,
+    foot_transition_width = 30,
+    foot_transition_height = 8
+);
+
+tube_clamp_build(clamp);
+```
+
+The object-based API remains the preferred direction for reusable OpenSCAD
+components in this repository.
+
+## Design views
 
 ```scad
 TUBE_CLAMP_VIEW_FINAL = 0;
 TUBE_CLAMP_VIEW_RING = 1;
 TUBE_CLAMP_VIEW_OPENING = 2;
 TUBE_CLAMP_VIEW_CLIP_BODY = 3;
+TUBE_CLAMP_VIEW_FOOT = 4;
+TUBE_CLAMP_VIEW_TRANSITION = 5;
+TUBE_CLAMP_VIEW_SIDE = 6;
 ```
 
-The Customizer uses the same numeric values.
-
-## OpenSCAD object feature
-
-The clamp data model uses OpenSCAD's experimental `object()` builtin. CLI
-renders therefore explicitly enable:
+Command-line renders must continue to enable OpenSCAD's experimental object
+functionality:
 
 ```bash
 openscad --enable=object-function ...

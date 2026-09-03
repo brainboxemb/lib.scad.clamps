@@ -7,12 +7,18 @@ TUBE_CLAMP_VIEW_FINAL = 0;
 TUBE_CLAMP_VIEW_RING = 1;
 TUBE_CLAMP_VIEW_OPENING = 2;
 TUBE_CLAMP_VIEW_CLIP_BODY = 3;
+TUBE_CLAMP_VIEW_FOOT = 4;
+TUBE_CLAMP_VIEW_TRANSITION = 5;
+TUBE_CLAMP_VIEW_SIDE = 6;
 
 TUBE_CLAMP_VIEW_TABLE = [
-    [TUBE_CLAMP_VIEW_FINAL,     "Final clamp"],
-    [TUBE_CLAMP_VIEW_RING,      "Full ring"],
-    [TUBE_CLAMP_VIEW_OPENING,   "Opening cutter"],
-    [TUBE_CLAMP_VIEW_CLIP_BODY, "Clip body"]
+    [TUBE_CLAMP_VIEW_FINAL,      "Final clamp"],
+    [TUBE_CLAMP_VIEW_RING,       "Full ring"],
+    [TUBE_CLAMP_VIEW_OPENING,    "Opening cutter"],
+    [TUBE_CLAMP_VIEW_CLIP_BODY,  "Clip body"],
+    [TUBE_CLAMP_VIEW_FOOT,       "Mounting foot"],
+    [TUBE_CLAMP_VIEW_TRANSITION, "Foot transition"],
+    [TUBE_CLAMP_VIEW_SIDE,       "Side view"]
 ];
 
 function tube_clamp_view_label(view) =
@@ -23,7 +29,7 @@ function tube_clamp_view_label(view) =
     TUBE_CLAMP_VIEW_TABLE[view][1];
 
 /* [View] */
-design_view = 0; // [0:Final clamp, 1:Full ring, 2:Opening cutter, 3:Clip body]
+design_view = 0; // [0:Final clamp, 1:Full ring, 2:Opening cutter, 3:Clip body, 4:Mounting foot, 5:Foot transition, 6:Side view]
 
 /* [Tube clamp] */
 tube_diameter = 20;
@@ -114,13 +120,26 @@ module tube_clamp_render(clamp, view = TUBE_CLAMP_VIEW_FINAL) {
     if (view == TUBE_CLAMP_VIEW_RING) {
         _full_ring(clamp);
     } else if (view == TUBE_CLAMP_VIEW_OPENING) {
-        _full_ring(clamp);
+        color("lightgray")
+            _full_ring(clamp);
 
         color([1, 0, 0, 0.35])
             _opening_cutter(clamp);
     } else if (view == TUBE_CLAMP_VIEW_CLIP_BODY) {
         _clip_body(clamp);
+    } else if (view == TUBE_CLAMP_VIEW_FOOT) {
+        _flat_foot(clamp);
+    } else if (view == TUBE_CLAMP_VIEW_TRANSITION) {
+        color("lightgray") {
+            _clip_body(clamp);
+            _flat_foot(clamp);
+        }
+
+        color([1, 0, 0, 0.35])
+            _transition_supports(clamp);
     } else {
+        // SIDE uses the same geometry as FINAL. The render workflow changes
+        // the camera to show the X/Y profile directly.
         tube_clamp_build(clamp);
     }
 }
@@ -178,20 +197,30 @@ module _opening_cutter(clamp) {
             ]);
 }
 
+module _flat_foot(clamp) {
+    translate([
+        0,
+        -clamp.foot_length / 2,
+        0
+    ])
+        cube([
+            clamp.foot_thickness,
+            clamp.foot_length,
+            clamp.clamp_width
+        ]);
+}
+
 module _mounting_foot(clamp) {
     union() {
-        translate([
-            0,
-            -clamp.foot_length / 2,
-            0
-        ])
-            cube([
-                clamp.foot_thickness,
-                clamp.foot_length,
-                clamp.clamp_width
-            ]);
-
+        _flat_foot(clamp);
         _foot_transition(clamp);
+    }
+}
+
+module _transition_supports(clamp) {
+    difference() {
+        _foot_transition(clamp);
+        _inner_bore_cutter(clamp);
     }
 }
 

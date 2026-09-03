@@ -322,6 +322,28 @@ verification generated functional verification evidence
 
 
 
+## Visual design documentation
+
+The `tube-clamp` design documentation is intentionally built as a visual
+construction sequence rather than only showing the final model.
+
+For both implementations the generated images are:
+
+```text
+01-ring.png
+02-opening.png
+03-clip-body.png
+04-foot.png
+05-transition.png
+06-final.png
+07-side-view.png
+```
+
+The transition view highlights newly added material in transparent red. The
+profile view looks directly along the clamp width so the relationship between
+the round clip, sloped transition and flat mounting foot can be judged without
+perspective distortion.
+
 ## Implementation direction
 
 OpenSCAD is the primary implementation direction for future reusable clamp

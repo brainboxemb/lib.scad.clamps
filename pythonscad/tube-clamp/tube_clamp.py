@@ -16,6 +16,9 @@ class TubeClamp:
         RING = "Full ring"
         OPENING = "Opening cutter"
         CLIP_BODY = "Clip body"
+        FOOT = "Mounting foot"
+        TRANSITION = "Foot transition"
+        SIDE = "Side view"
 
     tube_diameter: float = 20
     clearance: float = 0.0
@@ -86,6 +89,21 @@ class TubeClamp:
         if view == self.View.CLIP_BODY:
             return self._clip_body()
 
+        if view == self.View.FOOT:
+            return self._flat_foot()
+
+        if view == self.View.TRANSITION:
+            return [
+                self._clip_body().color("lightgray"),
+                self._flat_foot().color("lightgray"),
+                self._transition_supports().color(
+                    "red",
+                    alpha=0.35,
+                ),
+            ]
+
+        # SIDE uses the final geometry; the render workflow changes the
+        # camera to show the X/Y profile directly.
         return self.build()
 
     def _outer_ring_solid(self):
@@ -140,8 +158,8 @@ class TubeClamp:
             -EPS,
         ])
 
-    def _mounting_foot(self):
-        foot = cube([
+    def _flat_foot(self):
+        return cube([
             self.foot_thickness,
             self.foot_length,
             self.clamp_width,
@@ -151,7 +169,14 @@ class TubeClamp:
             0,
         ])
 
-        return foot | self._foot_transition()
+    def _mounting_foot(self):
+        return self._flat_foot() | self._foot_transition()
+
+    def _transition_supports(self):
+        return (
+            self._foot_transition()
+            - self._inner_bore_cutter()
+        )
 
     def _foot_transition(self):
         attach_x = min(

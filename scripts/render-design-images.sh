@@ -68,10 +68,29 @@ run_checked "OpenSCAD 03-clip-body" \
   -o "$OPENSCAD_OUT/03-clip-body.png" \
   "$OPENSCAD_SOURCE"
 
-run_checked "OpenSCAD 04-final" \
+run_checked "OpenSCAD 04-foot" \
+  openscad --enable=object-function "${common_args[@]}" \
+  -D 'design_view=4' \
+  -o "$OPENSCAD_OUT/04-foot.png" \
+  "$OPENSCAD_SOURCE"
+
+run_checked "OpenSCAD 05-transition" \
+  openscad --enable=object-function "${common_args[@]}" \
+  -D 'design_view=5' \
+  -o "$OPENSCAD_OUT/05-transition.png" \
+  "$OPENSCAD_SOURCE"
+
+run_checked "OpenSCAD 06-final" \
   openscad --enable=object-function "${common_args[@]}" \
   -D 'design_view=0' \
-  -o "$OPENSCAD_OUT/04-final.png" \
+  -o "$OPENSCAD_OUT/06-final.png" \
+  "$OPENSCAD_SOURCE"
+
+run_checked "OpenSCAD 07-side-view" \
+  openscad --enable=object-function "${common_args[@]}" \
+  --camera=0,0,0,0,0,0,100 \
+  -D 'design_view=6' \
+  -o "$OPENSCAD_OUT/07-side-view.png" \
   "$OPENSCAD_SOURCE"
 
 echo
@@ -98,11 +117,33 @@ run_checked "PythonSCAD 03-clip-body" \
   -o "$PYTHONSCAD_OUT/03-clip-body.png" \
   "$PYTHONSCAD_SOURCE"
 
-run_checked "PythonSCAD 04-final" \
+run_checked "PythonSCAD 04-foot" \
+  xvfb-run -a pythonscad "${common_args[@]}" \
+  --trust-python \
+  -D 'design_view="Mounting foot"' \
+  -o "$PYTHONSCAD_OUT/04-foot.png" \
+  "$PYTHONSCAD_SOURCE"
+
+run_checked "PythonSCAD 05-transition" \
+  xvfb-run -a pythonscad "${common_args[@]}" \
+  --trust-python \
+  -D 'design_view="Foot transition"' \
+  -o "$PYTHONSCAD_OUT/05-transition.png" \
+  "$PYTHONSCAD_SOURCE"
+
+run_checked "PythonSCAD 06-final" \
   xvfb-run -a pythonscad "${common_args[@]}" \
   --trust-python \
   -D 'design_view="Final clamp"' \
-  -o "$PYTHONSCAD_OUT/04-final.png" \
+  -o "$PYTHONSCAD_OUT/06-final.png" \
+  "$PYTHONSCAD_SOURCE"
+
+run_checked "PythonSCAD 07-side-view" \
+  xvfb-run -a pythonscad "${common_args[@]}" \
+  --trust-python \
+  --camera=0,0,0,0,0,0,100 \
+  -D 'design_view="Side view"' \
+  -o "$PYTHONSCAD_OUT/07-side-view.png" \
   "$PYTHONSCAD_SOURCE"
 
 echo

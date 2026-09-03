@@ -316,8 +316,17 @@ Current design sequence:
 01-ring
 02-opening
 03-clip-body
-04-final
+04-foot
+05-transition
+06-final
+07-side-view
 ```
+
+Design documentation should make geometry changes visually explicit. When a
+construction step adds geometry, keep existing geometry neutral/light gray and
+show the newly added material in transparent red where practical. The final
+profile view should look directly along the clamp width so mounting-foot and
+transition dimensions are easy to judge without perspective.
 
 For step 2, show the complete ring plus the opening cutter as a transparent red
 overlay. The ring should be neutral/light gray.
