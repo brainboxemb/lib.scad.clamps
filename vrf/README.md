@@ -1,0 +1,23 @@
+# Verification
+
+Functional verification is intentionally separate from the design renders.
+
+Source tests live under:
+
+```text
+test/
+├── openscad/
+│   └── tube_clamp_api.scad
+└── pythonscad/
+    └── tube_clamp_api.py
+```
+
+Both files act as external consumers of the library. Each creates three clamps
+with different dimensions and checks derived radius values.
+
+The workflow `.github/workflows/verify.yml` renders and exports both consumer
+tests. Generated output is published to the orphan `verification` branch and is
+not committed to `main`.
+
+The last successful verification therefore remains available even when a later
+workflow run fails.

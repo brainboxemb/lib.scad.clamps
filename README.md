@@ -314,3 +314,21 @@ clamp.outer_radius
 Render views are represented by the nested `TubeClamp.View` `StrEnum`; its
 values are the readable labels, so no separate view configuration table is
 required.
+
+## Functional verification
+
+The repository contains consumer-level API tests under `test/`.
+
+Both the OpenSCAD and PythonSCAD tests create three clamps with different
+dimensions, verify calculated radii, render the result and export STL geometry.
+
+Generated verification output is not stored on `main`. The
+`VRF - Functional verification` workflow publishes successful output to the
+orphan `verification` branch.
+
+This separates:
+
+```text
+main          source, design documentation and tests
+verification generated functional verification evidence
+```

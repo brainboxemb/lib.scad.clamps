@@ -2,7 +2,7 @@ $fn = 120;
 
 use <tube_clamp.scad>
 
-design_view = is_undef(design_view) ? VIEW_FINAL : design_view;
+design_view = is_undef(design_view) ? TUBE_CLAMP_VIEW_FINAL : design_view;
 
 clamp = tube_clamp_create();
 

@@ -1,0 +1,69 @@
+name: VRF - Functional verification
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "openscad/**"
+      - "pythonscad/**"
+      - "test/**"
+      - "scripts/run-verification.sh"
+      - "scripts/build-verification-index.sh"
+      - ".github/workflows/verify.yml"
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    container:
+      image: ghcr.io/brainboxemb/scad-toolchain:v0.1.2
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Toolchain info
+        run: scad-toolchain-info
+
+      - name: Configure Git safe directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Run functional verification
+        run: scripts/run-verification.sh
+
+      - name: Build verification index
+        run: scripts/build-verification-index.sh
+
+      - name: Add build metadata
+        shell: bash
+        run: |
+          mkdir -p vrf/out/metadata
+          {
+            echo "Repository: $GITHUB_REPOSITORY"
+            echo "Commit: $GITHUB_SHA"
+            echo "Workflow: $GITHUB_WORKFLOW"
+            echo "Run: $GITHUB_RUN_ID"
+            echo "Toolchain:"
+            scad-toolchain-info
+          } > vrf/out/metadata/build-info.txt
+
+      - name: Publish verification branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: verification
+          publish_dir: ./vrf/out
+          force_orphan: true
+          enable_jekyll: true
+          commit_message: "Verification for ${{ github.sha }}"
