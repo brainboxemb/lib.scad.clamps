@@ -33,3 +33,27 @@ bit is not always preserved.
 The GitHub Actions workflow invokes the verification scripts explicitly through
 `bash`, so it does not depend on the Unix executable bit being preserved by a
 Windows checkout or ZIP-based update.
+
+## PythonSCAD consumer import
+
+The PythonSCAD verification file lives outside the library directory on purpose.
+It therefore adds `pythonscad/tube-clamp/` to `sys.path` before importing
+`TubeClamp`.
+
+`run-verification.sh` first changes to the repository root, making that import
+path deterministic in GitHub Actions and local CLI runs.
+
+## PythonSCAD import reference
+
+The consumer test follows the approach shown in the official PythonSCAD
+examples:
+
+https://www.pythonscad.org/examples/
+
+```python
+import sys
+sys.path.append("\\path\\to\\python\\site-packages-dir")
+```
+
+In this repository the path is resolved relative to the repository root before
+`TubeClamp` is imported.

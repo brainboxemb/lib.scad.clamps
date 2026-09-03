@@ -332,3 +332,32 @@ This separates:
 main          source, design documentation and tests
 verification generated functional verification evidence
 ```
+
+## PythonSCAD module imports
+
+PythonSCAD uses normal Python module imports. Its official examples show adding
+an external Python module location to `sys.path` before importing:
+
+Source: https://www.pythonscad.org/examples/
+
+```python
+import sys
+sys.path.append("\\path\\to\\python\\site-packages-dir")
+```
+
+The functional verification test uses the same mechanism, but keeps the path
+relative to this repository:
+
+```python
+import sys
+from pathlib import Path
+
+LIB_DIR = Path.cwd() / "pythonscad" / "tube-clamp"
+sys.path.append(str(LIB_DIR))
+
+from tube_clamp import TubeClamp
+```
+
+`run-verification.sh` changes to the repository root before invoking
+PythonSCAD, so the relative module path is deterministic in both local and
+GitHub Actions runs.

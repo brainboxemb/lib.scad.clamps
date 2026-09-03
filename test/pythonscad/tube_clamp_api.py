@@ -1,4 +1,10 @@
+import sys
+from pathlib import Path
+
 from pythonscad import *
+
+LIB_DIR = Path.cwd() / "pythonscad" / "tube-clamp"
+sys.path.insert(0, str(LIB_DIR))
 
 from tube_clamp import TubeClamp
 
