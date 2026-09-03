@@ -47,7 +47,7 @@ run_checked "PythonSCAD design final" \
   xvfb-run -a pythonscad \
   --trust-python \
   --render \
-  -D 'design_view=0' \
+  -D 'design_view="Final clamp"' \
   -o "$TMP_DIR/design-pythonscad.stl" \
   "$ROOT_DIR/pythonscad/tube-clamp/tube_clamp_render.py"
 

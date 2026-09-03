@@ -4,9 +4,11 @@ from tube_clamp import TubeClamp
 
 fn = 120
 
-design_view = globals().get(
-    "design_view",
-    TubeClamp.View.FINAL,
+design_view = TubeClamp.View(
+    globals().get(
+        "design_view",
+        TubeClamp.View.FINAL,
+    )
 )
 
 clamp = TubeClamp()

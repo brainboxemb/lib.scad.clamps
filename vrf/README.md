@@ -28,3 +28,8 @@ GitHub Actions invokes repository shell scripts explicitly with `bash` instead
 of relying on the executable file mode. This keeps the workflow reliable when
 the repository is prepared or updated from Windows, where the Unix executable
 bit is not always preserved.
+
+
+The GitHub Actions workflow invokes the verification scripts explicitly through
+`bash`, so it does not depend on the Unix executable bit being preserved by a
+Windows checkout or ZIP-based update.

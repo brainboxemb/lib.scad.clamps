@@ -84,6 +84,23 @@ clamp.render(
 `render()` converts the supplied value through `TubeClamp.View(...)`, so invalid
 view values are rejected by the enum itself.
 
+The render entrypoint converts the command-line value explicitly to the enum:
+
+```python
+design_view = TubeClamp.View(
+    globals().get(
+        "design_view",
+        TubeClamp.View.FINAL,
+    )
+)
+```
+
+The render workflow therefore passes the enum values as strings, for example:
+
+```bash
+-D 'design_view="Opening cutter"'
+```
+
 ## Rendering
 
 The separate render entrypoint creates a default `TubeClamp`, selects the

@@ -74,21 +74,21 @@ echo "== PythonSCAD design images =="
 run_checked "PythonSCAD 01-ring" \
   xvfb-run -a pythonscad "${common_args[@]}" \
   --trust-python \
-  -D 'design_view=1' \
+  -D 'design_view="Full ring"' \
   -o "$PYTHONSCAD_OUT/01-ring.png" \
   "$PYTHONSCAD_SOURCE"
 
 run_checked "PythonSCAD 02-opening" \
   xvfb-run -a pythonscad "${common_args[@]}" \
   --trust-python \
-  -D 'design_view=2' \
+  -D 'design_view="Opening cutter"' \
   -o "$PYTHONSCAD_OUT/02-opening.png" \
   "$PYTHONSCAD_SOURCE"
 
 run_checked "PythonSCAD 03-final" \
   xvfb-run -a pythonscad "${common_args[@]}" \
   --trust-python \
-  -D 'design_view=0' \
+  -D 'design_view="Final clamp"' \
   -o "$PYTHONSCAD_OUT/03-final.png" \
   "$PYTHONSCAD_SOURCE"
 
