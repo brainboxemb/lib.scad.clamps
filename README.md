@@ -273,10 +273,10 @@ design-step renders use the same surface quality.
 ## OpenSCAD object requirement
 
 The OpenSCAD implementation uses the experimental `object()` builtin for the
-clamp data model. OpenSCAD CLI runs must therefore enable that feature:
+clamp data model. CLI runs explicitly enable the required experimental feature:
 
 ```bash
-openscad --enable=object ...
+openscad --enable=object-function ...
 ```
 
 The repository scripts and GitHub Actions do this automatically. When opening

@@ -32,7 +32,7 @@ run_checked() {
 echo "== Design render entrypoints =="
 
 run_checked "OpenSCAD design final" \
-  openscad --enable=object \
+  openscad --enable=object-function \
   --render \
   -D 'design_view="final"' \
   -o "$TMP_DIR/design-openscad.stl" \

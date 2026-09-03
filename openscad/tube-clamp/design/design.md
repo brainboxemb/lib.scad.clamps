@@ -81,10 +81,10 @@ render context.
 ## OpenSCAD object feature
 
 The clamp data model uses OpenSCAD's experimental `object()` builtin. CLI
-renders therefore require:
+renders therefore explicitly enable the required feature:
 
 ```bash
-openscad --enable=object ...
+openscad --enable=object-function ...
 ```
 
 The repository render and test scripts add this flag automatically.
