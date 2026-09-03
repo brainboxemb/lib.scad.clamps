@@ -2,10 +2,10 @@
 
 ## Purpose
 
-The PythonSCAD implementation follows the same model concepts as OpenSCAD, but
-uses Python's native class model instead of copying the OpenSCAD/C-style API.
+The PythonSCAD implementation uses Python's native class model rather than
+copying the OpenSCAD/C-style API literally.
 
-The clamp remains fully parametric: all geometry inputs are constructor
+The model remains fully parametric: all geometry inputs are constructor
 parameters of `TubeClamp`.
 
 ## Constructor
@@ -20,8 +20,6 @@ clamp = TubeClamp(
 )
 ```
 
-This is the Python equivalent of creating the OpenSCAD clamp object.
-
 ## 1. Full ring
 
 Derived dimensions are exposed as properties:
@@ -30,13 +28,9 @@ Derived dimensions are exposed as properties:
 @property
 def inner_radius(self):
     return (self.tube_diameter + self.clearance) / 2
-
-@property
-def outer_radius(self):
-    return self.inner_radius + self.wall_thickness
 ```
 
-The ring itself remains an outer cylinder minus an inner cylinder.
+The ring remains an outer cylinder minus an inner cylinder.
 
 ![Full ring](img/01-ring.png)
 
@@ -50,43 +44,47 @@ cutter_half_width = cutter_length * tan(
 )
 ```
 
-The opening design view returns the ring and cutter as two separate objects so
-the cutter remains a transparent visualization overlay.
+The opening design view returns the ring and cutter as two separate objects.
+The ring is explicitly light gray and the cutter remains transparent red.
 
 ![Ring with opening cutter](img/02-opening.png)
 
 ## 3. Final clamp
 
-The public geometry API is now an instance method:
+The public geometry API is an instance method:
 
 ```python
 clamp.build()
 ```
 
-Private construction helpers are methods on the same object.
-
 ![Final clamp](img/03-final.png)
 
 ## View selection
 
-PythonSCAD keeps the same numeric view constants and configuration table as the
-OpenSCAD implementation:
+Views are part of the `TubeClamp` class and use a Python `StrEnum`:
 
 ```python
-VIEW_FINAL = 0
-VIEW_RING = 1
-VIEW_OPENING = 2
+class View(StrEnum):
+    FINAL = "Final clamp"
+    RING = "Full ring"
+    OPENING = "Opening cutter"
 ```
 
-## Rendering
+The enum value is already the readable label, so no separate view constants,
+configuration table or label lookup function are needed.
 
-Construction views are rendered with:
+Use:
 
 ```python
 clamp.render(
-    view=VIEW_OPENING,
+    view=TubeClamp.View.OPENING,
 )
 ```
+
+`render()` converts the supplied value through `TubeClamp.View(...)`, so invalid
+view values are rejected by the enum itself.
+
+## Rendering
 
 The separate render entrypoint creates a default `TubeClamp`, selects the
 requested view and sets `fn = 120` in its own render context.

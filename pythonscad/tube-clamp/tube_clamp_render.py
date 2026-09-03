@@ -1,10 +1,13 @@
 from pythonscad import *
 
-from tube_clamp import TubeClamp, VIEW_FINAL
+from tube_clamp import TubeClamp
 
 fn = 120
 
-design_view = globals().get("design_view", VIEW_FINAL)
+design_view = globals().get(
+    "design_view",
+    TubeClamp.View.FINAL,
+)
 
 clamp = TubeClamp()
 

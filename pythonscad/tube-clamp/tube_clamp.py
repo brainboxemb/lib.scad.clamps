@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import StrEnum
 from math import radians, tan
 
 from pythonscad import *
@@ -6,24 +7,14 @@ from pythonscad import *
 fn = 120
 EPS = 0.05
 
-VIEW_FINAL = 0
-VIEW_RING = 1
-VIEW_OPENING = 2
-
-VIEW_CONFIG = [
-    (VIEW_FINAL, "Final clamp"),
-    (VIEW_RING, "Full ring"),
-    (VIEW_OPENING, "Opening cutter"),
-]
-
-
-def tube_clamp_view_label(view):
-    assert VIEW_CONFIG[view][0] == view, "VIEW_CONFIG index/value mismatch"
-    return VIEW_CONFIG[view][1]
-
 
 @dataclass(frozen=True)
 class TubeClamp:
+    class View(StrEnum):
+        FINAL = "Final clamp"
+        RING = "Full ring"
+        OPENING = "Opening cutter"
+
     tube_diameter: float = 20
     clearance: float = 0.0
     wall_thickness: float = 3
@@ -48,13 +39,15 @@ class TubeClamp:
     def build(self):
         return self._full_ring() - self._opening_cutter()
 
-    def render(self, view=VIEW_FINAL):
-        if view == VIEW_RING:
-            return self._full_ring()
+    def render(self, view=View.FINAL):
+        view = self.View(view)
 
-        if view == VIEW_OPENING:
+        if view == self.View.RING:
+            return self._full_ring().color("lightgray")
+
+        if view == self.View.OPENING:
             return [
-                self._full_ring(),
+                self._full_ring().color("lightgray"),
                 self._opening_cutter().color(
                     "red",
                     alpha=0.35,
@@ -96,7 +89,5 @@ class TubeClamp:
 clamp = TubeClamp()
 
 show(
-    clamp.render(
-        view=VIEW_FINAL,
-    )
+    clamp.render()
 )

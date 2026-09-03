@@ -301,15 +301,16 @@ every helper function signature.
 
 ### PythonSCAD API
 
-PythonSCAD uses a native class API rather than reproducing the OpenSCAD
-factory/functions literally:
+PythonSCAD uses a native class API:
 
 ```python
 clamp = TubeClamp(...)
 clamp.build()
-clamp.render(view=VIEW_OPENING)
+clamp.render(view=TubeClamp.View.OPENING)
 clamp.inner_radius
 clamp.outer_radius
 ```
 
-The constructor remains the complete parametric input surface for the model.
+Render views are represented by the nested `TubeClamp.View` `StrEnum`; its
+values are the readable labels, so no separate view configuration table is
+required.
