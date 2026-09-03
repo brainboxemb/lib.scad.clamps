@@ -21,3 +21,10 @@ not committed to `main`.
 
 The last successful verification therefore remains available even when a later
 workflow run fails.
+
+## Shell script execution
+
+GitHub Actions invokes repository shell scripts explicitly with `bash` instead
+of relying on the executable file mode. This keeps the workflow reliable when
+the repository is prepared or updated from Windows, where the Unix executable
+bit is not always preserved.

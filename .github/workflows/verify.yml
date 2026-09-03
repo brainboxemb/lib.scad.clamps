@@ -40,10 +40,10 @@ jobs:
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Run functional verification
-        run: scripts/run-verification.sh
+        run: bash scripts/run-verification.sh
 
       - name: Build verification index
-        run: scripts/build-verification-index.sh
+        run: bash scripts/build-verification-index.sh
 
       - name: Add build metadata
         shell: bash
