@@ -99,36 +99,38 @@ unless a new explicit architectural decision is made.
 Current defaults:
 
 ```text
-tube diameter             20 mm
-clearance                  0.0 mm
-wall thickness             3 mm
-clamp width               16 mm
-opening angle             60°
-foot length               40 mm
-foot thickness             4 mm
-foot transition width     30 mm
-foot transition height     8 mm
-FOOT_OVERLAP               1.0 mm
-EPS                        0.05 mm
+tube diameter          20 mm
+clearance               0.0 mm
+wall thickness          3 mm
+clamp width            16 mm
+opening angle          60°
+base thickness          4 mm
+transition width       30 mm
+transition depth        8 mm
+BASE_OVERLAP            1.0 mm
+EPS                     0.05 mm
 ```
 
 Construction:
 
-1. build a complete cylindrical ring;
-2. build the same simple triangular opening cutter;
-3. inspect the resulting C-shaped clip body;
-4. add a flat mounting foot and trapezoidal transition;
-5. subtract the tube bore and opening from the complete outer body so the
-   transition becomes two sloped side supports.
+1. build the solid circular outside;
+2. add the compact flat base;
+3. add the sloped transition, producing one complete outer shape;
+4. subtract the tube bore once from that outer shape;
+5. subtract the simple triangular snap opening.
 
-The ring overlaps the foot by `FOOT_OVERLAP` so the body is physically joined.
+The base clip is deliberately mounting-neutral. Its flat base width is exactly
+`transition_width`; there is no independent base/mounting-plate width.
 
-The triangular opening cutter is deliberate. Do not replace it with a more
-complicated sector unless the design requires it.
+Current compact-base parameters are `base_thickness`, `transition_width`, and
+`transition_depth`.
 
-The mounting-foot step is intentionally still basic. Do not add screw holes,
-countersinks, edge-mount variants or other mounting systems unless they are the
-explicit next design step.
+The triangular opening cutter remains deliberate. Do not replace it with a
+more complicated sector unless the design requires it.
+
+Possible future mounting variants include a single-screw version and an
+extended two-screw mounting-plate version. They are not part of the base clip
+yet.
 
 ## OpenSCAD API
 
@@ -296,6 +298,32 @@ final renders/exports prove it insufficient.
 
 ## Design documentation
 
+### Source comments
+
+Source files should explain non-obvious design intent rather than restating
+syntax. In particular, document:
+
+- why Boolean overlaps such as `BASE_OVERLAP` exist;
+- the outer-shape-first / cutouts-afterwards construction order;
+- why the compact base has no independent width parameter;
+- what `transition_width` and `transition_depth` mean geometrically.
+
+Routine expressions do not need line-by-line commentary.
+
+
+### Generated design image cleanup
+
+Each `design/img/` directory is a generated image set.
+
+`scripts/render-design-images.sh` must maintain an explicit list of expected
+PNG filenames for each implementation. Only after all design renders have
+succeeded should it remove PNG files that are no longer in that list.
+
+This prevents stale files after design-step renames (for example an old
+`03-final.png` remaining beside `03-clip-body.png`) without deleting valid
+existing images before a render that might fail.
+
+
 Each implementation has `design/design.md`. These files are important project
 artifacts.
 
@@ -313,13 +341,13 @@ They must not become either:
 Current design sequence:
 
 ```text
-01-ring
-02-opening
-03-clip-body
-04-foot
-05-transition
+01-outer-ring
+02-base
+03-transition
+04-bore
+05-opening
 06-final
-07-side-view
+07-profile
 ```
 
 Design documentation should make geometry changes visually explicit. When a

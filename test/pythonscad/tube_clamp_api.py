@@ -3,6 +3,7 @@ from pathlib import Path
 
 from pythonscad import *
 
+# Verification runs from the repository root.
 LIB_DIR = Path.cwd() / "pythonscad" / "tube-clamp"
 sys.path.insert(0, str(LIB_DIR))
 
@@ -16,10 +17,9 @@ small = TubeClamp(
     wall_thickness=2,
     clamp_width=12,
     opening_angle=55,
-    foot_length=28,
-    foot_thickness=3,
-    foot_transition_width=22,
-    foot_transition_height=5,
+    base_thickness=3,
+    transition_width=18,
+    transition_depth=5,
 )
 
 medium = TubeClamp()
@@ -30,10 +30,9 @@ large = TubeClamp(
     wall_thickness=4,
     clamp_width=22,
     opening_angle=70,
-    foot_length=54,
-    foot_thickness=5,
-    foot_transition_width=42,
-    foot_transition_height=10,
+    base_thickness=5,
+    transition_width=40,
+    transition_depth=10,
 )
 
 assert abs(small.inner_radius - 6.1) < 0.001

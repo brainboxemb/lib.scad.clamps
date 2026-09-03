@@ -36,12 +36,13 @@ lib.scad.clamps/
 
 ## Tube clamp
 
-The first reference part is an open snap-fit tube clamp with a simple flat
-mounting foot.
+The first reference part is an open snap-fit tube clamp with a compact flat
+base.
 
-The current design intentionally stops at the basic mounting form: a flat foot
-and sloped transition are included, while screw holes and mounting-head variants
-are not yet part of the geometry.
+The base is deliberately **not** a mounting plate. Its width is derived from
+the transition width, so it cannot extend beyond the lower edge of the sloped
+transition. A consuming project or later library variant can add screw or
+mounting-plate geometry.
 
 Both implementations expose equivalent parameters for:
 
@@ -50,8 +51,9 @@ Both implementations expose equivalent parameters for:
 - wall thickness;
 - clamp width;
 - opening angle;
-- foot length and thickness;
-- foot transition width and height.
+- compact base thickness;
+- transition width;
+- transition depth.
 
 ## SCAD toolchain
 
@@ -330,19 +332,25 @@ construction sequence rather than only showing the final model.
 For both implementations the generated images are:
 
 ```text
-01-ring.png
-02-opening.png
-03-clip-body.png
-04-foot.png
-05-transition.png
+01-outer-ring.png
+02-base.png
+03-transition.png
+04-bore.png
+05-opening.png
 06-final.png
-07-side-view.png
+07-profile.png
 ```
 
-The transition view highlights newly added material in transparent red. The
-profile view looks directly along the clamp width so the relationship between
-the round clip, sloped transition and flat mounting foot can be judged without
-perspective distortion.
+The construction views highlight newly added geometry or material to be
+removed in transparent red. The sequence first creates the complete outside and
+only then shows the tube bore and snap opening as subtractive operations. The
+profile view looks directly along the clamp width so the compact base and
+transition can be judged without perspective distortion.
+
+The render script treats these PNGs as a generated set. After all renders have
+completed successfully, stale PNG files in each `design/img/` directory are
+removed. This prevents renamed or deleted design steps from accumulating old
+images while avoiding cleanup before a failed render.
 
 ## Implementation direction
 
