@@ -361,3 +361,9 @@ from tube_clamp import TubeClamp
 `run-verification.sh` changes to the repository root before invoking
 PythonSCAD, so the relative module path is deterministic in both local and
 GitHub Actions runs.
+
+## Development guide
+
+Repository-wide development and API conventions are documented in
+[`CHATGPT.md`](CHATGPT.md). This includes the OpenSCAD/PythonSCAD API model,
+naming conventions, design documentation rules and verification workflow.
