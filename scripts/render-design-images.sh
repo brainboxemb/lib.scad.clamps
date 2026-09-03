@@ -51,19 +51,19 @@ run_checked() {
 echo "== OpenSCAD design images =="
 
 run_checked "OpenSCAD 01-ring" \
-  openscad "${common_args[@]}" \
+  openscad --enable=object "${common_args[@]}" \
   -D 'design_view="01-ring"' \
   -o "$OPENSCAD_OUT/01-ring.png" \
   "$OPENSCAD_SOURCE"
 
 run_checked "OpenSCAD 02-opening" \
-  openscad "${common_args[@]}" \
+  openscad --enable=object "${common_args[@]}" \
   -D 'design_view="02-opening"' \
   -o "$OPENSCAD_OUT/02-opening.png" \
   "$OPENSCAD_SOURCE"
 
 run_checked "OpenSCAD 03-final" \
-  openscad "${common_args[@]}" \
+  openscad --enable=object "${common_args[@]}" \
   -D 'design_view="final"' \
   -o "$OPENSCAD_OUT/03-final.png" \
   "$OPENSCAD_SOURCE"

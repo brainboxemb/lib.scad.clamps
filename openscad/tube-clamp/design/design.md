@@ -77,3 +77,14 @@ tube_clamp_render(
 
 The render entrypoint creates a default clamp and sets `$fn = 120` in its own
 render context.
+
+## OpenSCAD object feature
+
+The clamp data model uses OpenSCAD's experimental `object()` builtin. CLI
+renders therefore require:
+
+```bash
+openscad --enable=object ...
+```
+
+The repository render and test scripts add this flag automatically.

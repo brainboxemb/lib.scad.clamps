@@ -270,6 +270,19 @@ same global resolution in their own execution context, so module previews and
 design-step renders use the same surface quality.
 
 
+## OpenSCAD object requirement
+
+The OpenSCAD implementation uses the experimental `object()` builtin for the
+clamp data model. OpenSCAD CLI runs must therefore enable that feature:
+
+```bash
+openscad --enable=object ...
+```
+
+The repository scripts and GitHub Actions do this automatically. When opening
+or running the OpenSCAD source outside those scripts, use an OpenSCAD nightly
+build with the object feature enabled.
+
 ## Object-based clamp API
 
 Both implementations use one clamp object as the public data model:

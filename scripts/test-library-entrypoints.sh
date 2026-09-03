@@ -42,7 +42,7 @@ run_checked() {
 echo "== Standalone library/show entrypoints =="
 
 run_checked "OpenSCAD tube-clamp" \
-  openscad \
+  openscad --enable=object \
   --render \
   --autocenter \
   --viewall \
