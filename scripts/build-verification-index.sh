@@ -25,20 +25,10 @@ and build three clamps with different dimensions.
 - [STL export](pythonscad/tube-clamp-api.stl)
 
 
-## PythonSCAD consuming OpenSCAD
-
-This test runs in PythonSCAD but loads the OpenSCAD implementation through
-`osuse()` and calls its public functions/modules through the returned library
-handle.
-
-![PythonSCAD -> OpenSCAD API verification](pythonscad-openscad/tube-clamp-api.png)
-
-- [STL export](pythonscad-openscad/tube-clamp-api.stl)
 
 ## What is verified
 
-- the native OpenSCAD and PythonSCAD libraries can be consumed from separate source files;
-- PythonSCAD can consume the OpenSCAD library through `osuse()`;
+- the OpenSCAD and PythonSCAD libraries can be consumed from separate source files;
 - three independent parametrized clamp instances can be created;
 - the public build API produces geometry;
 - derived radius calculations return the expected values;

@@ -9,8 +9,7 @@ test/
 ├── openscad/
 │   └── tube_clamp_api.scad
 └── pythonscad/
-    ├── tube_clamp_api.py
-    └── tube_clamp_openscad_api.py
+    └── tube_clamp_api.py
 ```
 
 Both files act as external consumers of the library. Each creates three clamps
@@ -59,12 +58,24 @@ sys.path.append("\\path\\to\\python\\site-packages-dir")
 In this repository the path is resolved relative to the repository root before
 `TubeClamp` is imported.
 
+## PythonSCAD evaluation conclusion
 
-## PythonSCAD -> OpenSCAD interoperability
+PythonSCAD remains part of this repository only for the existing `tube-clamp`
+comparison implementation.
 
-`tube_clamp_openscad_api.py` is a third consumer test. It runs under
-PythonSCAD, loads `openscad/tube-clamp/tube_clamp.scad` using `osuse()`, and
-then calls the OpenSCAD public API through the returned handle.
+The interoperability investigation showed that PythonSCAD can consume normal
+OpenSCAD libraries through `osuse()`, but its current OpenSCAD/Python conversion
+layer does not support OpenSCAD `object()` values across that boundary.
 
-This verifies that the OpenSCAD implementation is usable not only from
-OpenSCAD, but also as an OpenSCAD library consumed by PythonSCAD.
+This project deliberately prefers object-based OpenSCAD APIs for reusable CAD
+libraries. Therefore:
+
+- OpenSCAD is the primary implementation direction for future reusable
+  libraries;
+- the object-based OpenSCAD API will not be flattened merely to accommodate
+  PythonSCAD;
+- the existing PythonSCAD `tube-clamp` implementation remains for comparison
+  and consistency;
+- no further PythonSCAD library expansion is planned for now;
+- this decision can be revisited if PythonSCAD later supports OpenSCAD object
+  conversion.

@@ -334,13 +334,21 @@ verification generated functional verification evidence
 ```
 
 
-The verification suite covers three consumer paths:
 
-```text
-OpenSCAD    -> OpenSCAD library
-PythonSCAD  -> PythonSCAD library
-PythonSCAD  -> OpenSCAD library via osuse()
-```
+## Implementation direction
+
+OpenSCAD is the primary implementation direction for future reusable clamp
+libraries.
+
+This project deliberately uses OpenSCAD `object()` values as a struct-like
+public data model. PythonSCAD currently cannot transfer those object values
+across the `osuse()` boundary, so adapting the OpenSCAD API around that
+limitation would compromise the preferred library design.
+
+The PythonSCAD `tube-clamp` implementation is retained because this repository
+also serves as a technology comparison and the implementation itself remains
+useful. For now, however, no further PythonSCAD expansion is planned beyond
+maintaining this existing implementation and its native consumer test.
 
 ## PythonSCAD module imports
 

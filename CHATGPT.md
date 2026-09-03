@@ -40,9 +40,7 @@ lib.scad.clamps/
 │       └── img/
 ├── test/
 │   ├── openscad/tube_clamp_api.scad
-│   └── pythonscad/
-│       ├── tube_clamp_api.py
-│       └── tube_clamp_openscad_api.py
+│   └── pythonscad/tube_clamp_api.py
 ├── vrf/README.md
 ├── scripts/
 └── .github/workflows/
@@ -364,13 +362,59 @@ deterministic.
 
 Do not use `osuse()` to import `tube_clamp.py`; native Python modules use normal Python imports.
 
-`osuse()` is intentionally used by `tube_clamp_openscad_api.py` to consume the OpenSCAD `.scad` library from PythonSCAD.
+PythonSCAD can consume ordinary OpenSCAD libraries through `osuse()`, but the
+current conversion layer cannot transfer OpenSCAD `object()` values across that
+boundary. Because this project deliberately prefers object-based OpenSCAD APIs,
+direct PythonSCAD consumption of the OpenSCAD implementation is not a supported
+project path for now.
+
+
+## Primary implementation direction
+
+OpenSCAD is the primary implementation direction for future reusable libraries
+in this project.
+
+This is a deliberate outcome of the PythonSCAD evaluation.
+
+The preferred OpenSCAD architecture uses `object()` values as struct-like
+parametric data models:
+
+```scad
+clamp = tube_clamp_create(...);
+tube_clamp_build(clamp);
+```
+
+That design is considered cleaner and more extensible than flattening every
+operation into long scalar parameter lists.
+
+PythonSCAD can consume conventional OpenSCAD geometry modules through
+`osuse()`, but its current OpenSCAD/Python conversion layer does not support
+OpenSCAD `object()` values. A function returning an OpenSCAD object therefore
+does not produce a reusable Python-side value that can later be passed back to
+another OpenSCAD function/module.
+
+For this project the conclusion is intentionally strong:
+
+- do not weaken or flatten the OpenSCAD object API to accommodate PythonSCAD;
+- do not invest further in PythonSCAD as the default implementation path for
+  new reusable libraries;
+- keep the existing PythonSCAD `tube-clamp` implementation because this
+  repository is also a technology exploration/comparison and that implementation
+  remains useful;
+- maintain its native PythonSCAD consumer test so the existing implementation
+  does not silently regress;
+- revisit PythonSCAD only if its object interoperability or overall maturity
+  materially changes.
+
+This conclusion is specific to the project's preferred reusable-library
+architecture, not a claim that PythonSCAD cannot generate CAD geometry.
+
 
 ## Functional consumer tests
 
 Tests under `test/` exercise the public API as an external consumer.
 
-There are three compatibility paths: native OpenSCAD, native PythonSCAD, and PythonSCAD consuming the OpenSCAD library via `osuse()`.
+There are two maintained consumer paths: native OpenSCAD and native PythonSCAD.
 
 They create three clearly different clamps: small, default/medium and large.
 They vary several geometric parameters and also assert derived radius values.
@@ -503,6 +547,14 @@ Equivalent behavior is the goal, not identical language mechanics.
 
 ## Explicitly rejected approaches
 
+Also rejected:
+
+- a permanent PythonSCAD/OpenSCAD scalar bridge whose only purpose is to hide
+  the missing OpenSCAD `object()` conversion;
+- flattening the public OpenSCAD API into scalar convenience wrappers for
+  PythonSCAD interoperability.
+
+
 Do not silently reintroduce these without a new architectural decision:
 
 - public `segments`/resolution parameter propagated through geometry APIs;
@@ -555,7 +607,10 @@ At this point:
 - PythonSCAD views use `TubeClamp.View(StrEnum)`;
 - both implementations use global surface resolution 120;
 - design docs use explanation + essential snippets + images;
-- functional consumer tests exist for both implementations;
+- native functional consumer tests exist for both implementations;
+- OpenSCAD is the primary direction for future reusable libraries;
+- PythonSCAD is retained only for this comparison implementation and is not
+  currently a target for further library expansion;
 - verification publishes generated evidence to the orphan `verification`
   branch;
 - PythonSCAD consumer imports use the documented `sys.path` approach;

@@ -7,8 +7,7 @@ OUT_DIR="${ROOT_DIR}/vrf/out"
 
 mkdir -p \
   "${OUT_DIR}/openscad" \
-  "${OUT_DIR}/pythonscad" \
-  "${OUT_DIR}/pythonscad-openscad"
+  "${OUT_DIR}/pythonscad"
 
 run_checked() {
   local label="$1"
@@ -78,26 +77,5 @@ run_checked \
       "${ROOT_DIR}/test/pythonscad/tube_clamp_api.py"
 
 
-# PythonSCAD consuming the OpenSCAD library through osuse().
-run_checked \
-  "PythonSCAD -> OpenSCAD tube-clamp API PNG" \
-  xvfb-run -a \
-    pythonscad \
-      --trust-python \
-      --enable=object-function \
-      --imgsize=1600,900 \
-      --viewall \
-      --autocenter \
-      -o "${OUT_DIR}/pythonscad-openscad/tube-clamp-api.png" \
-      "${ROOT_DIR}/test/pythonscad/tube_clamp_openscad_api.py"
-
-run_checked \
-  "PythonSCAD -> OpenSCAD tube-clamp API STL" \
-  xvfb-run -a \
-    pythonscad \
-      --trust-python \
-      --enable=object-function \
-      -o "${OUT_DIR}/pythonscad-openscad/tube-clamp-api.stl" \
-      "${ROOT_DIR}/test/pythonscad/tube_clamp_openscad_api.py"
 
 echo "Verification output written to ${OUT_DIR}"
