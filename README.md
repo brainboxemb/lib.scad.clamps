@@ -135,12 +135,12 @@ Each implementation exposes two public operations:
 
 ```text
 tube_clamp(...)
-render_tube_clamp(...)
+tube_clamp_render(...)
 ```
 
 `tube_clamp(...)` is the reusable geometry API.
 
-`render_tube_clamp(...)` is also part of the public API. It provides the
+`tube_clamp_render(...)` is also part of the public API. It provides the
 standard construction/debug views while keeping the private geometry helpers
 private.
 
@@ -154,7 +154,7 @@ _opening_cutter(...)
 ```
 
 The design workflow does not call these private helpers directly. Its separate
-entrypoints only translate `design_view` into a public `render_tube_clamp(...)`
+entrypoints only translate `design_view` into a public `tube_clamp_render(...)`
 call:
 
 ```text
@@ -201,10 +201,10 @@ development workflow and automated verification.
 Both implementations deliberately show a default clamp when their library file
 is opened directly.
 
-OpenSCAD uses a top-level `render_tube_clamp(...)` call. PythonSCAD uses:
+OpenSCAD uses a top-level `tube_clamp_render(...)` call. PythonSCAD uses:
 
 ```python
-show(render_tube_clamp())
+show(tube_clamp_render())
 ```
 
 This keeps the direct-open behavior conceptually similar between the two
@@ -243,7 +243,7 @@ starting PythonSCAD, after which `design/tube_clamp_render.py` can use a normal 
 import:
 
 ```python
-from tube_clamp import render_tube_clamp
+from tube_clamp import tube_clamp_render
 ```
 
 ## Surface resolution
@@ -268,3 +268,19 @@ the geometry API.
 The standalone library files and the separate render entrypoints each set the
 same global resolution in their own execution context, so module previews and
 design-step renders use the same surface quality.
+
+
+## Object-based clamp API
+
+Both implementations use one clamp object as the public data model:
+
+```text
+tube_clamp_create(...)        -> create clamp object
+tube_clamp_build(clamp)             -> generate final geometry
+tube_clamp_render(clamp, ...) -> render a design/debug view
+tube_clamp_inner_radius(clamp)
+tube_clamp_outer_radius(clamp)
+```
+
+This keeps future calculations and additional clamp parameters from expanding
+every helper function signature.

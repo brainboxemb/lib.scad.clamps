@@ -4,6 +4,9 @@ use <tube_clamp.scad>
 
 design_view = is_undef(design_view) ? "final" : design_view;
 
-render_tube_clamp(
+clamp = tube_clamp_create();
+
+tube_clamp_render(
+    clamp,
     mode = design_view
 );

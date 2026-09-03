@@ -2,96 +2,74 @@
 
 ## Purpose
 
-This document explains the PythonSCAD implementation of the same reusable
-`tube_clamp` geometry as the OpenSCAD version.
+The PythonSCAD implementation follows the same object-based API as OpenSCAD.
+One clamp object contains all geometry parameters and is passed to geometry,
+rendering and calculation functions.
 
-The full implementation lives in `tube_clamp.py`; this document focuses on the
-design choices and the few language-specific differences.
-
-The clamp is built in three steps:
-
-1. create a complete cylindrical ring;
-2. define a triangular opening cutter;
-3. subtract the cutter from the ring.
-
-## Parameters
-
-| Parameter | Default | Meaning |
-| --- | ---: | --- |
-| `tube_diameter` | 20 mm | Nominal outside diameter of the tube. |
-| `clearance` | 0.0 mm | Extra diametral space around the tube. |
-| `wall_thickness` | 3 mm | Radial wall thickness of the clamp. |
-| `clamp_width` | 16 mm | Clamp width along the tube axis. |
-| `opening_angle` | 60° | Angular size of the open section. |
-
-PythonSCAD uses the equivalent global surface setting:
+## API shape
 
 ```python
-fn = 120
+clamp = tube_clamp_create()
+
+tube_clamp_build(clamp)
+tube_clamp_render(clamp, mode="02-opening")
+
+inner_r = tube_clamp_inner_radius(clamp)
+outer_r = tube_clamp_outer_radius(clamp)
 ```
+
+The clamp data is represented by an immutable Python dataclass.
+`tube_clamp_create(...)` provides the same creation-style API as OpenSCAD.
 
 ## 1. Full ring
 
-The radius calculation is identical to the OpenSCAD version:
+Calculations receive the object instead of separate values:
 
 ```python
-inner_r = (tube_diameter + clearance) / 2
-outer_r = inner_r + wall_thickness
+def tube_clamp_inner_radius(clamp):
+    return (clamp.tube_diameter + clamp.clearance) / 2
 ```
 
-The complete ring is created by subtracting the inner cylinder from the outer
-one. `EPS` gives the subtracting cylinder a small overlap beyond both faces.
+The ring remains an outer cylinder minus an inner cylinder.
 
 ![Full ring](img/01-ring.png)
 
 ## 2. Opening cutter
 
-The opening uses the same triangular construction as OpenSCAD:
+The same triangular construction is used:
 
 ```python
-cutter_length = outer_r + 10
-
 cutter_half_width = cutter_length * tan(
-    radians(opening_angle / 2)
+    radians(clamp.opening_angle / 2)
 )
 ```
 
-The `radians()` conversion is the main language-specific difference here:
-Python's `tan()` expects radians, while the design parameter is expressed in
-degrees.
-
-The cutter is then made from the same three points:
-
-```python
-points = [
-    [0, 0],
-    [cutter_length, -cutter_half_width],
-    [cutter_length,  cutter_half_width],
-]
-```
+`radians()` is needed because Python's `tan()` expects radians.
 
 ![Ring with opening cutter](img/02-opening.png)
 
 ## 3. Final clamp
 
-The final geometry mirrors the OpenSCAD boolean construction:
+The public geometry call is:
 
 ```python
-return _full_ring(...) - _opening_cutter(...)
+tube_clamp_build(clamp)
 ```
 
-The reusable public geometry is exposed as `tube_clamp(...)`.
+Internally `_opening_cutter(clamp)` is subtracted from `_full_ring(clamp)`.
 
 ![Final clamp](img/03-final.png)
 
-## Design rendering
+## Rendering
 
-`render_tube_clamp(...)` provides the construction views used by the design
-documentation. The separate `tube_clamp_render.py` entrypoint selects the
-requested view and sets:
+Construction views use:
 
 ```python
-fn = 120
+tube_clamp_render(
+    clamp,
+    mode="02-opening",
+)
 ```
 
-This keeps the design images consistent with the standalone module preview.
+The render entrypoint creates a default clamp and sets `fn = 120` in its own
+render context.

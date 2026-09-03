@@ -2,107 +2,78 @@
 
 ## Purpose
 
-This document explains the geometry of the reusable `tube_clamp` component.
-The full implementation lives in `tube_clamp.scad`; this document focuses on
-the design decisions and the construction steps.
+The clamp API uses one object to represent the complete clamp definition.
+This is comparable to passing a `struct` through a C API: creation, geometry,
+rendering and calculations all use the same object.
 
-The clamp is built in three steps:
-
-1. create a complete cylindrical ring;
-2. define a triangular opening cutter;
-3. subtract the cutter from the ring.
-
-## Parameters
-
-| Parameter | Default | Meaning |
-| --- | ---: | --- |
-| `tube_diameter` | 20 mm | Nominal outside diameter of the tube. |
-| `clearance` | 0.0 mm | Extra diametral space around the tube. |
-| `wall_thickness` | 3 mm | Radial wall thickness of the clamp. |
-| `clamp_width` | 16 mm | Clamp width along the tube axis. |
-| `opening_angle` | 60° | Angular size of the open section. |
-
-Surface quality is controlled separately with:
+## API shape
 
 ```scad
-$fn = 120;
+clamp = tube_clamp_create(...);
+
+tube_clamp_build(clamp);
+tube_clamp_render(clamp, mode = "02-opening");
+
+inner_r = tube_clamp_inner_radius(clamp);
+outer_r = tube_clamp_outer_radius(clamp);
 ```
+
+`tube_clamp_create(...)` contains the defaults and creates the object. This
+avoids passing a growing list of geometry parameters through every helper.
 
 ## 1. Full ring
 
-The ring is defined by an inner and outer radius:
+Radius calculations take the clamp object directly:
 
 ```scad
-inner_r = (tube_diameter + clearance) / 2;
-outer_r = inner_r + wall_thickness;
+function tube_clamp_inner_radius(clamp) =
+    (clamp.tube_diameter + clamp.clearance) / 2;
+
+function tube_clamp_outer_radius(clamp) =
+    tube_clamp_inner_radius(clamp)
+    + clamp.wall_thickness;
 ```
 
-The geometry is a simple outer cylinder with the inner cylinder removed:
-
-```scad
-difference() {
-    cylinder(h = clamp_width, r = outer_r);
-
-    translate([0, 0, -EPS])
-        cylinder(
-            h = clamp_width + 2 * EPS,
-            r = inner_r
-        );
-}
-```
-
-The small `EPS` overlap avoids coincident surfaces during subtraction.
+The ring remains an outer cylinder minus an inner cylinder.
 
 ![Full ring](img/01-ring.png)
 
 ## 2. Opening cutter
 
-The snap opening is made with a simple triangular cutter rather than a more
-complex circular sector.
+The opening remains a simple triangular cutter:
 
 ```scad
 cutter_length = outer_r + 10;
 cutter_half_width =
-    cutter_length * tan(opening_angle / 2);
-
-polygon(points = [
-    [0, 0],
-    [cutter_length, -cutter_half_width],
-    [cutter_length,  cutter_half_width]
-]);
+    cutter_length * tan(clamp.opening_angle / 2);
 ```
 
-The triangle starts at the center of the clamp and extends beyond the outer
-radius. The opening angle therefore directly determines the width of the cut.
-
-The design view shows the cutter together with the ring so the intended
-subtraction remains visible.
+All required dimensions come from the same clamp object.
 
 ![Ring with opening cutter](img/02-opening.png)
 
 ## 3. Final clamp
 
-The final clamp is simply the full ring minus the opening cutter:
+The public geometry call is intentionally small:
 
 ```scad
-difference() {
-    _full_ring(...);
-    _opening_cutter(...);
-}
+tube_clamp_build(clamp);
 ```
 
-The reusable public geometry is exposed as `tube_clamp(...)`.
+Internally `_opening_cutter(clamp)` is subtracted from `_full_ring(clamp)`.
 
 ![Final clamp](img/03-final.png)
 
-## Design rendering
+## Rendering
 
-`render_tube_clamp(...)` provides the construction views used by the design
-documentation. The separate `tube_clamp_render.scad` entrypoint selects the
-requested view and sets its own render resolution:
+Construction views use the same object:
 
 ```scad
-$fn = 120;
+tube_clamp_render(
+    clamp,
+    mode = "02-opening"
+);
 ```
 
-This keeps the design images consistent with the standalone module preview.
+The render entrypoint creates a default clamp and sets `$fn = 120` in its own
+render context.
