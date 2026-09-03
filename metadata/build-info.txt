@@ -1,0 +1,11 @@
+Repository: brainboxemb/lib.scad.clamps
+Commit: 0da99dbc9aebdb67bc6d97f94c3836f117f7caaf
+Workflow: VRF - Functional verification
+Run: 33784672758
+Toolchain:
+SCAD toolchain
+==============
+OpenSCAD   : OpenSCAD version 2026.08.31.nightly
+PythonSCAD : PythonSCAD version 1.1.2
+Python     : Python 3.12.3
+Git        : git version 2.43.0
