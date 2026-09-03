@@ -7,7 +7,11 @@ small = tube_clamp_create(
     clearance = 0.2,
     wall_thickness = 2,
     clamp_width = 12,
-    opening_angle = 55
+    opening_angle = 55,
+    foot_length = 28,
+    foot_thickness = 3,
+    foot_transition_width = 22,
+    foot_transition_height = 5
 );
 
 medium = tube_clamp_create();
@@ -17,7 +21,11 @@ large = tube_clamp_create(
     clearance = 0.4,
     wall_thickness = 4,
     clamp_width = 22,
-    opening_angle = 70
+    opening_angle = 70,
+    foot_length = 54,
+    foot_thickness = 5,
+    foot_transition_width = 42,
+    foot_transition_height = 10
 );
 
 translate([-32, 0, 0])

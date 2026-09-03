@@ -62,10 +62,16 @@ run_checked "OpenSCAD 02-opening" \
   -o "$OPENSCAD_OUT/02-opening.png" \
   "$OPENSCAD_SOURCE"
 
-run_checked "OpenSCAD 03-final" \
+run_checked "OpenSCAD 03-clip-body" \
+  openscad --enable=object-function "${common_args[@]}" \
+  -D 'design_view=3' \
+  -o "$OPENSCAD_OUT/03-clip-body.png" \
+  "$OPENSCAD_SOURCE"
+
+run_checked "OpenSCAD 04-final" \
   openscad --enable=object-function "${common_args[@]}" \
   -D 'design_view=0' \
-  -o "$OPENSCAD_OUT/03-final.png" \
+  -o "$OPENSCAD_OUT/04-final.png" \
   "$OPENSCAD_SOURCE"
 
 echo
@@ -85,11 +91,18 @@ run_checked "PythonSCAD 02-opening" \
   -o "$PYTHONSCAD_OUT/02-opening.png" \
   "$PYTHONSCAD_SOURCE"
 
-run_checked "PythonSCAD 03-final" \
+run_checked "PythonSCAD 03-clip-body" \
+  xvfb-run -a pythonscad "${common_args[@]}" \
+  --trust-python \
+  -D 'design_view="Clip body"' \
+  -o "$PYTHONSCAD_OUT/03-clip-body.png" \
+  "$PYTHONSCAD_SOURCE"
+
+run_checked "PythonSCAD 04-final" \
   xvfb-run -a pythonscad "${common_args[@]}" \
   --trust-python \
   -D 'design_view="Final clamp"' \
-  -o "$PYTHONSCAD_OUT/03-final.png" \
+  -o "$PYTHONSCAD_OUT/04-final.png" \
   "$PYTHONSCAD_SOURCE"
 
 echo

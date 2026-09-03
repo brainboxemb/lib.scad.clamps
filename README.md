@@ -36,17 +36,22 @@ lib.scad.clamps/
 
 ## Tube clamp
 
-The first reference part is a simple open snap-fit tube clamp. The initial
-design is deliberately limited to the reusable clamp body; mounting feet and
-project-specific attachment features are left out.
+The first reference part is an open snap-fit tube clamp with a simple flat
+mounting foot.
 
-Both implementations expose equivalent core parameters:
+The current design intentionally stops at the basic mounting form: a flat foot
+and sloped transition are included, while screw holes and mounting-head variants
+are not yet part of the geometry.
+
+Both implementations expose equivalent parameters for:
 
 - tube diameter;
 - clearance;
 - wall thickness;
 - clamp width;
-- opening angle.
+- opening angle;
+- foot length and thickness;
+- foot transition width and height.
 
 ## SCAD toolchain
 
@@ -131,41 +136,26 @@ generated output.
 
 ## Library and design rendering
 
-Each implementation exposes two public operations:
+OpenSCAD uses the object-based public API:
 
-```text
-tube_clamp(...)
-tube_clamp_render(...)
+```scad
+clamp = tube_clamp_create(...);
+tube_clamp_build(clamp);
+tube_clamp_render(clamp, view = TUBE_CLAMP_VIEW_OPENING);
 ```
 
-`tube_clamp(...)` is the reusable geometry API.
+PythonSCAD keeps the equivalent native class API:
 
-`tube_clamp_render(...)` is also part of the public API. It provides the
-standard construction/debug views while keeping the private geometry helpers
-private.
-
-Internal helpers use a leading underscore:
-
-```text
-_clamp_inner_radius(...)
-_clamp_outer_radius(...)
-_full_ring(...)
-_opening_cutter(...)
+```python
+clamp = TubeClamp(...)
+clamp.build()
+clamp.render(view=TubeClamp.View.OPENING)
 ```
 
-The design workflow does not call these private helpers directly. Its separate
-entrypoints only translate `design_view` into a public `tube_clamp_render(...)`
-call:
+Dedicated render entrypoints translate the external `design_view` selection and
+call these public APIs. They do not call private geometry helpers directly.
 
-```text
-openscad/tube-clamp/tube_clamp_tube_clamp_render.scad
-pythonscad/tube-clamp/tube_clamp_tube_clamp_render.py
-```
-
-Opening `tube_clamp.scad` directly still shows a useful preview, and its
-`design_view` value can be changed through the OpenSCAD Customizer. Projects
-using it as a library can use `use <tube_clamp.scad>` so the top-level preview
-is ignored.
+Opening either implementation directly still produces the default final clamp.
 
 ## Implementation parity
 
@@ -174,17 +164,17 @@ and the same parameter flow wherever practical.
 
 Both versions:
 
-- use the same parameter names and defaults;
-- use the same `EPS` constant;
-- pass design parameters explicitly into geometry modules/functions;
-- use the same radius helpers;
+- use the same geometric parameter names and defaults;
+- use the same `EPS` and foot-overlap values;
+- calculate the same tube radii;
 - build the same full ring;
 - build the opening from the same simple triangular cutter;
-- expose the same design views.
+- add the same flat foot and sloped transition;
+- expose the same design stages.
 
 PythonSCAD receives the workflow's `-D name=value` defines as Python
-globals before the script executes. The implementation reads `design_view`
-from `globals()` and provides `final` as the normal interactive fallback.
+globals before the script executes. The render entrypoint reads `design_view`
+from `globals()` and uses `TubeClamp.View.FINAL` as the normal fallback.
 
 The languages still use their natural constructs: OpenSCAD geometry is grouped
 in modules, while PythonSCAD geometry is returned from Python functions.
@@ -201,10 +191,11 @@ development workflow and automated verification.
 Both implementations deliberately show a default clamp when their library file
 is opened directly.
 
-OpenSCAD uses a top-level `tube_clamp_render(...)` call. PythonSCAD uses:
+OpenSCAD uses a top-level `tube_clamp_render(...)` call. PythonSCAD creates a
+default `TubeClamp` and uses:
 
 ```python
-show(tube_clamp_render())
+show(clamp.render())
 ```
 
 This keeps the direct-open behavior conceptually similar between the two
@@ -235,15 +226,11 @@ construction-step images remain under `design/img/`.
 
 ## PythonSCAD design imports
 
-PythonSCAD does not provide `__file__` in the executed design script. The design
-entrypoint therefore contains no path-discovery code.
-
-The render/test scripts add the module directory to `PYTHONPATH` before
-starting PythonSCAD, after which `design/tube_clamp_render.py` can use a normal public
-import:
+The PythonSCAD render entrypoint lives next to `tube_clamp.py`, so it can use a
+normal sibling import:
 
 ```python
-from tube_clamp import tube_clamp_render
+from tube_clamp import TubeClamp
 ```
 
 ## Surface resolution

@@ -99,22 +99,36 @@ unless a new explicit architectural decision is made.
 Current defaults:
 
 ```text
-tube diameter   20 mm
-clearance        0.0 mm
-wall thickness   3 mm
-clamp width     16 mm
-opening angle   60°
-EPS              0.05 mm
+tube diameter             20 mm
+clearance                  0.0 mm
+wall thickness             3 mm
+clamp width               16 mm
+opening angle             60°
+foot length               40 mm
+foot thickness             4 mm
+foot transition width     30 mm
+foot transition height     8 mm
+FOOT_OVERLAP               1.0 mm
+EPS                        0.05 mm
 ```
 
 Construction:
 
 1. build a complete cylindrical ring;
-2. build a simple triangular opening cutter;
-3. subtract the cutter from the ring.
+2. build the same simple triangular opening cutter;
+3. inspect the resulting C-shaped clip body;
+4. add a flat mounting foot and trapezoidal transition;
+5. subtract the tube bore and opening from the complete outer body so the
+   transition becomes two sloped side supports.
 
-The triangular cutter is deliberate. Do not replace it with a more complicated
-sector unless the design requires it.
+The ring overlaps the foot by `FOOT_OVERLAP` so the body is physically joined.
+
+The triangular opening cutter is deliberate. Do not replace it with a more
+complicated sector unless the design requires it.
+
+The mounting-foot step is intentionally still basic. Do not add screw holes,
+countersinks, edge-mount variants or other mounting systems unless they are the
+explicit next design step.
 
 ## OpenSCAD API
 
@@ -144,8 +158,8 @@ tube_clamp_outer_radius
 OpenSCAD object. Helpers receive that object instead of repeated parameter
 lists.
 
-Private implementation helpers use `_`, for example `_full_ring` and
-`_opening_cutter`.
+Private implementation helpers use `_`, for example `_full_ring`,
+`_opening_cutter`, `_mounting_foot` and `_foot_transition`.
 
 ### OpenSCAD global names and views
 
@@ -156,11 +170,13 @@ namespace for them:
 TUBE_CLAMP_VIEW_FINAL = 0;
 TUBE_CLAMP_VIEW_RING = 1;
 TUBE_CLAMP_VIEW_OPENING = 2;
+TUBE_CLAMP_VIEW_CLIP_BODY = 3;
 
 TUBE_CLAMP_VIEW_TABLE = [
-    [TUBE_CLAMP_VIEW_FINAL,   "Final clamp"],
-    [TUBE_CLAMP_VIEW_RING,    "Full ring"],
-    [TUBE_CLAMP_VIEW_OPENING, "Opening cutter"]
+    [TUBE_CLAMP_VIEW_FINAL,     "Final clamp"],
+    [TUBE_CLAMP_VIEW_RING,      "Full ring"],
+    [TUBE_CLAMP_VIEW_OPENING,   "Opening cutter"],
+    [TUBE_CLAMP_VIEW_CLIP_BODY, "Clip body"]
 ];
 ```
 
@@ -191,6 +207,10 @@ clamp = TubeClamp(
     wall_thickness=3,
     clamp_width=16,
     opening_angle=60,
+    foot_length=40,
+    foot_thickness=4,
+    foot_transition_width=30,
+    foot_transition_height=8,
 )
 
 clamp.build()
@@ -208,6 +228,8 @@ Private construction logic belongs in methods such as:
 ```text
 _full_ring()
 _opening_cutter()
+_mounting_foot()
+_foot_transition()
 ```
 
 The class is currently an immutable/frozen dataclass.
@@ -221,6 +243,7 @@ class View(StrEnum):
     FINAL = "Final clamp"
     RING = "Full ring"
     OPENING = "Opening cutter"
+    CLIP_BODY = "Clip body"
 ```
 
 The enum value is already the readable label. Do not add duplicate
@@ -292,7 +315,8 @@ Current design sequence:
 ```text
 01-ring
 02-opening
-03-final
+03-clip-body
+04-final
 ```
 
 For step 2, show the complete ring plus the opening cutter as a transparent red
@@ -606,6 +630,7 @@ At this point:
   `TUBE_CLAMP_VIEW_TABLE`;
 - PythonSCAD views use `TubeClamp.View(StrEnum)`;
 - both implementations use global surface resolution 120;
+- the tube clamp now includes a flat mounting foot with a sloped transition;
 - design docs use explanation + essential snippets + images;
 - native functional consumer tests exist for both implementations;
 - OpenSCAD is the primary direction for future reusable libraries;

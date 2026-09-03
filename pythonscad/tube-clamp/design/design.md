@@ -2,11 +2,12 @@
 
 ## Purpose
 
-The PythonSCAD implementation uses Python's native class model rather than
-copying the OpenSCAD/C-style API literally.
+The PythonSCAD implementation remains as the parallel comparison implementation
+for this existing library.
 
-The model remains fully parametric: all geometry inputs are constructor
-parameters of `TubeClamp`.
+The geometry now follows the same next design step as OpenSCAD: the C-shaped
+clip gets a flat mounting foot and a simple sloped transition. No screw holes
+or mounting-head variants are added yet.
 
 ## Constructor
 
@@ -17,12 +18,16 @@ clamp = TubeClamp(
     wall_thickness=3,
     clamp_width=16,
     opening_angle=60,
+    foot_length=40,
+    foot_thickness=4,
+    foot_transition_width=30,
+    foot_transition_height=8,
 )
 ```
 
 ## 1. Full ring
 
-Derived dimensions are exposed as properties:
+Derived tube dimensions remain normal class properties:
 
 ```python
 @property
@@ -30,13 +35,24 @@ def inner_radius(self):
     return (self.tube_diameter + self.clearance) / 2
 ```
 
-The ring remains an outer cylinder minus an inner cylinder.
+The ring is moved in front of the mounting foot while keeping a small physical
+overlap:
+
+```python
+@property
+def _center_x(self):
+    return (
+        self.foot_thickness
+        + self.outer_radius
+        - FOOT_OVERLAP
+    )
+```
 
 ![Full ring](img/01-ring.png)
 
 ## 2. Opening cutter
 
-The same triangular construction is used:
+The same triangular opening construction is retained:
 
 ```python
 cutter_half_width = cutter_length * tan(
@@ -44,64 +60,69 @@ cutter_half_width = cutter_length * tan(
 )
 ```
 
-The opening design view returns the ring and cutter as two separate objects.
-The ring is explicitly light gray and the cutter remains transparent red.
+The construction view shows the complete ring in light gray and the cutter in
+transparent red.
 
 ![Ring with opening cutter](img/02-opening.png)
 
-## 3. Final clamp
+## 3. Clip body
 
-The public geometry API is an instance method:
+The original C-shaped geometry remains available as a separate design view:
 
 ```python
-clamp.build()
+def _clip_body(self):
+    return (
+        self._full_ring()
+        - self._opening_cutter()
+    )
 ```
 
-![Final clamp](img/03-final.png)
+![Clip body](img/03-clip-body.png)
+
+## 4. Flat mounting foot
+
+The foot is a rectangular mounting body plus an extruded trapezoidal
+transition:
+
+```python
+points = [
+    [self.foot_thickness, -base_half_width],
+    [self.foot_thickness, base_half_width],
+    [attach_x, attach_y],
+    [attach_x, -attach_y],
+]
+```
+
+The final model first unions the outer ring and mounting foot. The bore and
+opening are then cut from the complete body:
+
+```python
+outer_body = (
+    self._outer_ring_solid()
+    | self._mounting_foot()
+)
+
+return (
+    outer_body
+    - self._inner_bore_cutter()
+    - self._opening_cutter()
+)
+```
+
+This leaves the tube path open while turning the transition into two sloped
+side supports.
+
+![Final clamp with flat foot](img/04-final.png)
 
 ## View selection
-
-Views are part of the `TubeClamp` class and use a Python `StrEnum`:
 
 ```python
 class View(StrEnum):
     FINAL = "Final clamp"
     RING = "Full ring"
     OPENING = "Opening cutter"
+    CLIP_BODY = "Clip body"
 ```
 
-The enum value is already the readable label, so no separate view constants,
-configuration table or label lookup function are needed.
-
-Use:
-
-```python
-clamp.render(
-    view=TubeClamp.View.OPENING,
-)
-```
-
-`render()` converts the supplied value through `TubeClamp.View(...)`, so invalid
-view values are rejected by the enum itself.
-
-The render entrypoint converts the command-line value explicitly to the enum:
-
-```python
-design_view = TubeClamp.View(
-    globals().get(
-        "design_view",
-        TubeClamp.View.FINAL,
-    )
-)
-```
-
-The render workflow therefore passes the enum values as strings, for example:
-
-```bash
--D 'design_view="Opening cutter"'
-```
-
-## Rendering
-
-The separate render entrypoint creates a default `TubeClamp`, selects the
-requested view and sets `fn = 120` in its own render context.
+The languages keep equivalent design stages while using their own natural API
+style.
