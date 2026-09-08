@@ -1,5 +1,11 @@
 # Tube clamp — PythonSCAD design
 
+<!-- scad-render-defaults
+engine: pythonscad
+source: ../tube_clamp_render.py
+vpr: [65, 0, 35]
+-->
+
 ## Scope
 
 This is the retained PythonSCAD comparison implementation of the same reusable
@@ -30,7 +36,9 @@ final clip
 
 The design starts with a solid outside cylinder. The tube cavity is not cut yet.
 
-![Outer ring](img/01-outer-ring.png)
+<!-- scad-render
+view: Outer ring
+-->
 
 ## 2. Compact base
 
@@ -46,7 +54,9 @@ def _flat_base(self):
     ])
 ```
 
-![Compact base](img/02-base.png)
+<!-- scad-render
+view: Compact base
+-->
 
 ## 3. Sloped transition
 
@@ -62,7 +72,9 @@ def _outer_shape(self):
     )
 ```
 
-![Base transition](img/03-transition.png)
+<!-- scad-render
+view: Base transition
+-->
 
 ## 4. Tube bore
 
@@ -72,13 +84,17 @@ The tube cavity is removed once from the completed outside.
 self._outer_shape() - self._inner_bore_cutter()
 ```
 
-![Tube bore](img/04-bore.png)
+<!-- scad-render
+view: Tube bore
+-->
 
 ## 5. Snap opening
 
 The triangular snap-opening cutter is applied after the tube cavity.
 
-![Snap opening](img/05-opening.png)
+<!-- scad-render
+view: Snap opening
+-->
 
 ## 6. Final base clip
 
@@ -91,14 +107,19 @@ def build(self):
     )
 ```
 
-![Final base clip](img/06-final.png)
+<!-- scad-render
+view: Final clamp
+-->
 
 ## 7. Profile view
 
 This view removes perspective and is intended for judging the base and
 transition geometry.
 
-![Profile view](img/07-profile.png)
+<!-- scad-render
+view: Profile view
+vpr: [0, 0, 0]
+-->
 
 ## Possible later variants
 

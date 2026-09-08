@@ -1,0 +1,23 @@
+project:
+  name: lib.scad.clamps
+
+paths:
+  design_root: .
+  build_root: bld
+
+openscad:
+  common_flags:
+    - --enable=object-function
+  render_flags:
+    - --render
+  image_size: [1600, 1000]
+  design_image_size: [640, 480]
+
+pythonscad:
+  common_flags:
+    - --trust-python
+  render_flags:
+    - --render
+
+publication:
+  build_branch: build

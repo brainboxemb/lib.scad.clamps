@@ -1,5 +1,12 @@
 # Tube clamp — OpenSCAD design
 
+<!-- scad-render-defaults
+engine: openscad
+source: ../tube_clamp_render.scad
+module: tube_clamp_design
+vpr: [65, 0, 35]
+-->
+
 ## Goal of the base clip
 
 This component is the reusable **basic tube clip**, not yet a complete mounting
@@ -82,7 +89,9 @@ module _outer_ring_solid(clamp) {
 }
 ```
 
-![Outer ring](img/01-outer-ring.png)
+<!-- scad-render
+view: outer-ring
+-->
 
 ## 2. Compact flat base
 
@@ -107,7 +116,9 @@ module _flat_base(clamp) {
 The important part is that the base uses `transition_width` directly. It cannot
 stick out farther than the transition underneath it.
 
-![Compact base](img/02-base.png)
+<!-- scad-render
+view: base
+-->
 
 ## 3. Sloped transition
 
@@ -136,7 +147,9 @@ module _outer_shape(clamp) {
 
 No holes have been made yet.
 
-![Base transition](img/03-transition.png)
+<!-- scad-render
+view: transition
+-->
 
 ## 4. Tube bore
 
@@ -153,7 +166,9 @@ difference() {
 
 This is the only tube-bore subtraction in the construction.
 
-![Tube bore](img/04-bore.png)
+<!-- scad-render
+view: bore
+-->
 
 ## 5. Snap opening
 
@@ -166,7 +181,9 @@ cutter_half_width =
     cutter_length * tan(clamp.opening_angle / 2);
 ```
 
-![Snap opening](img/05-opening.png)
+<!-- scad-render
+view: opening
+-->
 
 ## 6. Final base clip
 
@@ -186,7 +203,9 @@ module tube_clamp_build(clamp) {
 The result has a useful compact flat back but still makes no assumptions about
 how a project will fasten it.
 
-![Final base clip](img/06-final.png)
+<!-- scad-render
+view: final
+-->
 
 ## 7. Profile view
 
@@ -198,7 +217,10 @@ judging:
 - `transition_depth`;
 - the overlap between the circular body and the compact base.
 
-![Profile view](img/07-profile.png)
+<!-- scad-render
+view: profile
+vpr: [0, 0, 0]
+-->
 
 ## Public object API
 

@@ -1,50 +1,54 @@
 # Workflows
 
-## DSG - Update design images
+## DSG - Build design documentation
 
-`dsg-openscad.yml` updates implementation-specific design images for both
-OpenSCAD and PythonSCAD.
-
-The job runs inside the pinned shared toolchain container:
+`design-build.yml` uses the project-pinned `tool.scad-project` checkout to
+generate design documentation for both implementations:
 
 ```text
-ghcr.io/brainboxemb/scad-toolchain:v0.1.2
+OpenSCAD
+PythonSCAD
 ```
 
-The version is intentionally explicit. Toolchain upgrades should be deliberate
-repository changes so geometry or render differences can be reviewed.
+Both implementations use the same Markdown render model:
 
-The workflow:
-
-1. checks out the repository;
-2. shows the active SCAD toolchain versions;
-3. regenerates OpenSCAD and PythonSCAD design images;
-4. checks only the tracked `design/img/` paths for changes;
-5. commits generated design images back to `main` only when they changed.
-
-Generated PNG commits do not trigger another workflow run because `design/img`
-is not part of the path trigger.
-
-If `main` changes while rendering is in progress, the workflow refuses to push
-stale generated output.
-
-## Git ownership inside the container
-
-GitHub checks out the repository on the runner and mounts that workspace into
-the toolchain container. The checkout owner and the container user can differ.
-
-Before running Git commands, the workflow therefore marks the mounted workspace
-as a trusted Git directory:
-
-```bash
-git config --global --add safe.directory "$GITHUB_WORKSPACE"
+```text
+scad-render-defaults
+scad-render
 ```
 
-This is scoped to the ephemeral CI container and prevents Git's dubious
-ownership protection from rejecting the mounted checkout.
+Generated images and generated Markdown are written only to `bld/` and are
+published to the mutable orphan `build` branch. They are not committed to
+`main`.
 
-## Render error handling
+The workflow runs in:
 
-OpenSCAD can emit `ERROR:` messages while still returning exit code `0`.
-The design render script therefore checks both the process exit code and the
-captured render log. Any `ERROR:` line causes the workflow to fail.
+```text
+ghcr.io/brainboxemb/scad-toolchain:v0.3.0
+```
+
+`tool.scad-project` is a pinned Git submodule under:
+
+```text
+tools/tool.scad-project
+```
+
+## VRF - Functional verification
+
+`verify.yml` keeps the independent consumer-level API verification.
+
+Generated functional verification evidence is published to:
+
+```text
+verification
+```
+
+This is deliberately separate from the generated design/build branch:
+
+```text
+build
+    generated design documentation
+
+verification
+    consumer-level API verification evidence
+```

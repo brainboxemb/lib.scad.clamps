@@ -1,0 +1,93 @@
+name: DSG - Build design documentation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "openscad/**"
+      - "pythonscad/**"
+      - "project.yml"
+      - ".gitmodules"
+      - "tools/tool.scad-project"
+      - ".github/workflows/design-build.yml"
+  pull_request:
+    paths:
+      - "openscad/**"
+      - "pythonscad/**"
+      - "project.yml"
+      - ".gitmodules"
+      - "tools/tool.scad-project"
+      - ".github/workflows/design-build.yml"
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  design:
+    runs-on: ubuntu-latest
+
+    container:
+      image: ghcr.io/brainboxemb/scad-toolchain:v0.3.0
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout repository and pinned tooling
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Show toolchain
+        run: scad-toolchain-info
+
+      - name: Configure Git safe directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Lint project configuration
+        run: bash ./tools/tool.scad-project/scad-project.sh config-lint
+
+      - name: Lint design documentation
+        run: bash ./tools/tool.scad-project/scad-project.sh design-lint
+
+      - name: Build OpenSCAD and PythonSCAD design documentation
+        run: bash ./tools/tool.scad-project/scad-project.sh design-build
+
+      - name: Add build branch index
+        shell: bash
+        run: |
+          mkdir -p bld
+          cat > bld/README.md <<'EOF'
+          # lib.scad.clamps generated build
+
+          This branch contains generated documentation and build output.
+
+          ## Design documentation
+
+          - [Generated design documentation](design/README.md)
+
+          ## Source
+
+          The maintained source lives on the `main` branch.
+
+          Do not edit this branch manually; it is replaced by CI.
+          EOF
+
+      - name: Upload generated design documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: lib-scad-clamps-design-${{ github.sha }}
+          path: bld
+
+      - name: Publish generated build branch
+        if: github.event_name != 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global credential.helper store
+          printf "https://x-access-token:%s@github.com\n" "$GITHUB_TOKEN" > ~/.git-credentials
+          bash ./tools/tool.scad-project/scad-project.sh publish-build

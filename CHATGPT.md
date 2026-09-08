@@ -46,16 +46,17 @@ lib.scad.clamps/
 └── .github/workflows/
 ```
 
-Design images may be generated/committed on the normal branch. Functional
-verification output is generated and published to the orphan
-`verification` branch, not to `main`.
+Generated design documentation is written below `bld/` and published to the
+mutable orphan `build` branch. Functional verification output is published
+separately to the orphan `verification` branch. Neither generated output set
+belongs on `main`.
 
 ## Toolchain
 
 Pinned container:
 
 ```text
-ghcr.io/brainboxemb/scad-toolchain:v0.1.2
+ghcr.io/brainboxemb/scad-toolchain:v0.3.0
 ```
 
 Important commands:
@@ -311,56 +312,22 @@ syntax. In particular, document:
 Routine expressions do not need line-by-line commentary.
 
 
-### Generated design image cleanup
+### Generated design documentation
 
-Each `design/img/` directory is a generated image set.
+Each implementation keeps only source `design.md` on `main`.
 
-`scripts/render-design-images.sh` must maintain an explicit list of expected
-PNG filenames for each implementation. Only after all design renders have
-succeeded should it remove PNG files that are no longer in that list.
-
-This prevents stale files after design-step renames (for example an old
-`03-final.png` remaining beside `03-clip-body.png`) without deleting valid
-existing images before a render that might fail.
-
-
-Each implementation has `design/design.md`. These files are important project
-artifacts.
-
-They must contain:
-
-1. concise geometry/design explanation;
-2. essential code snippets only;
-3. generated design images.
-
-They must not become either:
-
-- only images;
-- full source-code walkthroughs.
-
-Current design sequence:
+Canonical render declarations:
 
 ```text
-01-outer-ring
-02-base
-03-transition
-04-bore
-05-opening
-06-final
-07-profile
+scad-render-defaults
+scad-render
 ```
 
-Design documentation should make geometry changes visually explicit. When a
-construction step adds geometry, keep existing geometry neutral/light gray and
-show the newly added material in transparent red where practical. The final
-profile view should look directly along the clamp width so mounting-foot and
-transition dimensions are easy to judge without perspective.
+`tool.scad-project design-build` generates both OpenSCAD and PythonSCAD design
+images below `bld/design`.
 
-For step 2, show the complete ring plus the opening cutter as a transparent red
-overlay. The ring should be neutral/light gray.
+Do not recreate `design/img/` on the source branch.
 
-OpenSCAD and PythonSCAD images should be conceptually equivalent even if their
-implementation syntax differs.
 
 ## Render entrypoints
 
@@ -678,3 +645,32 @@ At this point:
 - PythonSCAD consumer imports use the documented `sys.path` approach;
 - future work should build on these decisions rather than reconstruct them from
   chat history.
+## Shared project tooling
+
+`tool.scad-project` is pinned as:
+
+```text
+tools/tool.scad-project
+```
+
+The repository-level `project.yml` configures both render engines.
+
+OpenSCAD design adapter:
+- `openscad/tube-clamp/tube_clamp_render.scad`
+- exposes `tube_clamp_design(view=...)`
+- maps stable documentation names to the public numeric clamp view API.
+
+PythonSCAD design adapter:
+- `pythonscad/tube-clamp/tube_clamp_render.py`
+- consumes `design_view` injected by `tool.scad-project`.
+
+Keep the clamp geometry and public APIs independent of the documentation
+tooling. Render adapters translate the generic tool contract into each native
+public library API.
+
+Generated branches:
+- `build`: generated design/build documentation
+- `verification`: functional consumer/API verification
+
+The two branches have different purposes and must remain separate.
+

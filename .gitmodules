@@ -1,0 +1,3 @@
+[submodule "tools/tool.scad-project"]
+	path = tools/tool.scad-project
+	url = https://github.com/brainboxemb/tool.scad-project.git
