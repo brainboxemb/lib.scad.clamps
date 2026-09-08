@@ -674,3 +674,21 @@ Generated branches:
 
 The two branches have different purposes and must remain separate.
 
+
+### Design render source paths
+
+In `design/design.md`, `source:` is resolved relative to the component
+directory (the parent of `design/`), not relative to the Markdown file itself.
+
+Examples:
+
+```text
+openscad/tube-clamp/design/design.md
+source: tube_clamp_render.scad
+
+pythonscad/tube-clamp/design/design.md
+source: tube_clamp_render.py
+```
+
+Do not prefix these with `../`.
+

@@ -2,7 +2,7 @@
 
 <!-- scad-render-defaults
 engine: pythonscad
-source: ../tube_clamp_render.py
+source: tube_clamp_render.py
 vpr: [65, 0, 35]
 -->
 

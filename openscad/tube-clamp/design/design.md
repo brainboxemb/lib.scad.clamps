@@ -2,7 +2,7 @@
 
 <!-- scad-render-defaults
 engine: openscad
-source: ../tube_clamp_render.scad
+source: tube_clamp_render.scad
 module: tube_clamp_design
 vpr: [65, 0, 35]
 -->
