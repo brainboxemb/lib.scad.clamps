@@ -1,6 +1,13 @@
 project:
   name: lib.scad.clamps
 
+tooling:
+  tool_scad_project:
+    type: git-submodule
+    url: https://github.com/brainboxemb/tool.scad-project.git
+    path: tools/tool.scad-project
+    ref: v0.4.3
+
 paths:
   design_root: .
   build_root: bld
@@ -19,5 +26,12 @@ pythonscad:
   render_flags:
     - --render
 
+verification:
+  commands:
+    - [bash, scripts/run-verification.sh]
+    - [bash, scripts/build-verification-index.sh]
+  output_root: vrf/out
+
 publication:
   build_branch: build
+  verification_branch: verification

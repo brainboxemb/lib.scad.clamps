@@ -692,3 +692,68 @@ source: tube_clamp_render.py
 
 Do not prefix these with `../`.
 
+## tool.scad-project v0.4.3 pinning
+
+This repository uses `tool.scad-project` release `v0.4.3`.
+
+Keep all three references aligned:
+
+```text
+project.yml tooling.tool_scad_project.ref
+tools/tool.scad-project gitlink
+.github/workflows/* reusable workflow @tag
+```
+
+For this version they must all resolve to `v0.4.3`.
+
+The root `bootstrap.ps1` and `bootstrap.sh` are copied from the canonical
+scripts in `tool.scad-project/bootstrap/`. Do not maintain a library-specific
+bootstrap implementation.
+
+GitHub Actions files in this repository are thin callers:
+
+```text
+design-build.yml
+    -> project-build.yml@v0.4.3
+
+verify.yml
+    -> project-verify.yml@v0.4.3
+```
+
+Common build/verification mechanics belong in `tool.scad-project`, not in this
+library.
+
+The project-specific verification behavior remains declared in `project.yml`
+and implemented by the existing scripts under `scripts/`.
+
+## Repository dependency management
+
+This repository follows the `tool.scad-project` v0.4.3 dependency model.
+
+`project.yml` is the dependency-policy source:
+
+```yaml
+tooling:
+  tool_scad_project:
+    type: git-submodule
+    url: https://github.com/brainboxemb/tool.scad-project.git
+    path: tools/tool.scad-project
+    ref: v0.4.3
+```
+
+The parent gitlink remains the resolved lock.
+
+Root convenience scripts copied from `tool.scad-project`:
+- `bootstrap.ps1`
+- `bootstrap.sh`
+- `update-repo.ps1`
+- `update-repo.sh`
+
+Semantics:
+- bootstrap: establish/repair submodule registrations;
+- repo-sync: restore committed gitlinks;
+- repo-update: resolve configured refs and intentionally advance them;
+- repo-status: show configured refs/current commits.
+
+Do not hand-maintain separate library-specific dependency update logic.
+

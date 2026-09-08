@@ -405,6 +405,82 @@ GitHub Actions runs.
 
 Repository architecture, workflow rules and persistent ChatGPT handoff
 context are documented in [`CHATGPT.md`](CHATGPT.md).
+## Shared project workflow
+
+This repository pins `tool.scad-project` release `v0.4.3` for both local
+tooling and GitHub Actions.
+
+The intended alignment is:
+
+```text
+project.yml
+    v0.4.3
+
+tools/tool.scad-project
+    gitlink -> commit tagged v0.4.3
+
+GitHub reusable workflows
+    @v0.4.3
+```
+
+The repository's own GitHub Actions YAML files are deliberately thin callers.
+The common build and verification steps live in `tool.scad-project`.
+
+Build output is published to:
+
+```text
+build
+```
+
+Functional verification evidence is published separately to:
+
+```text
+verification
+```
+
+## Repository dependency update
+
+`project.yml` is the dependency-policy source. For this library the project
+tooling is pinned as:
+
+```yaml
+tooling:
+  tool_scad_project:
+    type: git-submodule
+    url: https://github.com/brainboxemb/tool.scad-project.git
+    path: tools/tool.scad-project
+    ref: v0.4.3
+```
+
+After bootstrap, the normal intentional dependency update command is:
+
+```powershell
+.\update-repo.ps1
+```
+
+or:
+
+```bash
+bash ./update-repo.sh
+```
+
+The command resolves the configured refs, updates submodule gitlinks and keeps
+the thin GitHub workflow references aligned. It deliberately leaves all changes
+uncommitted for review.
+
+The repository updater is intentionally Python-free; on Windows it only requires Git and PowerShell.
+
+Useful direct commands are:
+
+```powershell
+.\tools\tool.scad-project\scad-project.ps1 repo-status
+.\tools\tool.scad-project\scad-project.ps1 repo-sync
+.\tools\tool.scad-project\scad-project.ps1 repo-update
+```
+
+`repo-sync` restores the commits already locked by the parent repository.
+`repo-update` intentionally resolves the configured refs again.
+
 ## Generated design documentation
 
 The source branch contains only the maintained design source:
@@ -431,7 +507,7 @@ engine: pythonscad
 source: tube_clamp_render.py
 ```
 
-The shared project tooling generates:
+The reusable `tool.scad-project` build workflow generates:
 
 ```text
 bld/design/
