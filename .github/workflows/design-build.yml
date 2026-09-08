@@ -27,6 +27,6 @@ permissions:
 
 jobs:
   build:
-    uses: brainboxemb/tool.scad-project/.github/workflows/project-build.yml@v0.4.3
+    uses: brainboxemb/tool.scad-project/.github/workflows/project-build.yml@v0.4.4
     with:
       artifact_name: lib-scad-clamps-build

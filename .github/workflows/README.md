@@ -1,14 +1,14 @@
 # Workflows
 
 This repository keeps only thin GitHub Actions callers. The shared job logic is
-owned by `tool.scad-project` and pinned to release `v0.4.3`.
+owned by `tool.scad-project` and pinned to release `v0.4.4`.
 
 ## Build
 
 `design-build.yml` calls:
 
 ```text
-brainboxemb/tool.scad-project/.github/workflows/project-build.yml@v0.4.3
+brainboxemb/tool.scad-project/.github/workflows/project-build.yml@v0.4.4
 ```
 
 The reusable workflow handles:
@@ -26,7 +26,7 @@ The reusable workflow handles:
 `verify.yml` calls:
 
 ```text
-brainboxemb/tool.scad-project/.github/workflows/project-verify.yml@v0.4.3
+brainboxemb/tool.scad-project/.github/workflows/project-verify.yml@v0.4.4
 ```
 
 The reusable workflow first performs generic project verification and then runs
@@ -48,13 +48,13 @@ These references should all represent the same `tool.scad-project` release:
 
 ```text
 project.yml
-    tooling.tool_scad_project.ref: v0.4.3
+    tooling.tool_scad_project.ref: v0.4.4
 
 tools/tool.scad-project
-    gitlink pinned to the commit tagged v0.4.3
+    gitlink pinned to the commit tagged v0.4.4
 
 GitHub workflow
-    @v0.4.3
+    @v0.4.4
 ```
 
 A tooling upgrade is therefore one deliberate repository change rather than an

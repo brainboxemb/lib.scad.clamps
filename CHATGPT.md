@@ -692,9 +692,9 @@ source: tube_clamp_render.py
 
 Do not prefix these with `../`.
 
-## tool.scad-project v0.4.3 pinning
+## tool.scad-project v0.4.4 pinning
 
-This repository uses `tool.scad-project` release `v0.4.3`.
+This repository uses `tool.scad-project` release `v0.4.4`.
 
 Keep all three references aligned:
 
@@ -704,7 +704,7 @@ tools/tool.scad-project gitlink
 .github/workflows/* reusable workflow @tag
 ```
 
-For this version they must all resolve to `v0.4.3`.
+For this version they must all resolve to `v0.4.4`.
 
 The root `bootstrap.ps1` and `bootstrap.sh` are copied from the canonical
 scripts in `tool.scad-project/bootstrap/`. Do not maintain a library-specific
@@ -714,10 +714,10 @@ GitHub Actions files in this repository are thin callers:
 
 ```text
 design-build.yml
-    -> project-build.yml@v0.4.3
+    -> project-build.yml@v0.4.4
 
 verify.yml
-    -> project-verify.yml@v0.4.3
+    -> project-verify.yml@v0.4.4
 ```
 
 Common build/verification mechanics belong in `tool.scad-project`, not in this
@@ -728,7 +728,7 @@ and implemented by the existing scripts under `scripts/`.
 
 ## Repository dependency management
 
-This repository follows the `tool.scad-project` v0.4.3 dependency model.
+This repository follows the `tool.scad-project` v0.4.4 dependency model.
 
 `project.yml` is the dependency-policy source:
 
@@ -738,7 +738,7 @@ tooling:
     type: git-submodule
     url: https://github.com/brainboxemb/tool.scad-project.git
     path: tools/tool.scad-project
-    ref: v0.4.3
+    ref: v0.4.4
 ```
 
 The parent gitlink remains the resolved lock.
@@ -756,4 +756,15 @@ Semantics:
 - repo-status: show configured refs/current commits.
 
 Do not hand-maintain separate library-specific dependency update logic.
+
+## Direct dependency boundary
+
+When `lib.scad.clamps` is used as an external library, its nested
+`tools/tool.scad-project` submodule must not be initialized by the parent
+consumer's normal checkout.
+
+When this repository is the standalone project, its own bootstrap initializes
+that direct tooling dependency.
+
+Do not reintroduce recursive submodule checkout into normal workflows.
 

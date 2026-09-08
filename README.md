@@ -407,20 +407,20 @@ Repository architecture, workflow rules and persistent ChatGPT handoff
 context are documented in [`CHATGPT.md`](CHATGPT.md).
 ## Shared project workflow
 
-This repository pins `tool.scad-project` release `v0.4.3` for both local
+This repository pins `tool.scad-project` release `v0.4.4` for both local
 tooling and GitHub Actions.
 
 The intended alignment is:
 
 ```text
 project.yml
-    v0.4.3
+    v0.4.4
 
 tools/tool.scad-project
-    gitlink -> commit tagged v0.4.3
+    gitlink -> commit tagged v0.4.4
 
 GitHub reusable workflows
-    @v0.4.3
+    @v0.4.4
 ```
 
 The repository's own GitHub Actions YAML files are deliberately thin callers.
@@ -440,6 +440,18 @@ verification
 
 ## Repository dependency update
 
+### Direct dependency behavior
+
+When this repository is cloned standalone, bootstrap initializes its direct
+`tools/tool.scad-project` dependency.
+
+When `lib.scad.clamps` is consumed as a submodule of another project, the
+parent project's normal checkout does not recursively initialize this library's
+own tooling submodule. Consumers therefore receive the CAD source without
+pulling the library's development tooling tree.
+
+
+
 `project.yml` is the dependency-policy source. For this library the project
 tooling is pinned as:
 
@@ -449,7 +461,7 @@ tooling:
     type: git-submodule
     url: https://github.com/brainboxemb/tool.scad-project.git
     path: tools/tool.scad-project
-    ref: v0.4.3
+    ref: v0.4.4
 ```
 
 After bootstrap, the normal intentional dependency update command is:
