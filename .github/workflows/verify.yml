@@ -1,4 +1,4 @@
-name: Verify SCAD project
+name: Verify
 
 on:
   workflow_dispatch:
@@ -35,6 +35,9 @@ permissions:
 
 jobs:
   verify:
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     uses: brainboxemb/tool.scad-project/.github/workflows/project-verify.yml@v0.6.1
     with:
       artifact_name: lib-scad-clamps-verification
