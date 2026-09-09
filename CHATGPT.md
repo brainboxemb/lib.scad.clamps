@@ -692,9 +692,9 @@ source: tube_clamp_render.py
 
 Do not prefix these with `../`.
 
-## tool.scad-project v0.6.0 pinning
+## tool.scad-project v0.6.1 pinning
 
-This repository uses `tool.scad-project` release `v0.6.0`.
+This repository uses `tool.scad-project` release `v0.6.1`.
 
 Keep all three references aligned:
 
@@ -704,7 +704,7 @@ tools/tool.scad-project gitlink
 .github/workflows/* reusable workflow @tag
 ```
 
-For this version they must all resolve to `v0.6.0`.
+For this version they must all resolve to `v0.6.1`.
 
 The root `bootstrap.ps1` and `bootstrap.sh` are copied from the canonical
 scripts in `tool.scad-project/bootstrap/`. Do not maintain a library-specific
@@ -714,10 +714,10 @@ GitHub Actions files in this repository are thin callers:
 
 ```text
 design-build.yml
-    -> project-build.yml@v0.6.0
+    -> project-build.yml@v0.6.1
 
 verify.yml
-    -> project-verify.yml@v0.6.0
+    -> project-verify.yml@v0.6.1
 ```
 
 Common build/verification mechanics belong in `tool.scad-project`, not in this
@@ -728,7 +728,7 @@ and implemented by the existing scripts under `scripts/`.
 
 ## Repository dependency management
 
-This repository follows the `tool.scad-project` v0.6.0 dependency model.
+This repository follows the `tool.scad-project` v0.6.1 dependency model.
 
 `project.yml` is the dependency-policy source:
 
@@ -738,7 +738,7 @@ tooling:
     type: git-submodule
     url: https://github.com/brainboxemb/tool.scad-project.git
     path: tools/tool.scad-project
-    ref: v0.6.0
+    ref: v0.6.1
 ```
 
 The parent gitlink remains the resolved lock.
