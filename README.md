@@ -7,7 +7,9 @@ implementations.
 
 - [Generated build output](../../tree/build)
 - [Generated design documentation](../../blob/build/design/README.md)
+- [Build provenance](../../blob/build/publication-info.txt)
 - [Functional verification](../../tree/verification)
+- [Verification provenance](../../blob/verification/publication-info.txt)
 
 The repository is organized by implementation technology first. Each concrete
 clamp keeps its source, design documentation and generated design images
