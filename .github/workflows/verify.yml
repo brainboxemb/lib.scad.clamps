@@ -35,7 +35,7 @@ permissions:
 
 jobs:
   verify:
-    uses: brainboxemb/tool.scad-project/.github/workflows/project-verify.yml@v0.5.0
+    uses: brainboxemb/tool.scad-project/.github/workflows/project-verify.yml@v0.6.0
     with:
       artifact_name: lib-scad-clamps-verification
       verification_path: vrf/out
