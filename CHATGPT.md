@@ -161,8 +161,11 @@ tube_clamp_outer_radius
 OpenSCAD object. Helpers receive that object instead of repeated parameter
 lists.
 
-Private implementation helpers use `_`, for example `_full_ring`,
-`_opening_cutter`, `_mounting_foot` and `_foot_transition`.
+Private implementation helpers always use a leading `_`, including helpers
+nested inside another module. Scope does not replace the naming convention.
+
+Current examples include `_outer_shape`, `_outer_ring_solid`,
+`_inner_bore_cutter` and `_opening_cutter`.
 
 ### OpenSCAD global names and views
 
@@ -540,6 +543,7 @@ OpenSCAD identifiers         snake_case
 Python functions             snake_case
 Python classes               PascalCase
 OpenSCAD global constants    UPPER_SNAKE_CASE with component prefix
+Private OpenSCAD symbols     leading underscore, regardless of scope
 ```
 
 Examples:

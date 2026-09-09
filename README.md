@@ -295,6 +295,11 @@ tube_clamp_outer_radius(clamp)
 This keeps future calculations and additional clamp parameters from expanding
 every helper function signature.
 
+Private OpenSCAD implementation helpers use a leading `_`. This also applies
+to helpers nested inside another module: nested scope makes a helper local, but
+the underscore still communicates that it is an implementation detail. This
+matches the convention used by BOSL2.
+
 
 ### PythonSCAD API
 
