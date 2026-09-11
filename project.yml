@@ -6,7 +6,7 @@ tooling:
     type: git-submodule
     url: https://github.com/brainboxemb/tool.scad-project.git
     path: tools/tool.scad-project
-    ref: v0.9.11
+    ref: v0.9.12
 
 paths:
   design_root: .
