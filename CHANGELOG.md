@@ -4,6 +4,14 @@ Functional changes to released `lib.scad.clamps` versions.
 
 ## Unreleased
 
+### Changed
+
+- Upgrade repository tooling from `tool.scad-project` v0.9.10 to v0.9.11.
+- Replace shared `dev/build` and `dev/verification` publication with isolated `dev/pr-<number>/build` and `dev/pr-<number>/verification` pull-request previews.
+- Run Build and Verify for pull requests and pushes to `main`, avoiding duplicate feature-branch push runs.
+- Add pull-request cleanup that removes generated PR preview branches after close and deletes merged same-repository feature branches.
+- Pin the tool gitlink and Build/Verify/Release/PR-cleanup reusable workflows to the exact v0.9.11 source commit.
+
 ## v0.1.1
 
 ### Changed
