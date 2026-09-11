@@ -4,6 +4,12 @@ Functional changes to released `lib.scad.clamps` versions.
 
 ## Unreleased
 
+### Changed
+
+- Upgrade repository tooling from `tool.scad-project` v0.9.8 to v0.9.10.
+- Pin `project.yml`, the `tools/tool.scad-project` gitlink, and Build/Verify/Release reusable workflows to the exact v0.9.10 source commit.
+- Adopt the layout-independent Build/Verify cache hashing and design-render improvements included in v0.9.10.
+
 ## v0.1.0
 
 ### Added
