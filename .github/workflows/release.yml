@@ -1,0 +1,89 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Immutable release version, e.g. v0.1.0"
+        required: true
+        type: string
+      source_sha:
+        description: "Exact 40-character source commit SHA from main"
+        required: true
+        type: string
+  push:
+    branches:
+      - "release-request/**"
+
+permissions:
+  actions: read
+  contents: write
+  packages: read
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      source_sha: ${{ steps.release.outputs.source_sha }}
+
+    steps:
+      - name: Resolve release request
+        id: release
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_SOURCE_SHA: ${{ inputs.source_sha }}
+          REF_NAME: ${{ github.ref_name }}
+          ACTOR: ${{ github.actor }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+          if [[ "${EVENT_NAME}" == "push" ]]; then
+            if [[ "${ACTOR}" != "${REPOSITORY_OWNER}" ]]; then echo "ERROR: release-request branches may only be created by ${REPOSITORY_OWNER}" >&2; exit 1; fi
+            REQUEST="${REF_NAME#release-request/}"
+            IFS='/' read -r VERSION SOURCE_SHA EXTRA <<< "${REQUEST}"
+            if [[ "${REQUEST}" == "${REF_NAME}" || -z "${VERSION}" || -z "${SOURCE_SHA}" || -n "${EXTRA:-}" ]]; then echo "ERROR: release request branch must be release-request/vX.Y.Z/<40-char-sha>" >&2; exit 1; fi
+          else
+            VERSION="${INPUT_VERSION}"
+            SOURCE_SHA="${INPUT_SOURCE_SHA}"
+          fi
+          if [[ ! "${VERSION}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo "ERROR: version must match vX.Y.Z" >&2; exit 1; fi
+          if [[ ! "${SOURCE_SHA}" =~ ^[0-9a-f]{40}$ ]]; then echo "ERROR: source_sha must be an exact 40-character commit SHA" >&2; exit 1; fi
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "source_sha=${SOURCE_SHA}" >> "$GITHUB_OUTPUT"
+          echo "Release request: ${VERSION} @ ${SOURCE_SHA}"
+
+  release:
+    needs: resolve
+    permissions:
+      actions: read
+      contents: write
+      packages: read
+    uses: brainboxemb/tool.scad-project/.github/workflows/project-release.yml@360b6aa950288adfad845fffccd0ffa41becd45c
+    with:
+      version: ${{ needs.resolve.outputs.version }}
+      source_sha: ${{ needs.resolve.outputs.source_sha }}
+      build_path: bld
+      verification_path: vrf/out
+
+  cleanup-request:
+    if: ${{ always() && github.event_name == 'push' }}
+    needs: [resolve, release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout request branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Remove release request branch
+        env:
+          REQUEST_BRANCH: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          git push origin --delete "${REQUEST_BRANCH}" || true

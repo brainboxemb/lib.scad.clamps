@@ -5,23 +5,8 @@ on:
   push:
     branches:
       - "**"
-    tags:
-      - "v*"
-    paths:
-      - "openscad/**"
-      - "pythonscad/**"
-      - "project.yml"
-      - ".gitmodules"
-      - "tools/tool.scad-project"
-      - ".github/workflows/design-build.yml"
+      - "!release-request/**"
   pull_request:
-    paths:
-      - "openscad/**"
-      - "pythonscad/**"
-      - "project.yml"
-      - ".gitmodules"
-      - "tools/tool.scad-project"
-      - ".github/workflows/design-build.yml"
 
 permissions:
   contents: write
@@ -32,6 +17,6 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
-    uses: brainboxemb/tool.scad-project/.github/workflows/project-build.yml@v0.7.2
+    uses: brainboxemb/tool.scad-project/.github/workflows/project-build.yml@360b6aa950288adfad845fffccd0ffa41becd45c
     with:
       artifact_name: lib-scad-clamps-build

@@ -192,14 +192,14 @@ for row in "${ordered[@]}"; do
   new="$(git -C "$path" rev-parse HEAD)"
   results+=("$name|$path|$ref|$workflow_ref|$old|$new")
 
-  [[ "$role" == "tooling" ]] && tool_workflow_ref="$workflow_ref"
+  [[ "$role" == "tooling" ]] && tool_workflow_ref="$new"
 done
 
 if [[ -n "$tool_workflow_ref" && -d .github/workflows ]]; then
   while IFS= read -r -d '' file; do
     before="$(cat "$file")"
     after="$(printf '%s' "$before" | sed -E \
-      "s#(brainboxemb/tool\\.scad-project/\\.github/workflows/(project-build|project-verify)\\.yml)@[^[:space:]\"']+#\\1@${tool_workflow_ref}#g")"
+      "s#(brainboxemb/tool\\.scad-project/\\.github/workflows/(project-build|project-verify|project-release)\\.yml)@[^[:space:]\"']+#\\1@${tool_workflow_ref}#g")"
     if [[ "$after" != "$before" ]]; then
       printf '%s' "$after" > "$file"
       echo "Updated workflow ref: $file"
