@@ -2,6 +2,15 @@
 
 Persistent guidance for automated coding agents working in `lib.scad.clamps`.
 
+## Generic workflow policy
+
+Before branch, pull-request, publication or release work, read the pinned
+`tools/tool.scad-project/AGENTS.md`. Its pull-request-first change workflow and
+publication lifecycle are authoritative for this consumer.
+
+This root file adds library-specific guidance only. It must not contradict or
+copy changing generic workflow rules from the pinned tool policy.
+
 ## Project purpose
 
 `lib.scad.clamps` is a reusable CAD library. Its first component is an open
@@ -150,7 +159,8 @@ shared tool policy, not only process exit status.
 ## Tooling and CI
 
 Pin `tool.scad-project` through `project.yml` and the gitlink. Use direct-only
-submodule checkout and thin reusable workflow callers.
+submodule checkout and thin reusable workflow callers. Generic branch naming,
+PR preview publication and cleanup are governed by the pinned tool policy.
 
 Shell scripts invoked from Actions must be called explicitly with `bash`; do not
 rely on executable-bit preservation across Windows/ZIP workflows.
