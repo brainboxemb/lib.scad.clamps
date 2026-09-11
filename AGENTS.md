@@ -1,540 +1,164 @@
-# ChatGPT project handoff guide
+# Repository agent guidance
 
-This file is the persistent development context for `lib.scad.clamps`.
-Read it before making structural changes. It is a handoff document, not a
-conversation transcript.
-
-The model, code and documentation are being developed with the assistance of
-ChatGPT.
+Persistent guidance for automated coding agents working in `lib.scad.clamps`.
 
 ## Project purpose
 
-`lib.scad.clamps` is a reusable CAD library. The first component is an open
-snap-fit tube clamp implemented in parallel in OpenSCAD and PythonSCAD:
+`lib.scad.clamps` is a reusable CAD library. Its first component is an open
+snap-fit tube clamp implemented in both OpenSCAD and PythonSCAD.
+
+Both implementations represent the same design, but should use the natural
+idioms of their language. Equivalent behavior is the goal; syntax-level symmetry
+is not.
+
+## Sources of truth
+
+Use:
+
+```text
+component source + design documentation     geometry/API intent
+project.yml                                 tooling/dependency policy
+.gitlinks / .gitmodules                     resolved dependency state
+verification tests                          public-consumer behavior
+```
+
+Do not duplicate volatile toolchain or `tool.scad-project` versions in this
+file. Read the active values from `project.yml`, workflow refs and runtime
+metadata.
+
+## Repository structure
+
+Keep implementation families separate:
 
 ```text
 openscad/tube-clamp/
 pythonscad/tube-clamp/
+test/
+vrf/
 ```
 
-Both implementations must represent the same design, but should use the natural
-idioms of their language. Do not force syntax-level symmetry.
+Generated design/build/verification output belongs under generated output paths
+and publication branches, never on `main` beside source documentation.
 
-## Repository structure
+## OpenSCAD direction
 
-```text
-lib.scad.clamps/
-├── README.md
-├── CHATGPT.md
-├── openscad/tube-clamp/
-│   ├── tube_clamp.scad
-│   ├── tube_clamp_render.scad
-│   └── design/
-│       ├── design.md
-│       └── img/
-├── pythonscad/tube-clamp/
-│   ├── tube_clamp.py
-│   ├── tube_clamp_render.py
-│   └── design/
-│       ├── design.md
-│       └── img/
-├── test/
-│   ├── openscad/tube_clamp_api.scad
-│   └── pythonscad/tube_clamp_api.py
-├── vrf/README.md
-├── scripts/
-└── .github/workflows/
-```
+OpenSCAD is the primary implementation direction for future reusable libraries
+in this repository.
 
-Generated design documentation is written below `bld/` and published to the
-mutable orphan `build` branch. Functional verification output is published
-separately to the orphan `verification` branch. Neither generated output set
-belongs on `main`.
-
-## Toolchain
-
-Pinned container:
-
-```text
-ghcr.io/brainboxemb/scad-toolchain:v0.4.0
-```
-
-Important commands:
-
-```text
-openscad
-pythonscad
-python3
-git
-scad-toolchain-info
-```
-
-PythonSCAD headless rendering uses:
-
-```bash
-xvfb-run -a pythonscad --trust-python ...
-```
-
-### OpenSCAD objects
-
-The OpenSCAD implementation uses experimental `object()` support. Every CLI run
-that consumes the library must enable:
-
-```bash
-openscad --enable=object-function ...
-```
-
-The correct feature name is `object-function`.
-
-Do not use the rejected/incorrect variants:
-
-```text
---enable=object
---enable=all
-```
-
-unless a new explicit architectural decision is made.
-
-## Tube clamp geometry
-
-Current defaults:
-
-```text
-tube diameter          20 mm
-clearance               0.0 mm
-wall thickness          3 mm
-clamp width            16 mm
-opening angle          60°
-base thickness          4 mm
-transition width       30 mm
-transition depth        8 mm
-BASE_OVERLAP            1.0 mm
-EPS                     0.05 mm
-```
-
-Construction:
-
-1. build the solid circular outside;
-2. add the compact flat base;
-3. add the sloped transition, producing one complete outer shape;
-4. subtract the tube bore once from that outer shape;
-5. subtract the simple triangular snap opening.
-
-The base clip is deliberately mounting-neutral. Its flat base width is exactly
-`transition_width`; there is no independent base/mounting-plate width.
-
-Current compact-base parameters are `base_thickness`, `transition_width`, and
-`transition_depth`.
-
-The triangular opening cutter remains deliberate. Do not replace it with a
-more complicated sector unless the design requires it.
-
-Possible future mounting variants include a single-screw version and an
-extended two-screw mounting-plate version. They are not part of the base clip
-yet.
-
-## OpenSCAD API
-
-OpenSCAD uses an object in a C-struct-like way.
+Use object-based public APIs:
 
 ```scad
 clamp = tube_clamp_create(...);
-
 tube_clamp_build(clamp);
-tube_clamp_render(clamp, view = TUBE_CLAMP_VIEW_OPENING);
-
-inner_r = tube_clamp_inner_radius(clamp);
-outer_r = tube_clamp_outer_radius(clamp);
+tube_clamp_render(clamp, view);
 ```
 
-Public lifecycle names:
+Do not flatten the public API into long scalar wrappers merely to accommodate
+PythonSCAD interoperability limitations.
 
-```text
-tube_clamp_create
-tube_clamp_build
-tube_clamp_render
-tube_clamp_inner_radius
-tube_clamp_outer_radius
-```
+Private implementation helpers always use a leading underscore, including
+nested helpers. Global constants use a component prefix because OpenSCAD has no
+real namespace.
 
-`tube_clamp_create(...)` owns the primary parametrical inputs and returns the
-OpenSCAD object. Helpers receive that object instead of repeated parameter
-lists.
+Surface resolution is render concern, not part of the public geometry API. Do
+not reintroduce a public `segments` parameter.
 
-Private implementation helpers always use a leading `_`, including helpers
-nested inside another module. Scope does not replace the naming convention.
+## PythonSCAD direction
 
-Current examples include `_outer_shape`, `_outer_ring_solid`,
-`_inner_bore_cutter` and `_opening_cutter`.
-
-### OpenSCAD global names and views
-
-Global constants must be component-prefixed because OpenSCAD has no proper
-namespace for them:
-
-```scad
-TUBE_CLAMP_VIEW_FINAL = 0;
-TUBE_CLAMP_VIEW_RING = 1;
-TUBE_CLAMP_VIEW_OPENING = 2;
-TUBE_CLAMP_VIEW_CLIP_BODY = 3;
-
-TUBE_CLAMP_VIEW_TABLE = [
-    [TUBE_CLAMP_VIEW_FINAL,     "Final clamp"],
-    [TUBE_CLAMP_VIEW_RING,      "Full ring"],
-    [TUBE_CLAMP_VIEW_OPENING,   "Opening cutter"],
-    [TUBE_CLAMP_VIEW_CLIP_BODY, "Clip body"]
-];
-```
-
-`TABLE` is intentionally preferred over `CONFIG`.
-
-The enum value intentionally equals the table index. Keep the consistency
-check:
-
-```scad
-function tube_clamp_view_label(view) =
-    assert(
-        TUBE_CLAMP_VIEW_TABLE[view][0] == view,
-        "TUBE_CLAMP_VIEW_TABLE index/value mismatch"
-    )
-    TUBE_CLAMP_VIEW_TABLE[view][1];
-```
-
-The OpenSCAD Customizer uses the same numeric view values.
-
-## PythonSCAD API
-
-PythonSCAD uses native Python OOP instead of copying the OpenSCAD/C API.
+PythonSCAD uses native Python OOP rather than copying the OpenSCAD/C-like API:
 
 ```python
-clamp = TubeClamp(
-    tube_diameter=20,
-    clearance=0.0,
-    wall_thickness=3,
-    clamp_width=16,
-    opening_angle=60,
-    foot_length=40,
-    foot_thickness=4,
-    foot_transition_width=30,
-    foot_transition_height=8,
-)
-
+clamp = TubeClamp(...)
 clamp.build()
-clamp.render(view=TubeClamp.View.OPENING)
-
-clamp.inner_radius
-clamp.outer_radius
+clamp.render(view=...)
 ```
 
-The `TubeClamp(...)` constructor is the complete parametric input surface.
-Do not add a redundant `tube_clamp_create()` factory without a real need.
+Keep its existing implementation and consumer tests as a technology comparison
+and regression target, but do not make PythonSCAD the default direction for new
+reusable library work unless its maturity/interoperability materially changes.
 
-Private construction logic belongs in methods such as:
+Native Python modules use normal Python imports. Do not use `osuse()` to import
+`tube_clamp.py`.
 
-```text
-_full_ring()
-_opening_cutter()
-_mounting_foot()
-_foot_transition()
-```
+## Interoperability conclusion
 
-The class is currently an immutable/frozen dataclass.
+Current PythonSCAD interoperability does not transfer OpenSCAD `object()` values
+as reusable Python-side objects. This is an architectural limitation worth
+preserving as evidence, not something to hide with scalar bridge wrappers.
 
-### PythonSCAD views
+Do not weaken the OpenSCAD API to work around this limitation.
 
-Views are scoped to the class and use a `StrEnum`:
+## Geometry discipline
 
-```python
-class View(StrEnum):
-    FINAL = "Final clamp"
-    RING = "Full ring"
-    OPENING = "Opening cutter"
-    CLIP_BODY = "Clip body"
-```
+Preserve the established construction order for the base clamp:
 
-The enum value is already the readable label. Do not add duplicate
-`VIEW_CONFIG`, `VIEW_LABELS` or `tube_clamp_view_label()` structures in Python.
+1. create the complete outside body;
+2. subtract the tube bore once;
+3. subtract the snap opening.
 
-The render entrypoint must explicitly convert command-line injected values:
+The compact base remains mounting-neutral. Do not reintroduce a separate
+mounting-plate width into the base component without a new design decision.
 
-```python
-design_view = TubeClamp.View(
-    globals().get(
-        "design_view",
-        TubeClamp.View.FINAL,
-    )
-)
-```
+Boolean overlap constants exist to make operations robust and should be
+explained where non-obvious rather than removed as "redundant" geometry.
 
-The Python render workflow therefore passes strings such as:
+## Views and render entrypoints
 
-```bash
--D 'design_view="Opening cutter"'
-```
+Dedicated render entrypoints translate external view selection, construct a
+default component and call the public render API. They must not call private
+geometry helpers directly.
 
-OpenSCAD intentionally uses numeric CLI view values; PythonSCAD uses the
-`StrEnum` string values.
-
-## Surface resolution
-
-Surface resolution is not part of the geometry API.
-
-OpenSCAD:
-
-```scad
-$fn = 120;
-```
-
-PythonSCAD:
-
-```python
-fn = 120
-```
-
-Render entrypoints set their own resolution as well.
-
-Do not reintroduce a public `segments` parameter.
-
-Known PythonSCAD observation: some intermediate construction views have shown
-rougher OpenCSG/faceting artifacts while final geometry renders correctly.
-Current policy is to keep the documented global `fn = 120` approach unless
-final renders/exports prove it insufficient.
+OpenSCAD uses component-prefixed numeric view constants/table entries;
+PythonSCAD uses its scoped enum/string model. Do not add duplicate view mapping
+structures just to make the languages look identical.
 
 ## Design documentation
 
-### Source comments
+Source `design.md` files explain the physical design, not merely the code or a
+catalogue of render views.
 
-Source files should explain non-obvious design intent rather than restating
-syntax. In particular, document:
+For each meaningful step:
 
-- why Boolean overlaps such as `BASE_OVERLAP` exist;
-- the outer-shape-first / cutouts-afterwards construction order;
-- why the compact base has no independent width parameter;
-- what `transition_width` and `transition_depth` mean geometrically.
+1. explain the physical feature first;
+2. explain the geometric operation;
+3. show an image that makes the change visible;
+4. show concise source excerpts only where they improve understanding.
 
-Routine expressions do not need line-by-line commentary.
+Generated design images belong under `bld/design`. Do not recreate committed
+`design/img/` output on `main`.
 
+## Consumer verification
 
-### Generated design documentation
+Tests under `test/` act as external consumers and must exercise public APIs only.
+Maintain both native OpenSCAD and native PythonSCAD paths while the PythonSCAD
+implementation exists.
 
-Each implementation keeps only source `design.md` on `main`.
-
-Canonical render declarations:
-
-```text
-scad-render-defaults
-scad-render
-```
-
-`tool.scad-project design-build` generates both OpenSCAD and PythonSCAD design
-images below `bld/design`.
-
-Do not recreate `design/img/` on the source branch.
-
-
-## Render entrypoints
-
-Dedicated render entrypoints:
-
-```text
-openscad/tube-clamp/tube_clamp_render.scad
-pythonscad/tube-clamp/tube_clamp_render.py
-```
-
-They should:
-
-- translate external view selection;
-- create a default clamp;
-- invoke the public render API;
-- set their own surface resolution.
-
-They should not call private geometry helpers directly.
-
-The primary library files should also produce a useful default/final preview
-when opened directly.
-
-Expected module preview names are based on the source filename:
-
-```text
-tube_clamp.png
-```
-
-not `standalone.png`.
-
-## PythonSCAD imports
-
-Native PythonSCAD `.py` libraries use normal Python imports.
-
-Official reference:
-https://www.pythonscad.org/examples/
-
-PythonSCAD shows the normal Python pattern:
-
-```python
-import sys
-sys.path.append("\\path\\to\\python\\site-packages-dir")
-```
-
-The functional consumer test uses the same approach with a repository-relative
-path:
-
-```python
-import sys
-from pathlib import Path
-
-LIB_DIR = Path.cwd() / "pythonscad" / "tube-clamp"
-sys.path.append(str(LIB_DIR))
-
-from tube_clamp import TubeClamp
-```
-
-`run-verification.sh` changes to the repository root first so this is
-deterministic.
-
-Do not use `osuse()` to import `tube_clamp.py`; native Python modules use normal Python imports.
-
-PythonSCAD can consume ordinary OpenSCAD libraries through `osuse()`, but the
-current conversion layer cannot transfer OpenSCAD `object()` values across that
-boundary. Because this project deliberately prefers object-based OpenSCAD APIs,
-direct PythonSCAD consumption of the OpenSCAD implementation is not a supported
-project path for now.
-
-
-## Primary implementation direction
-
-OpenSCAD is the primary implementation direction for future reusable libraries
-in this project.
-
-This is a deliberate outcome of the PythonSCAD evaluation.
-
-The preferred OpenSCAD architecture uses `object()` values as struct-like
-parametric data models:
-
-```scad
-clamp = tube_clamp_create(...);
-tube_clamp_build(clamp);
-```
-
-That design is considered cleaner and more extensible than flattening every
-operation into long scalar parameter lists.
-
-PythonSCAD can consume conventional OpenSCAD geometry modules through
-`osuse()`, but its current OpenSCAD/Python conversion layer does not support
-OpenSCAD `object()` values. A function returning an OpenSCAD object therefore
-does not produce a reusable Python-side value that can later be passed back to
-another OpenSCAD function/module.
-
-For this project the conclusion is intentionally strong:
-
-- do not weaken or flatten the OpenSCAD object API to accommodate PythonSCAD;
-- do not invest further in PythonSCAD as the default implementation path for
-  new reusable libraries;
-- keep the existing PythonSCAD `tube-clamp` implementation because this
-  repository is also a technology exploration/comparison and that implementation
-  remains useful;
-- maintain its native PythonSCAD consumer test so the existing implementation
-  does not silently regress;
-- revisit PythonSCAD only if its object interoperability or overall maturity
-  materially changes.
-
-This conclusion is specific to the project's preferred reusable-library
-architecture, not a claim that PythonSCAD cannot generate CAD geometry.
-
-
-## Functional consumer tests
-
-Tests under `test/` exercise the public API as an external consumer.
-
-There are two maintained consumer paths: native OpenSCAD and native PythonSCAD.
-
-They create three clearly different clamps: small, default/medium and large.
-They vary several geometric parameters and also assert derived radius values.
-
-The tests must verify:
+Verification should cover:
 
 - external library consumption;
 - parametric construction;
-- public build API;
+- public build/render API;
 - derived calculations;
 - PNG rendering;
 - STL export.
 
-Do not call private helpers from these consumer tests.
+Do not call private helpers from consumer tests.
 
-## Verification workflow
+OpenSCAD output must be checked for logged geometry errors/warnings as defined by
+shared tool policy, not only process exit status.
 
-`.github/workflows/verify.yml` performs functional verification.
+## Tooling and CI
 
-It should:
+Pin `tool.scad-project` through `project.yml` and the gitlink. Use direct-only
+submodule checkout and thin reusable workflow callers.
 
-1. run OpenSCAD consumer tests;
-2. run PythonSCAD consumer tests;
-3. render PNG output;
-4. export STL output;
-5. verify calculations;
-6. fail on command errors;
-7. fail on logged `ERROR:` lines;
-8. create an index and build metadata;
-9. publish only after all checks pass;
-10. publish to orphan branch `verification`.
+Shell scripts invoked from Actions must be called explicitly with `bash`; do not
+rely on executable-bit preservation across Windows/ZIP workflows.
 
-A failed run must not replace the last successful verification output.
+Root bootstrap/update scripts are canonical copies from `tool.scad-project` and
+must remain Python-free during bootstrap.
 
-Expected generated structure:
-
-```text
-verification branch
-├── index.md
-├── openscad/
-│   ├── tube-clamp-api.png
-│   └── tube-clamp-api.stl
-├── pythonscad/
-│   ├── tube-clamp-api.png
-│   └── tube-clamp-api.stl
-└── metadata/
-    └── build-info.txt
-```
-
-### OpenSCAD error handling
-
-OpenSCAD can log `ERROR:` and still exit with status 0. Scripts therefore must
-check both:
-
-- actual process status;
-- output logs for `ERROR:`.
-
-Do not simplify this back to exit-code-only checking.
-
-### Shell scripts in Actions
-
-Do not rely on Unix executable bits because Windows/ZIP workflows may not
-preserve them.
-
-Use:
-
-```yaml
-run: bash scripts/run-verification.sh
-```
-
-instead of:
-
-```yaml
-run: scripts/run-verification.sh
-```
-
-Apply the same rule to other repository shell scripts used by Actions.
-
-### Git safe directory
-
-Container workflows may need:
-
-```bash
-git config --global --add safe.directory "$GITHUB_WORKSPACE"
-```
-
-before Git operations.
-
-## Naming conventions
+## Naming
 
 ```text
 repository/directory names   kebab-case
@@ -542,233 +166,8 @@ code filenames               snake_case
 OpenSCAD identifiers         snake_case
 Python functions             snake_case
 Python classes               PascalCase
-OpenSCAD global constants    UPPER_SNAKE_CASE with component prefix
-Private OpenSCAD symbols     leading underscore, regardless of scope
+OpenSCAD global constants    component-prefixed UPPER_SNAKE_CASE
+private OpenSCAD symbols     leading underscore
 ```
 
-Examples:
-
-```text
-tube-clamp/
-tube_clamp.scad
-tube_clamp_render.scad
-tube_clamp.py
-tube_clamp_render.py
-TubeClamp
-TUBE_CLAMP_VIEW_OPENING
-TUBE_CLAMP_VIEW_TABLE
-```
-
-Do not return to hyphenated code filenames.
-
-## Conceptual parity
-
-Keep this conceptual mapping:
-
-```text
-OpenSCAD                        PythonSCAD
-
-tube_clamp_create(...)          TubeClamp(...)
-tube_clamp_build(clamp)         clamp.build()
-tube_clamp_render(clamp, view)  clamp.render(view)
-tube_clamp_inner_radius(clamp)  clamp.inner_radius
-tube_clamp_outer_radius(clamp)  clamp.outer_radius
-```
-
-Equivalent behavior is the goal, not identical language mechanics.
-
-## Explicitly rejected approaches
-
-Also rejected:
-
-- a permanent PythonSCAD/OpenSCAD scalar bridge whose only purpose is to hide
-  the missing OpenSCAD `object()` conversion;
-- flattening the public OpenSCAD API into scalar convenience wrappers for
-  PythonSCAD interoperability.
-
-
-Do not silently reintroduce these without a new architectural decision:
-
-- public `segments`/resolution parameter propagated through geometry APIs;
-- Python `__all__` for this small explicit-import library;
-- Python top-level `tube_clamp_create/build/render` functions that mimic C;
-- Python numeric `VIEW_CONFIG` tables;
-- generic OpenSCAD `VIEW_FINAL`, `VIEW_RING`, etc. without component prefix;
-- OpenSCAD `--enable=object` (wrong feature name);
-- OpenSCAD `--enable=all` for this library;
-- `osuse()` for importing native `tube_clamp.py`;
-- design docs containing only images;
-- design docs duplicating complete implementation files.
-
-## ZIP delivery rules
-
-When ChatGPT provides a development ZIP:
-
-- provide a complete repository snapshot unless a patch is explicitly requested;
-- use a new unique versioned filename;
-- never overwrite the previous ZIP;
-- do not include generated PNGs;
-- do not include generated verification output;
-- do not add meaningless `.gitkeep` placeholders merely for generated dirs;
-- inspect the produced snapshot before claiming a change exists.
-
-## Change discipline
-
-This project has accumulated deliberate decisions over many iterations.
-
-Before a refactor:
-
-1. inspect the current files;
-2. identify the exact concern being changed;
-3. preserve unrelated decisions;
-4. update relevant design docs together with source;
-5. update consumer tests when the public API changes;
-6. update render scripts when view/CLI semantics change;
-7. update verification workflow when invocation behavior changes.
-
-Prefer focused changes over broad cleanup.
-
-## Current handoff state
-
-At this point:
-
-- OpenSCAD uses an object-based create/build/render API;
-- PythonSCAD uses the `TubeClamp` class API;
-- OpenSCAD views use prefixed numeric constants plus
-  `TUBE_CLAMP_VIEW_TABLE`;
-- PythonSCAD views use `TubeClamp.View(StrEnum)`;
-- both implementations use global surface resolution 120;
-- the tube clamp now includes a flat mounting foot with a sloped transition;
-- design docs use explanation + essential snippets + images;
-- native functional consumer tests exist for both implementations;
-- OpenSCAD is the primary direction for future reusable libraries;
-- PythonSCAD is retained only for this comparison implementation and is not
-  currently a target for further library expansion;
-- verification publishes generated evidence to the orphan `verification`
-  branch;
-- PythonSCAD consumer imports use the documented `sys.path` approach;
-- future work should build on these decisions rather than reconstruct them from
-  chat history.
-## Shared project tooling
-
-`tool.scad-project` is pinned as:
-
-```text
-tools/tool.scad-project
-```
-
-The repository-level `project.yml` configures both render engines.
-
-OpenSCAD design adapter:
-- `openscad/tube-clamp/tube_clamp_render.scad`
-- exposes `tube_clamp_design(view=...)`
-- maps stable documentation names to the public numeric clamp view API.
-
-PythonSCAD design adapter:
-- `pythonscad/tube-clamp/tube_clamp_render.py`
-- consumes `design_view` injected by `tool.scad-project`.
-
-Keep the clamp geometry and public APIs independent of the documentation
-tooling. Render adapters translate the generic tool contract into each native
-public library API.
-
-Generated branches:
-- `build`: generated design/build documentation
-- `verification`: functional consumer/API verification
-
-The two branches have different purposes and must remain separate.
-
-
-### Design render source paths
-
-In `design/design.md`, `source:` is resolved relative to the component
-directory (the parent of `design/`), not relative to the Markdown file itself.
-
-Examples:
-
-```text
-openscad/tube-clamp/design/design.md
-source: tube_clamp_render.scad
-
-pythonscad/tube-clamp/design/design.md
-source: tube_clamp_render.py
-```
-
-Do not prefix these with `../`.
-
-## tool.scad-project v0.6.1 pinning
-
-This repository uses `tool.scad-project` release `v0.6.1`.
-
-Keep all three references aligned:
-
-```text
-project.yml tooling.tool_scad_project.ref
-tools/tool.scad-project gitlink
-.github/workflows/* reusable workflow @tag
-```
-
-For this version they must all resolve to `v0.6.1`.
-
-The root `bootstrap.ps1` and `bootstrap.sh` are copied from the canonical
-scripts in `tool.scad-project/bootstrap/`. Do not maintain a library-specific
-bootstrap implementation.
-
-GitHub Actions files in this repository are thin callers:
-
-```text
-design-build.yml
-    -> project-build.yml@v0.6.1
-
-verify.yml
-    -> project-verify.yml@v0.6.1
-```
-
-Common build/verification mechanics belong in `tool.scad-project`, not in this
-library.
-
-The project-specific verification behavior remains declared in `project.yml`
-and implemented by the existing scripts under `scripts/`.
-
-## Repository dependency management
-
-This repository follows the `tool.scad-project` v0.6.1 dependency model.
-
-`project.yml` is the dependency-policy source:
-
-```yaml
-tooling:
-  tool_scad_project:
-    type: git-submodule
-    url: https://github.com/brainboxemb/tool.scad-project.git
-    path: tools/tool.scad-project
-    ref: v0.6.1
-```
-
-The parent gitlink remains the resolved lock.
-
-Root convenience scripts copied from `tool.scad-project`:
-- `bootstrap.ps1`
-- `bootstrap.sh`
-- `update-repo.ps1`
-- `update-repo.sh`
-
-Semantics:
-- bootstrap: establish/repair submodule registrations;
-- repo-sync: restore committed gitlinks;
-- repo-update: resolve configured refs and intentionally advance them;
-- repo-status: show configured refs/current commits.
-
-Do not hand-maintain separate library-specific dependency update logic.
-
-## Direct dependency boundary
-
-When `lib.scad.clamps` is used as an external library, its nested
-`tools/tool.scad-project` submodule must not be initialized by the parent
-consumer's normal checkout.
-
-When this repository is the standalone project, its own bootstrap initializes
-that direct tooling dependency.
-
-Do not reintroduce recursive submodule checkout into normal workflows.
-
+The model, code and documentation are developed with the assistance of ChatGPT.
