@@ -4,6 +4,8 @@ Functional changes to released `lib.scad.clamps` versions.
 
 ## Unreleased
 
+## v0.1.1
+
 ### Changed
 
 - Upgrade repository tooling from `tool.scad-project` v0.9.8 to v0.9.10.
