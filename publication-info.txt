@@ -1,0 +1,40 @@
+Publication context : development
+Publication kind    : build
+Publication branch  : dev/build
+
+Source
+------
+Repository          : brainboxemb/lib.scad.clamps
+Ref type            : branch
+Ref                 : feature/pr-scoped-publication
+Commit              : e2e4c03a743b4c76ebd96f015ca81cc686defbf3
+Triggered by        : brainboxemb
+Workflow run        : https://github.com/brainboxemb/lib.scad.clamps/actions/runs/34590073607
+
+Tooling
+-------
+SCAD toolchain image: ghcr.io/brainboxemb/scad-toolchain:v0.4.1
+SCAD toolchain ver. : v0.4.1
+tool.scad-project   : v0.9.10
+
+Git submodules
+--------------
+tools/tool.scad-project : 827ae5fef4bffd83b81fb4e2eb580267d1dd3abb
+
+Runtime components
+------------------
+SCAD toolchain
+==============
+OpenSCAD   : OpenSCAD version 2026.09.09.nightly
+PythonSCAD : PythonSCAD version 1.1.2
+Python     : Python 3.12.3
+Git        : git version 2.43.0
+SCons      : 4.11.1
+BOSL2      : v2.0.752
+pybosl2    : 0.6.7
+Shapely    : 2.1.2
+docsgen    : 2.0.55
+Pillow     : 12.3.0
+OPENSCADPATH: /opt/openscad-libraries
+BOSL2_ROOT  : /opt/openscad-libraries/BOSL2
+PYTHONPATH : /__w/lib.scad.clamps/lib.scad.clamps/tools/tool.scad-project/src:/opt/python-libs
