@@ -4,8 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - "**"
-      - "!release-request/**"
+      - main
   pull_request:
 
 permissions:
@@ -17,6 +16,6 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
-    uses: brainboxemb/tool.scad-project/.github/workflows/project-build.yml@827ae5fef4bffd83b81fb4e2eb580267d1dd3abb
+    uses: brainboxemb/tool.scad-project/.github/workflows/project-build.yml@12c924eb4d0ef8f348c0947a2607f0a214d220da
     with:
       artifact_name: lib-scad-clamps-build
