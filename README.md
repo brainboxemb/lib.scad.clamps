@@ -74,6 +74,8 @@ Design documentation should explain the physical feature first, then the geometr
 
 Consumer-level tests under `test/` exercise the public OpenSCAD and native PythonSCAD APIs. They create multiple parameter sets, verify derived calculations, render PNG evidence and export STL geometry.
 
+Functional verification also checks the repository/tooling boundary: the split configuration, direct `tool.git-project` and `tool.scad-project` gitlinks, exact reusable-workflow pinning and canonical bootstrap/update launchers.
+
 Successful functional evidence is published separately to `prod/verification`. A failed verification must not replace the previous successful snapshot.
 
 A version release reruns Build and Verify against the exact release source and publishes immutable snapshots under:
@@ -93,9 +95,29 @@ PythonSCAD remains useful here as a technology comparison and as an independentl
 
 ## Project tooling
 
-The current `tool.scad-project` dependency is declared in `project.yml`, locked by the `tools/tool.scad-project` gitlink and matched by the reusable workflow commit pins. Keep those three representations aligned.
+Repository-level Git/dependency policy and SCAD-specific policy are intentionally separated:
 
-Bootstrap and dependency updates are Python-free:
+```text
+project.yml
+    generic project/profile/dependency policy
+
+project.scad.yml
+    SCAD paths, engines, verification and publication policy
+```
+
+The direct tooling layout is:
+
+```text
+tools/tool.git-project
+    generic bootstrap engine, pinned directly by the parent gitlink
+
+tools/tool.scad-project
+    SCAD tooling, declared as a managed dependency in project.yml
+```
+
+`tool.git-project` is not recursively listed in `project.yml` because it must exist before that configuration can be processed. `tool.scad-project` is declared in `project.yml`, locked by its gitlink and matched by the exact reusable workflow commit pins. Keep those representations aligned.
+
+Bootstrap and dependency updates remain simple from the consumer repository:
 
 ```powershell
 .\bootstrap.ps1
@@ -109,7 +131,9 @@ bash ./bootstrap.sh
 bash ./update-repo.sh
 ```
 
-Normal checkout initializes direct dependencies only. When this library is consumed as a submodule, the parent project does not recursively initialize this library's own development-tooling submodule.
+The root bootstrap launchers are canonical copies from `tool.git-project`. The root update launchers are thin SCAD wrappers from `tool.scad-project`; generic Git/ref handling still belongs to `tool.git-project`, while the SCAD wrapper additionally aligns Build/Verify/Release/cleanup workflow refs to the exact SCAD-tool gitlink.
+
+Normal checkout initializes direct dependencies only. When this library is consumed as a submodule, the parent project does not recursively initialize this library's own development-tooling submodules.
 
 Repository-specific agent guidance is in [`AGENTS.md`](AGENTS.md).
 
