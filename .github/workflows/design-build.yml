@@ -16,6 +16,6 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
-    uses: brainboxemb/tool.scad-project/.github/workflows/project-build.yml@ba93e9165f8c23df3f867c2ae7fa160187166d9d
+    uses: brainboxemb/tool.scad-project/.github/workflows/project-build.yml@40694891d3239401cb0ba4bfb35a3812d6584ab7
     with:
       artifact_name: lib-scad-clamps-build

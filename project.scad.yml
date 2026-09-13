@@ -1,0 +1,39 @@
+paths:
+  design_root: .
+  build_root: bld
+
+openscad:
+  common_flags:
+    - --enable=object-function
+  render_flags:
+    - --render
+  image_size: [1600, 1000]
+  design_image_size: [640, 480]
+
+pythonscad:
+  common_flags:
+    - --trust-python
+  render_flags:
+    - --render
+
+verification:
+  commands:
+    - [bash, scripts/run-verification.sh]
+    - [bash, scripts/build-verification-index.sh]
+  output_root: vrf/out
+
+publication:
+  production:
+    source_branch: main
+    build_branch: prod/build
+    verification_branch: prod/verification
+
+  development:
+    pr_branch_prefix: dev/pr
+
+  tags:
+    pattern: "v*"
+
+  release:
+    branch_prefix: rel
+    tag_pattern: "v*"

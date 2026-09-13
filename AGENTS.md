@@ -4,12 +4,16 @@ Persistent guidance for automated coding agents working in `lib.scad.clamps`.
 
 ## Generic workflow policy
 
-Before branch, pull-request, publication or release work, read the pinned
+Before SCAD branch, pull-request, publication or release work, read the pinned
 `tools/tool.scad-project/AGENTS.md`. Its pull-request-first change workflow and
 publication lifecycle are authoritative for this consumer.
 
+Generic repository bootstrap, dependency gitlink registration/status/update and
+ref resolution belong to the pinned `tools/tool.git-project`. Do not duplicate
+that logic here or in SCAD-specific scripts.
+
 This root file adds library-specific guidance only. It must not contradict or
-copy changing generic workflow rules from the pinned tool policy.
+copy changing generic workflow rules from the pinned tools.
 
 ## Project purpose
 
@@ -26,13 +30,17 @@ Use:
 
 ```text
 component source + design documentation     geometry/API intent
-project.yml                                 tooling/dependency policy
-.gitlinks / .gitmodules                     resolved dependency state
+project.yml                                 generic profile/dependency policy
+project.scad.yml                            SCAD build/verification/publication policy
+.gitlinks / .gitmodules                     exact dependency lock / registration
 verification tests                          public-consumer behavior
 ```
 
+`tools/tool.git-project` is the bootstrap special case and is pinned directly by
+the parent gitlink. It must not recursively list itself in `project.yml`.
+
 Do not duplicate volatile toolchain or `tool.scad-project` versions in this
-file. Read the active values from `project.yml`, workflow refs and runtime
+file. Read active values from `project.yml`, gitlinks, workflow refs and runtime
 metadata.
 
 ## Repository structure
@@ -149,7 +157,8 @@ Verification should cover:
 - public build/render API;
 - derived calculations;
 - PNG rendering;
-- STL export.
+- STL export;
+- the current bootstrap/tooling ownership boundary.
 
 Do not call private helpers from consumer tests.
 
@@ -158,15 +167,41 @@ shared tool policy, not only process exit status.
 
 ## Tooling and CI
 
-Pin `tool.scad-project` through `project.yml` and the gitlink. Use direct-only
-submodule checkout and thin reusable workflow callers. Generic branch naming,
-PR preview publication and cleanup are governed by the pinned tool policy.
+The direct tooling layout is:
+
+```text
+tools/tool.git-project      generic bootstrap engine, directly pinned
+tools/tool.scad-project     managed SCAD tooling dependency
+```
+
+`project.yml` declares the `tool.scad-project` dependency/update policy and
+selects `project.scad.yml`; the tool gitlink and reusable workflow refs pin the
+exact SCAD-tool commit used by a source revision.
+
+Root bootstrap scripts must remain exact copies of:
+
+```text
+tools/tool.git-project/bootstrap/consumer-bootstrap.ps1
+tools/tool.git-project/bootstrap/consumer-bootstrap.sh
+```
+
+Root update scripts must remain exact copies of the thin SCAD wrappers:
+
+```text
+tools/tool.scad-project/bootstrap/consumer-update.ps1
+tools/tool.scad-project/bootstrap/consumer-update.sh
+```
+
+The SCAD update wrapper delegates generic dependency movement to
+`tool.git-project` and then aligns SCAD reusable-workflow refs to the exact
+checked-out `tool.scad-project` gitlink. It must not reimplement generic Git/ref
+resolution.
+
+Use direct-only submodule checkout. Generic branch naming, PR preview
+publication and cleanup are governed by the pinned SCAD tool policy.
 
 Shell scripts invoked from Actions must be called explicitly with `bash`; do not
 rely on executable-bit preservation across Windows/ZIP workflows.
-
-Root bootstrap/update scripts are canonical copies from `tool.scad-project` and
-must remain Python-free during bootstrap.
 
 ## Naming
 
