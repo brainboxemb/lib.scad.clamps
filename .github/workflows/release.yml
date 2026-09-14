@@ -62,7 +62,7 @@ jobs:
       actions: read
       contents: write
       packages: read
-    uses: brainboxemb/tool.scad-project/.github/workflows/project-release.yml@40694891d3239401cb0ba4bfb35a3812d6584ab7
+    uses: brainboxemb/tool.scad-project/.github/workflows/project-release.yml@68301267273ea21c4b82ff3b26e1c8a30ff7b065
     with:
       version: ${{ needs.resolve.outputs.version }}
       source_sha: ${{ needs.resolve.outputs.source_sha }}
