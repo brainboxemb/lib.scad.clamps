@@ -2,16 +2,15 @@
 
 Functional changes to released `lib.scad.clamps` versions.
 
-## Unreleased
+## v0.1.2
 
 ### Changed
 
-- Upgrade repository tooling from `tool.scad-project` v0.9.10 through v0.9.11 to v0.9.12.
-- Replace shared `dev/build` and `dev/verification` publication with isolated `dev/pr-<number>/build` and `dev/pr-<number>/verification` pull-request previews.
-- Run Build and Verify for pull requests and pushes to `main`, avoiding duplicate feature-branch push runs.
-- Add pull-request cleanup that removes generated PR preview branches after close and deletes merged same-repository feature branches.
-- Pin the tool gitlink and Build/Verify/Release/PR-cleanup reusable workflows to the exact v0.9.12 source commit.
-- Defer generic branch, pull-request and publication-agent guidance to the pinned `tools/tool.scad-project/AGENTS.md` policy.
+- Complete the repository tooling migration from `tool.scad-project` v0.9.10 through the intermediate v0.9.12 work to released `v0.12.0`.
+- Pin `project.yml`, the `tools/tool.scad-project` gitlink, and Build/Verify/Release/PR-cleanup reusable workflows to the exact v0.12.0 source commit.
+- Keep pull-request previews isolated under `dev/pr-<number>/build` and `dev/pr-<number>/verification`, with cleanup after PR close.
+- Continue to run Build and Verify for pull requests and pushes to `main`, avoiding duplicate feature-branch push runs.
+- Preserve the existing clamp API, geometry and self-contained OpenSCAD/PythonSCAD verification behaviour while adopting the current released repository tooling.
 
 ## v0.1.1
 
