@@ -135,6 +135,23 @@ The root bootstrap launchers are canonical copies from `tool.git-project`. The r
 
 Normal checkout initializes direct dependencies only. When this library is consumed as a submodule, the parent project does not recursively initialize this library's own development-tooling submodules.
 
+### Repository orchestration choice
+
+This library deliberately does **not** use Moon at present.
+
+That is an optimisation choice, not an incomplete migration. The repository has one build domain and already gets the useful incremental behaviour from `tool.scad-project` and SCons: target-level dependency tracking, persistent build/verification caches, separate Build and Verify actions, generated-output publication and release qualification. Build and Verify are intentionally independent and can run in parallel.
+
+Adding Moon here would introduce a second repository-level task graph, task-output cache and materialization-evidence layer without currently removing meaningful work. For this small library that would add configuration and maintenance cost, and a template-style graph would also couple Verify back to Build even though the SCAD tooling deliberately separates those domains.
+
+Reconsider Moon only when there is a concrete repository-level problem it solves, for example:
+
+- several build/documentation domains need one coordinated dependency graph;
+- expensive whole-capability outputs benefit measurably from task-level hydration beyond the existing SCons caches;
+- publication requires explicit current-materialization evidence across several producers;
+- orchestration complexity has grown beyond the direct reusable Build/Verify workflows.
+
+Using current `tool.git-project` and `tool.scad-project` therefore does not imply that Moon must be present. Moon is optional repository orchestration, while SCons remains the fine-grained SCAD build authority.
+
 Repository-specific agent guidance is in [`AGENTS.md`](AGENTS.md).
 
 The model, code and documentation were developed with the assistance of ChatGPT.
