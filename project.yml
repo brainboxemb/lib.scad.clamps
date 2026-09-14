@@ -13,4 +13,4 @@ dependencies:
     type: git-submodule
     url: https://github.com/brainboxemb/tool.scad-project.git
     path: tools/tool.scad-project
-    ref: 40694891d3239401cb0ba4bfb35a3812d6584ab7
+    ref: v0.12.0
