@@ -1,0 +1,23 @@
+Publication context : pull_request
+Publication kind    : build
+Publication branch  : dev/pr-16/build
+
+Source
+------
+Repository          : brainboxemb/lib.scad.clamps
+Ref type            : pull_request
+Ref                 : feature/pr-16-migration-005-capability-lifecycle
+Commit              : d751445fcb7aee270753618127000b201b6d90fa
+Triggered by        : brainboxemb
+Workflow run        : https://github.com/brainboxemb/lib.scad.clamps/actions/runs/35026709686
+
+Tooling
+-------
+SCAD toolchain image: ghcr.io/brainboxemb/scad-toolchain:v0.5.0
+SCAD toolchain ver. : v0.5.0
+tool.scad-project   : v0.14.3
+
+Git submodules
+--------------
+tools/tool.git-project : 7c43f37e7b07cfb57638a1d1dad2501de09ba7eb
+tools/tool.scad-project : b86b2be325f64847b8d91b7f2596bfd4e4ffb7f2

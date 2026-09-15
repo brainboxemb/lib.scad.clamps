@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "tool_git_project_version": "0.2.8",
+  "moon_version": "moon 2.5.4",
+  "task": "consumer:scad.verify",
+  "source_revision": "68ff5d1c0ae930689aa05c756b1e8a69717faebe",
+  "status": "success",
+  "exit_code": 0,
+  "started_at": "2026-09-15T21:38:37Z",
+  "finished_at": "2026-09-15T21:38:39Z",
+  "duration_ms": 1926
+}
