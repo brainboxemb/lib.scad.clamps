@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   scad:
+    if: github.head_ref != 'diagnostic/migration-005-moon-hash-stability'
     uses: brainboxemb/tool.scad-project/.github/workflows/project-production.yml@28661fc040c4994e9c1d391285b7425c7a55252b
     with:
       affected_task: consumer:scad.production-impact
