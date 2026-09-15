@@ -11,16 +11,15 @@ tasks:
       - 'openscad/**/design/**'
       - 'pythonscad/**/*.py'
       - 'pythonscad/**/design/**'
-      - 'scripts/render-openscad-design.sh'
+      - 'scripts/**'
 
   scad.verify:
     inputs:
-      - 'openscad/tube-clamp/tube_clamp.scad'
-      - 'pythonscad/tube-clamp/tube_clamp.py'
+      - 'openscad/**/*.scad'
+      - 'pythonscad/**/*.py'
       - 'test/**'
-      - 'vrf/README.md'
-      - 'scripts/run-verification.sh'
-      - 'scripts/build-verification-index.sh'
+      - 'vrf/**'
+      - 'scripts/**'
       - 'bootstrap.sh'
       - 'bootstrap.ps1'
       - 'update-repo.sh'
