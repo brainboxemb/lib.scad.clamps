@@ -100,5 +100,6 @@ tools/tool.git-project
     generic cleanup workflow v0.2.8
 ```
 
-`scripts/run-verification.sh` checks this ownership/alignment contract in addition
-to the library's public-API tests.
+The exact pins and capability/runtime/cache contract are qualified by the shared
+planner, reusable workflows and PR CI evidence. `scripts/run-verification.sh`
+stays focused on the library's public OpenSCAD/PythonSCAD behaviour.
