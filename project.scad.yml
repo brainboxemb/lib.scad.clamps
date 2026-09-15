@@ -2,6 +2,9 @@ paths:
   design_root: .
   build_root: bld
 
+build_engine:
+  engine: direct
+
 openscad:
   common_flags:
     - --enable=object-function
