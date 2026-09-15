@@ -18,7 +18,7 @@ Both files act as external consumers of the library. Each creates three clamps w
 
 Normal CI uses `.github/workflows/scad.yml`, which calls the released common SCAD production workflow. Moon keeps `scad.verify` as an independent producer task; it does not depend on the design/documentation producer.
 
-When Verify is affected, the single SCAD production container runs the existing verification commands from `project.scad.yml`:
+When Verify is affected, the host orchestrator starts one explicit SCAD Docker process and runs the existing verification commands from `project.scad.yml` inside that process:
 
 ```yaml
 verification:
@@ -28,7 +28,7 @@ verification:
   output_root: vrf/out
 ```
 
-The heavy job stages `vrf/out`; a lightweight host publication job then publishes the successful snapshot to `dev/pr-<number>/verification` for pull requests or `prod/verification` for `main`. A failed verification therefore does not replace the previous successful production snapshot.
+After the Docker process exits, the same host job validates and stages `vrf/out` and publishes the successful snapshot to `dev/pr-<number>/verification` for pull requests or `prod/verification` for `main`. Publication credentials remain outside the SCAD container. A failed verification therefore does not replace the previous successful production snapshot.
 
 ## Shell script execution
 
