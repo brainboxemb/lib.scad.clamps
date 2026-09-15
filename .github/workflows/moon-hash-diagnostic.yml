@@ -1,4 +1,4 @@
-name: Moon stable-cache diagnostic
+name: SCons stable-cache diagnostic
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   diagnose:
-    name: diagnose stable Moon output cache
+    name: diagnose SCons object cache
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -24,23 +24,25 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
 
-      - name: Restore previous diagnostic Moon task cache
+      - name: Restore previous diagnostic SCons cache
         uses: actions/cache@v4
         with:
-          path: |
-            .moon/cache/hashes
-            .moon/cache/outputs
-          key: migration-005-moon-stable-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .cache/scad-project/scons
+          key: migration-005-scons-stable-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
-            migration-005-moon-stable-${{ runner.os }}-${{ github.run_id }}-
+            migration-005-scons-stable-${{ runner.os }}-${{ github.run_id }}-
 
-      - name: Bootstrap pinned Moon runtime
-        uses: brainboxemb/tool.git-project/moon/affected@v0.2.7
-        with:
-          task: consumer:scad.docs
-          base: ${{ github.event.pull_request.head.sha }}
-          head: ${{ github.event.pull_request.head.sha }}
-          evidence-directory: .moon/diagnostic-preflight
+      - name: Inspect restored SCons cache
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '--- restored SCons cache ---'
+          if [[ -d .cache/scad-project/scons ]]; then
+            find .cache/scad-project/scons -type f -print | sort
+            du -sh .cache/scad-project/scons || true
+          else
+            echo 'cache directory absent'
+          fi
 
       - name: Pull SCAD runtime
         shell: bash
@@ -52,29 +54,20 @@ jobs:
           docker pull "$SCAD_TOOLCHAIN_IMAGE"
           docker logout ghcr.io >/dev/null 2>&1 || true
 
-      - name: Run docs through Moon with stable Python input boundary
+      - name: Run design documentation directly through SCons-backed tooling
         shell: bash
-        env:
-          SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
-
-          moon_runtime="$RUNNER_TEMP/tool-git-project/moon-runtime"
-          git_tool_action_root="$(realpath "$GITHUB_WORKSPACE/../../_actions/brainboxemb/tool.git-project/v0.2.7")"
-          test -d "$moon_runtime"
-          test -f "$git_tool_action_root/moon-project.sh"
+          start_ns="$(date +%s%N)"
 
           docker run --rm \
             --user "$(id -u):$(id -g)" \
             -e HOME=/tmp \
             -e CI=true \
             -e PYTHONDONTWRITEBYTECODE=1 \
-            -e "MOON_BASE=$SOURCE_SHA" \
-            -e "MOON_HEAD=$SOURCE_SHA" \
-            -e MOON_INSTALL_ROOT=/moon-runtime \
+            -e "SCAD_TOOLCHAIN_IMAGE=$SCAD_TOOLCHAIN_IMAGE" \
+            -e SCAD_TOOLCHAIN_VERSION=v0.4.1 \
             -v "$GITHUB_WORKSPACE:/work" \
-            -v "$moon_runtime:/moon-runtime" \
-            -v "$git_tool_action_root:/tool-git-v027:ro" \
             -w /work \
             "$SCAD_TOOLCHAIN_IMAGE" bash -lc '
               set -euo pipefail
@@ -82,45 +75,41 @@ jobs:
               bash ./bootstrap.sh
               git config --global --add safe.directory /work/tools/tool.git-project
               git config --global --add safe.directory /work/tools/tool.scad-project
-              tools/tool.git-project/git-project.sh validate --repo .
               bash ./tools/tool.scad-project/scad-project.sh tooling-check
-
-              if find tools/tool.scad-project -type f -path "*/__pycache__/*.pyc" -print -quit | grep -q .; then
-                echo "ERROR: Python bytecode was created despite PYTHONDONTWRITEBYTECODE=1" >&2
-                find tools/tool.scad-project -type f -path "*/__pycache__/*.pyc" -print >&2
-                exit 1
-              fi
-
-              bash /tool-git-v027/moon-project.sh run consumer:scad.docs \
-                --repo . \
-                --install-root /moon-runtime \
-                --evidence-dir .moon/diagnostic-run
+              bash ./tools/tool.scad-project/scad-project.sh design-build
             '
 
-      - name: Summarize Moon cache result
+          end_ns="$(date +%s%N)"
+          python3 - "$start_ns" "$end_ns" <<'PY'
+          import sys
+          start, end = map(int, sys.argv[1:])
+          print(f'design-build elapsed seconds: {(end-start)/1_000_000_000:.3f}')
+          PY
+
+      - name: Inspect SCons state and cache after build
         if: always()
         shell: bash
         run: |
           set -euo pipefail
-          echo '--- Moon invocation log ---'
-          cat .moon/diagnostic-run/moon.log || true
-          echo '--- Moon materialization ---'
-          cat .moon/diagnostic-run/materialization.json || true
-          echo '--- task hash manifests ---'
-          find .moon/cache/hashes -maxdepth 1 -type f -name '*.json' -print | sort || true
-          echo '--- cached output entries ---'
-          find .moon/cache/outputs -maxdepth 2 -type f -print | sort || true
-          echo '--- generated docs ---'
-          find bld/design -type f -print | sort | head -40 || true
+          echo '--- SCons cache after build ---'
+          if [[ -d .cache/scad-project/scons ]]; then
+            find .cache/scad-project/scons -type f -print | sort
+            echo "file-count=$(find .cache/scad-project/scons -type f | wc -l)"
+            du -sh .cache/scad-project/scons || true
+          else
+            echo 'cache directory absent'
+          fi
+          echo '--- SCons decision report ---'
+          cat .cache/scad-project/state/last-design-build.json || true
+          echo '--- SCons executed targets ---'
+          cat .cache/scad-project/state/executed-design-targets.txt || true
 
       - name: Upload diagnostic evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: moon-stable-cache-attempt-${{ github.run_attempt }}
+          name: scons-stable-cache-attempt-${{ github.run_attempt }}
           path: |
-            .moon/diagnostic-preflight
-            .moon/diagnostic-run
-            .moon/cache/hashes
+            .cache/scad-project/state
           if-no-files-found: warn
           retention-days: 7
