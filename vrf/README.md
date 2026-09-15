@@ -66,3 +66,5 @@ This project deliberately prefers object-based OpenSCAD APIs for reusable CAD li
 - the existing PythonSCAD `tube-clamp` implementation remains for comparison and consistency;
 - no further PythonSCAD library expansion is planned for now;
 - this decision can be revisited if PythonSCAD later supports OpenSCAD object conversion.
+
+<!-- Migration 004 Step 5 Verify-only affected-state proof. -->
