@@ -1,16 +1,19 @@
-name: Moon hash stability diagnostic
+name: Moon stable-cache diagnostic
 
 on:
   pull_request:
 
 permissions:
   contents: read
+  packages: read
 
 jobs:
   diagnose:
-    name: diagnose Moon task hash
+    name: diagnose stable Moon output cache
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      SCAD_TOOLCHAIN_IMAGE: ghcr.io/brainboxemb/scad-toolchain:v0.4.1
 
     steps:
       - name: Checkout exact PR head with submodules
@@ -21,8 +24,17 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
 
+      - name: Restore previous diagnostic Moon task cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .moon/cache/hashes
+            .moon/cache/outputs
+          key: migration-005-moon-stable-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            migration-005-moon-stable-${{ runner.os }}-${{ github.run_id }}-
+
       - name: Bootstrap pinned Moon runtime
-        id: affected
         uses: brainboxemb/tool.git-project/moon/affected@v0.2.7
         with:
           task: consumer:scad.docs
@@ -30,63 +42,85 @@ jobs:
           head: ${{ github.event.pull_request.head.sha }}
           evidence-directory: .moon/diagnostic-preflight
 
-      - name: Record tool tree before tooling check
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo '--- git status before ---'
-          git -C tools/tool.scad-project status --short --ignored || true
-          echo '--- runtime files before ---'
-          find tools/tool.scad-project -type f \( -name '*.pyc' -o -path '*/__pycache__/*' -o -name '.git' \) -print -exec sha256sum {} \; || true
-
-      - name: Run the same tooling check as production
-        shell: bash
-        run: bash ./tools/tool.scad-project/scad-project.sh tooling-check
-
-      - name: Record tool tree after tooling check
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo '--- git status after ---'
-          git -C tools/tool.scad-project status --short --ignored || true
-          echo '--- runtime files after ---'
-          find tools/tool.scad-project -type f \( -name '*.pyc' -o -path '*/__pycache__/*' -o -name '.git' \) -print -exec sha256sum {} \; || true
-
-      - name: Generate and print scad.docs hash manifest
+      - name: Pull SCAD runtime
         shell: bash
         env:
-          MOON_DEBUG_PROCESS_INPUT: 'true'
-          MOON_BASE: ${{ github.event.pull_request.head.sha }}
-          MOON_HEAD: ${{ github.event.pull_request.head.sha }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          moon_bin="$(find "$RUNNER_TEMP/tool-git-project/moon-runtime" -type f -name moon -perm -u+x -print -quit)"
-          test -n "$moon_bin"
-          echo "Moon binary: $moon_bin"
-          set +e
-          "$moon_bin" run consumer:scad.docs --log debug
-          run_status=$?
-          set -e
-          echo "moon task exit: $run_status"
-          echo '--- hash files ---'
-          find .moon/cache/hashes -maxdepth 1 -type f -name '*.json' -print | sort
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
+          printf '%s' "$GH_TOKEN" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
+          docker pull "$SCAD_TOOLCHAIN_IMAGE"
+          docker logout ghcr.io >/dev/null 2>&1 || true
 
-          for path in sorted(Path('.moon/cache/hashes').glob('*.json')):
-              data = json.loads(path.read_text(encoding='utf-8'))
-              print(f'=== {path.name} ===')
-              print(json.dumps(data, indent=2, sort_keys=True))
-          PY
+      - name: Run docs through Moon with stable Python input boundary
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
 
-      - name: Upload diagnostic hash manifests
+          moon_runtime="$RUNNER_TEMP/tool-git-project/moon-runtime"
+          git_tool_action_root="$(realpath "$GITHUB_WORKSPACE/../../_actions/brainboxemb/tool.git-project/v0.2.7")"
+          test -d "$moon_runtime"
+          test -f "$git_tool_action_root/moon-project.sh"
+
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp \
+            -e CI=true \
+            -e PYTHONDONTWRITEBYTECODE=1 \
+            -e "MOON_BASE=$SOURCE_SHA" \
+            -e "MOON_HEAD=$SOURCE_SHA" \
+            -e MOON_INSTALL_ROOT=/moon-runtime \
+            -v "$GITHUB_WORKSPACE:/work" \
+            -v "$moon_runtime:/moon-runtime" \
+            -v "$git_tool_action_root:/tool-git-v027:ro" \
+            -w /work \
+            "$SCAD_TOOLCHAIN_IMAGE" bash -lc '
+              set -euo pipefail
+              git config --global --add safe.directory /work
+              bash ./bootstrap.sh
+              git config --global --add safe.directory /work/tools/tool.git-project
+              git config --global --add safe.directory /work/tools/tool.scad-project
+              tools/tool.git-project/git-project.sh validate --repo .
+              bash ./tools/tool.scad-project/scad-project.sh tooling-check
+
+              if find tools/tool.scad-project -type f -path "*/__pycache__/*.pyc" -print -quit | grep -q .; then
+                echo "ERROR: Python bytecode was created despite PYTHONDONTWRITEBYTECODE=1" >&2
+                find tools/tool.scad-project -type f -path "*/__pycache__/*.pyc" -print >&2
+                exit 1
+              fi
+
+              bash /tool-git-v027/moon-project.sh run consumer:scad.docs \
+                --repo . \
+                --install-root /moon-runtime \
+                --evidence-dir .moon/diagnostic-run
+            '
+
+      - name: Summarize Moon cache result
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '--- Moon invocation log ---'
+          cat .moon/diagnostic-run/moon.log || true
+          echo '--- Moon materialization ---'
+          cat .moon/diagnostic-run/materialization.json || true
+          echo '--- task hash manifests ---'
+          find .moon/cache/hashes -maxdepth 1 -type f -name '*.json' -print | sort || true
+          echo '--- cached output entries ---'
+          find .moon/cache/outputs -maxdepth 2 -type f -print | sort || true
+          echo '--- generated docs ---'
+          find bld/design -type f -print | sort | head -40 || true
+
+      - name: Upload diagnostic evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: moon-hash-diagnostic-attempt-${{ github.run_attempt }}
+          name: moon-stable-cache-attempt-${{ github.run_attempt }}
           path: |
-            .moon/cache/hashes
             .moon/diagnostic-preflight
+            .moon/diagnostic-run
+            .moon/cache/hashes
           if-no-files-found: warn
           retention-days: 7
