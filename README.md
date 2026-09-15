@@ -78,7 +78,7 @@ Functional verification also checks the repository/tooling boundary: the split c
 
 Successful functional evidence is published separately to `prod/verification`. A failed verification must not replace the previous successful snapshot.
 
-A version release reruns Build and Verify against the exact release source and publishes immutable snapshots under:
+A version release reruns Build-side design/documentation production and Verify against the exact release source and publishes immutable snapshots under:
 
 ```text
 rel/vX.Y.Z/build
@@ -86,6 +86,30 @@ rel/vX.Y.Z/verification
 ```
 
 The release also creates an annotated source tag, deterministic bundles and SHA-256 checksums.
+
+## Normal CI orchestration
+
+Normal pull-request and `main` production uses the released common SCAD lifecycle from `tool.scad-project v0.13.1`.
+
+A lightweight Moon preflight runs on the host before any SCAD image pull. If neither generated design/documentation nor consumer verification is affected, the single host job stops there. If production is required, the same host job restores caches, pulls the immutable SCAD image and starts exactly one explicit Docker process for both independent producer domains. After that process exits, the host validates current materialization, stages Build and Verification trees and publishes both snapshots sequentially through released `tool.git-project` publication tooling. Publication credentials are never passed into the SCAD container.
+
+The library-specific graph is intentionally smaller than the reference project graph:
+
+```text
+scad.docs
+    generated OpenSCAD + PythonSCAD design documentation
+
+scad.verify
+    OpenSCAD + PythonSCAD public-consumer PNG/STL verification
+
+scad.production-impact
+    source-impact aggregate for the pre-container gate
+
+scad.ci
+    publication-ready aggregate
+```
+
+There is no dummy `scad.build` task: this repository currently has no normal configured render/export targets. The shared orchestration is used because runner/container setup and publication mechanics are generic; source layout, public API tests and release contents remain library-owned.
 
 ## Implementation direction
 
@@ -103,19 +127,22 @@ project.yml
 
 project.scad.yml
     SCAD paths, engines, verification and publication policy
+
+moon.yml
+    repository production/affected graph
 ```
 
 The direct tooling layout is:
 
 ```text
 tools/tool.git-project
-    generic bootstrap engine, pinned directly by the parent gitlink
+    generic bootstrap and Moon/VCS engine, pinned directly by the parent gitlink
 
 tools/tool.scad-project
-    SCAD tooling, declared as a managed dependency in project.yml
+    SCAD tooling and reusable production/release workflows, declared in project.yml
 ```
 
-`tool.git-project` is not recursively listed in `project.yml` because it must exist before that configuration can be processed. `tool.scad-project` is declared in `project.yml`, locked by its gitlink and matched by the exact reusable workflow commit pins. Keep those representations aligned.
+`tool.git-project` is not recursively listed in `project.yml` because it must exist before that configuration can be processed. `tool.scad-project` is declared in `project.yml`, locked by its gitlink and matched by the exact reusable Production/Release/cleanup workflow commit pins. Keep those representations aligned.
 
 Bootstrap and dependency updates remain simple from the consumer repository:
 
@@ -131,10 +158,10 @@ bash ./bootstrap.sh
 bash ./update-repo.sh
 ```
 
-The root bootstrap launchers are canonical copies from `tool.git-project`. The root update launchers are thin SCAD wrappers from `tool.scad-project`; generic Git/ref handling still belongs to `tool.git-project`, while the SCAD wrapper additionally aligns Build/Verify/Release/cleanup workflow refs to the exact SCAD-tool gitlink.
+The root bootstrap launchers are canonical copies from `tool.git-project`. The root update launchers are thin SCAD wrappers from `tool.scad-project`; generic Git/ref handling still belongs to `tool.git-project`, while the SCAD wrapper additionally aligns SCAD reusable-workflow refs to the exact SCAD-tool gitlink.
 
 Normal checkout initializes direct dependencies only. When this library is consumed as a submodule, the parent project does not recursively initialize this library's own development-tooling submodules.
 
-Repository-specific agent guidance is in [`AGENTS.md`](AGENTS.md).
+Repository-specific agent guidance is in [`AGENTS.md`](AGENTS.md). Workflow-specific notes are in [`.github/workflows/README.md`](.github/workflows/README.md).
 
 The model, code and documentation were developed with the assistance of ChatGPT.

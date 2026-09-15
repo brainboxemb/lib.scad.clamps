@@ -1,61 +1,97 @@
 # Workflows
 
-This repository keeps only thin GitHub Actions callers. The shared job logic is
-owned by `tool.scad-project` and pinned to release `v0.4.4`.
+This repository keeps thin GitHub Actions callers. Shared SCAD workflow mechanics
+are owned by `tool.scad-project`; this library owns its Moon task graph and its
+OpenSCAD/PythonSCAD consumer verification.
 
-## Build
+The current SCAD tool dependency is `tool.scad-project v0.13.1`, locked by the
+`tools/tool.scad-project` gitlink and exact reusable-workflow SHA.
 
-`design-build.yml` calls:
+## Normal production
 
-```text
-brainboxemb/tool.scad-project/.github/workflows/project-build.yml@v0.4.4
-```
-
-The reusable workflow handles:
-
-- toolchain selection;
-- tooling-version alignment;
-- configuration, source and design linting;
-- OpenSCAD and PythonSCAD design generation;
-- configured project builds;
-- build artifact upload;
-- publication of the mutable `build` branch.
-
-## Verification
-
-`verify.yml` calls:
+`.github/workflows/scad.yml` calls the released common production workflow:
 
 ```text
-brainboxemb/tool.scad-project/.github/workflows/project-verify.yml@v0.4.4
+brainboxemb/tool.scad-project/.github/workflows/project-production.yml@<exact-v0.13.1-commit>
 ```
 
-The reusable workflow first performs generic project verification and then runs
-the commands declared in `project.yml`:
+Normal CI is no longer split into separate heavy Build and Verify jobs. Instead
+one GitHub-hosted orchestrator job owns the lifecycle:
 
-```yaml
-verification:
-  commands:
-    - [bash, scripts/run-verification.sh]
-    - [bash, scripts/build-verification-index.sh]
-  output_root: vrf/out
+```text
+host Moon preflight
+    |
+    +-- unaffected -> stop before image pull / SCAD container
+    |
+    `-- affected
+          -> restore caches on the host
+          -> pull the immutable SCAD image
+          -> one explicit SCAD Docker process
+               - generated design/documentation producer
+               - OpenSCAD + PythonSCAD consumer verification producer
+               - publication-ready aggregate
+          -> validate and stage after the container exits
+          -> publish Build from the same host job
+          -> publish Verification from the same host job
 ```
 
-Successful non-PR runs publish `vrf/out` to the `verification` branch.
+`moon.yml` keeps the source-impact gate (`scad.production-impact`) separate from
+the publication-ready execution aggregate (`scad.ci`). CI-context inputs used by
+index/provenance tasks therefore do not force the SCAD runtime for a README-only
+change.
+
+## Library-specific graph
+
+This library deliberately does **not** define a dummy `scad.build` task. It has no
+normal configured render/export targets; its Build-side generated product is the
+design/documentation tree plus index/provenance.
+
+The real producer domains are:
+
+- `scad.docs` — generated OpenSCAD and PythonSCAD design documentation;
+- `scad.verify` — public-consumer verification for both implementations.
+
+Verification remains self-contained and still renders/exports the public APIs as:
+
+- OpenSCAD PNG;
+- OpenSCAD STL;
+- PythonSCAD PNG;
+- PythonSCAD STL.
+
+The shared orchestration changes where these producers run, not what the library
+accepts as verification.
+
+## Publication
+
+The explicit SCAD Docker process never receives generated-output write credentials.
+After it exits, the same host job validates and stages the prepared trees and then
+publishes them through the released `tool.git-project` same-job publisher:
+
+```text
+bld       -> dev/pr-N/build or prod/build
+vrf/out   -> dev/pr-N/verification or prod/verification
+```
+
+Release publication remains owned by `project-release.yml` and keeps immutable
+`rel/vX.Y.Z/build` and `rel/vX.Y.Z/verification` snapshots.
 
 ## Version alignment
 
-These references should all represent the same `tool.scad-project` release:
+These representations must resolve to the same `tool.scad-project` release:
 
 ```text
 project.yml
-    tooling.tool_scad_project.ref: v0.4.4
+    dependency ref: v0.13.1
 
 tools/tool.scad-project
-    gitlink pinned to the commit tagged v0.4.4
+    exact gitlink behind v0.13.1
 
-GitHub workflow
-    @v0.4.4
+.github/workflows/scad.yml
+.github/workflows/release.yml
+.github/workflows/pr-cleanup.yml
+    exact reusable-workflow commit matching that gitlink
 ```
 
-A tooling upgrade is therefore one deliberate repository change rather than an
-implicit update to the latest tool version.
+`scripts/run-verification.sh` checks this ownership/alignment contract in addition
+to the library's public-API tests. A tooling upgrade is therefore one deliberate
+repository change rather than an implicit move to a newer tool version.
