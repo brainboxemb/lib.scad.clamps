@@ -2,6 +2,8 @@
 
 Functional verification is intentionally separate from generated design/documentation work.
 
+<!-- Migration 004 v0.13.1 Verify-only qualification marker. -->
+
 Source tests live under:
 
 ```text
