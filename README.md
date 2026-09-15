@@ -89,9 +89,9 @@ The release also creates an annotated source tag, deterministic bundles and SHA-
 
 ## Normal CI orchestration
 
-Normal pull-request and `main` production uses the released common SCAD lifecycle from `tool.scad-project v0.13.0`.
+Normal pull-request and `main` production uses the released common SCAD lifecycle from `tool.scad-project v0.13.1`.
 
-A lightweight Moon preflight runs before the SCAD runtime is created. If neither generated design/documentation nor consumer verification is affected, CI stops there. If production is required, one SCAD container runs both independent producer domains and stages their outputs; Build and Verification are then published by lightweight host jobs outside the container.
+A lightweight Moon preflight runs on the host before any SCAD image pull. If neither generated design/documentation nor consumer verification is affected, the single host job stops there. If production is required, the same host job restores caches, pulls the immutable SCAD image and starts exactly one explicit Docker process for both independent producer domains. After that process exits, the host validates current materialization, stages Build and Verification trees and publishes both snapshots sequentially through released `tool.git-project` publication tooling. Publication credentials are never passed into the SCAD container.
 
 The library-specific graph is intentionally smaller than the reference project graph:
 
