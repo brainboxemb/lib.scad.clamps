@@ -56,6 +56,8 @@ jobs:
         shell: bash
         env:
           MOON_DEBUG_PROCESS_INPUT: 'true'
+          MOON_BASE: ${{ github.event.pull_request.head.sha }}
+          MOON_HEAD: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
           moon_bin="$(find "$RUNNER_TEMP/tool-git-project/moon-runtime" -type f -name moon -perm -u+x -print -quit)"
