@@ -6,7 +6,7 @@ Functional changes to released `lib.scad.clamps` versions.
 
 ### Changed
 
-- Migrate the library to released `tool.git-project v0.2.8`, `tool.scad-project v0.14.2` and the SCAD toolchain v0.5.0 runtime family.
+- Migrate the library to released `tool.git-project v0.2.8`, `tool.scad-project v0.14.3` and the SCAD toolchain v0.5.0 runtime family.
 - Replace the consumer-authored Migration-004 Moon lifecycle graph with inherited `scad.docs` and `scad.verify` capabilities plus library-specific source-impact inputs.
 - Make the canary intent explicit with `build_engine.engine: direct` while retaining both OpenSCAD and PythonSCAD configuration, so production selects the full/dual runtime without normal or Verification SCons cache transport.
 - Use the Migration-005 thin production caller and generic v0.2.8 PR-preview cleanup; normal CI retains compact orchestration evidence instead of duplicate complete output artifacts.
