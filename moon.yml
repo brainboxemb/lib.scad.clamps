@@ -1,0 +1,135 @@
+tasks:
+  scad.docs:
+    command: 'bash tools/tool.scad-project/scad-project.sh design-build'
+    inputs:
+      - 'project.yml'
+      - 'project.scad.yml'
+      - '.gitmodules'
+      - 'openscad/**'
+      - 'pythonscad/**'
+      - 'scripts/render-openscad-design.sh'
+      - 'tools/tool.scad-project/**'
+      - 'moon.yml'
+      - '.moon/workspace.yml'
+    outputs:
+      - 'bld/design/**'
+      - 'bld/evidence/executions/scad-docs/**'
+      - 'bld/evidence/domain/last-design-build.json'
+      - '.cache/scad-project/state/last-design-build.json'
+    options:
+      cache: true
+
+  scad.build-index:
+    command: 'bash tools/tool.scad-project/scad-project.sh build-index'
+    deps:
+      - 'scad.docs'
+    inputs:
+      - 'project.yml'
+      - 'project.scad.yml'
+      - 'tools/tool.scad-project/**'
+      - 'moon.yml'
+      - '.moon/workspace.yml'
+      - '$GITHUB_EVENT_NAME'
+      - '$GITHUB_REF_TYPE'
+      - '$GITHUB_REF_NAME'
+      - '$GITHUB_HEAD_REF'
+      - '$SCAD_PROJECT_PR_NUMBER'
+    outputs:
+      - 'bld/README.md'
+    options:
+      cache: true
+
+  scad.build-provenance:
+    command: 'bash tools/tool.scad-project/scad-project.sh publication-info-build'
+    deps:
+      - 'scad.build-index'
+    inputs:
+      - 'project.yml'
+      - 'project.scad.yml'
+      - '.gitmodules'
+      - 'tools/tool.scad-project/**'
+      - 'moon.yml'
+      - '.moon/workspace.yml'
+      - '$GITHUB_EVENT_NAME'
+      - '$GITHUB_REF_TYPE'
+      - '$GITHUB_REF_NAME'
+      - '$GITHUB_HEAD_REF'
+      - '$SCAD_PROJECT_PR_NUMBER'
+    outputs:
+      - 'bld/publication-info.txt'
+    options:
+      cache: true
+
+  scad.verify:
+    command: 'bash tools/tool.scad-project/scad-project.sh verify'
+    inputs:
+      - 'project.yml'
+      - 'project.scad.yml'
+      - '.gitmodules'
+      - 'openscad/**'
+      - 'pythonscad/**'
+      - 'test/**'
+      - 'vrf/README.md'
+      - 'scripts/run-verification.sh'
+      - 'scripts/build-verification-index.sh'
+      - 'bootstrap.sh'
+      - 'bootstrap.ps1'
+      - 'update-repo.sh'
+      - 'update-repo.ps1'
+      - '.github/workflows/**'
+      - 'tools/tool.scad-project/**'
+      - 'tools/tool.git-project/**'
+      - 'moon.yml'
+      - '.moon/workspace.yml'
+    outputs:
+      - 'vrf/out/openscad/**'
+      - 'vrf/out/pythonscad/**'
+      - 'vrf/out/index.md'
+      - 'vrf/out/evidence/executions/scad-verify/**'
+      - 'vrf/out/evidence/domain/last-verification-build.json'
+      - '.cache/scad-project/verification-state/last-verification-build.json'
+    options:
+      cache: true
+
+  scad.verification-provenance:
+    command: 'bash tools/tool.scad-project/scad-project.sh publication-info-verification'
+    deps:
+      - 'scad.verify'
+    inputs:
+      - 'project.yml'
+      - 'project.scad.yml'
+      - '.gitmodules'
+      - 'tools/tool.scad-project/**'
+      - 'moon.yml'
+      - '.moon/workspace.yml'
+      - '$GITHUB_EVENT_NAME'
+      - '$GITHUB_REF_TYPE'
+      - '$GITHUB_REF_NAME'
+      - '$GITHUB_HEAD_REF'
+      - '$SCAD_PROJECT_PR_NUMBER'
+    outputs:
+      - 'vrf/out/publication-info.txt'
+    options:
+      cache: true
+
+  scad.production-impact:
+    script: ':'
+    deps:
+      - 'scad.docs'
+      - 'scad.verify'
+    inputs:
+      - 'moon.yml'
+      - '.moon/workspace.yml'
+    options:
+      cache: false
+
+  scad.ci:
+    script: ':'
+    deps:
+      - 'scad.build-provenance'
+      - 'scad.verification-provenance'
+    inputs:
+      - 'moon.yml'
+      - '.moon/workspace.yml'
+    options:
+      cache: false

@@ -39,8 +39,7 @@ if [[ -z "$TOOL_REF" || "$RESOLVED_REF_SHA" != "$TOOL_SHA" ]]; then
 fi
 
 for mapping in \
-  "design-build.yml:project-build" \
-  "verify.yml:project-verify" \
+  "scad.yml:project-production" \
   "release.yml:project-release" \
   "pr-cleanup.yml:project-pr-cleanup"; do
   caller="${mapping%%:*}"
@@ -51,6 +50,45 @@ for mapping in \
     exit 1
   fi
 done
+
+if [[ -e .github/workflows/design-build.yml || -e .github/workflows/verify.yml ]]; then
+  echo "ERROR: standalone Build/Verify callers must not coexist with common SCAD production orchestration" >&2
+  exit 1
+fi
+
+for required in \
+  'affected_task: consumer:scad.production-impact' \
+  'aggregate_task: consumer:scad.ci' \
+  'cache_namespace: lib-scad-clamps-production-v1'; do
+  if ! grep -Fq "$required" .github/workflows/scad.yml; then
+    echo "ERROR: scad.yml is missing common production caller contract: ${required}" >&2
+    exit 1
+  fi
+done
+
+for required in \
+  'scad.docs:' \
+  'scad.build-index:' \
+  'scad.build-provenance:' \
+  'scad.verify:' \
+  'scad.verification-provenance:' \
+  'scad.production-impact:' \
+  'scad.ci:'; do
+  if ! grep -Fq "$required" moon.yml; then
+    echo "ERROR: moon.yml is missing library production task: ${required}" >&2
+    exit 1
+  fi
+done
+
+if grep -Fq 'scad.build:' moon.yml; then
+  echo "ERROR: lib.scad.clamps has no normal configured render/export targets; do not invent an empty scad.build task" >&2
+  exit 1
+fi
+
+if ! grep -Fq -- "- 'scad.docs'" moon.yml || ! grep -Fq -- "- 'scad.verify'" moon.yml; then
+  echo "ERROR: scad.production-impact must cover both library design/docs and consumer verification producers" >&2
+  exit 1
+fi
 
 if ! cmp -s bootstrap.sh tools/tool.git-project/bootstrap/consumer-bootstrap.sh; then
   echo "ERROR: bootstrap.sh differs from the pinned tool.git-project consumer bootstrap" >&2
@@ -69,7 +107,7 @@ if ! cmp -s update-repo.ps1 tools/tool.scad-project/bootstrap/consumer-update.ps
   exit 1
 fi
 
-echo "Repository bootstrap ownership: OK"
+echo "Repository bootstrap and production ownership: OK"
 
 run_checked() {
   local label="$1"
