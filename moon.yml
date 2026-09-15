@@ -14,8 +14,6 @@ tasks:
     outputs:
       - 'bld/design/**'
       - 'bld/evidence/executions/scad-docs/**'
-      - 'bld/evidence/domain/last-design-build.json'
-      - '.cache/scad-project/state/last-design-build.json'
     options:
       cache: true
 
