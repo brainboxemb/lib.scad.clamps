@@ -2,6 +2,15 @@
 
 Functional changes to released `lib.scad.clamps` versions.
 
+## Unreleased
+
+### Changed
+
+- Upgrade repository tooling to released `tool.scad-project v0.13.0` and align the tool gitlink plus Production/Release/PR-cleanup reusable workflow pins to its exact source commit.
+- Replace separate normal Build and Verify heavy workflows with the common Moon-gated SCAD production lifecycle: lightweight host preflight, at most one SCAD container, and lightweight Build/Verification publication jobs.
+- Add a library-specific Moon graph that models the actual producer domains (`scad.docs` and `scad.verify`) without inventing a normal `scad.build` task for a repository that has no configured render/export build targets.
+- Keep the existing OpenSCAD and PythonSCAD public-consumer PNG/STL verification content unchanged while moving its orchestration into the shared lifecycle.
+
 ## v0.1.2
 
 ### Changed
