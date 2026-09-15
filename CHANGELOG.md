@@ -10,7 +10,7 @@ Functional changes to released `lib.scad.clamps` versions.
 - Replace the consumer-authored Migration-004 Moon lifecycle graph with inherited `scad.docs` and `scad.verify` capabilities plus library-specific source-impact inputs.
 - Make the canary intent explicit with `build_engine.engine: direct` while retaining both OpenSCAD and PythonSCAD configuration, so production selects the full/dual runtime without normal or Verification SCons cache transport.
 - Use the Migration-005 thin production caller and generic v0.2.8 PR-preview cleanup; normal CI retains compact orchestration evidence instead of duplicate complete output artifacts.
-- Extend functional verification to enforce the released foundation pins, inherited capability model and direct/full-runtime repository contract.
+- Keep functional verification focused on public OpenSCAD/PythonSCAD API behaviour, while shared planner/workflow CI evidence qualifies foundation pins, inherited capabilities and the direct/full-runtime integration contract.
 
 ## v0.1.3
 
@@ -33,25 +33,16 @@ Functional changes to released `lib.scad.clamps` versions.
 
 ## v0.1.1
 
+### Added
+
+- Add the first coordinated library release workflow with immutable Build/Verification snapshots and release bundles.
+
 ### Changed
 
-- Upgrade repository tooling from `tool.scad-project` v0.9.8 to v0.9.10.
-- Pin `project.yml`, the `tools/tool.scad-project` gitlink, and Build/Verify/Release reusable workflows to the exact v0.9.10 source commit.
-- Adopt the layout-independent Build/Verify cache hashing and design-render improvements included in v0.9.10.
+- Align the repository with the current split `project.yml` / `project.scad.yml` tooling model.
 
 ## v0.1.0
 
 ### Added
 
-- Establish the first immutable release of the reusable clamp library.
-- Release the OpenSCAD object-based `tube-clamp` API together with the maintained native PythonSCAD comparison implementation.
-- Publish generated design documentation and consumer-level PNG/STL verification evidence.
-- Add coordinated versioned release publication with immutable `rel/vX.Y.Z/build` and `rel/vX.Y.Z/verification` snapshots, release bundles and SHA-256 checksums.
-
-### Changed
-
-- Upgrade repository tooling from `tool.scad-project` v0.7.2 to v0.9.8.
-- Pin Build, Verify and Release reusable workflows to the exact commit behind v0.9.8.
-- Move mutable production output from legacy `build` / `verification` branches to `prod/build` / `prod/verification`; development output remains under `dev/*`.
-- Keep OpenSCAD as the primary reusable-library direction while retaining PythonSCAD as a maintained comparison/verification implementation.
-- Treat `project.yml`, the tool gitlink and workflow commit pins as the authoritative dependency alignment.
+- Initial reusable OpenSCAD and PythonSCAD tube-clamp library.
