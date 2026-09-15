@@ -74,7 +74,7 @@ Design documentation should explain the physical feature first, then the geometr
 
 Consumer-level tests under `test/` exercise the public OpenSCAD and native PythonSCAD APIs. They create multiple parameter sets, verify derived calculations, render PNG evidence and export STL geometry.
 
-Functional verification also checks the repository/tooling boundary: the split configuration, direct `tool.git-project` and `tool.scad-project` gitlinks, exact reusable-workflow pinning, inherited Moon capability model and canonical bootstrap/update launchers.
+Functional verification stays focused on those library behaviours. Repository/tooling alignment—dependency refs, exact gitlinks, reusable-workflow pins, inherited Moon capabilities and runtime/cache selection—is qualified by the shared tooling and PR CI evidence instead of being reimplemented as configuration-string checks in the product verification script.
 
 Successful functional evidence is published separately to `prod/verification`. A failed verification must not replace the previous successful snapshot.
 
@@ -89,7 +89,7 @@ The release also creates an annotated source tag, deterministic bundles and SHA-
 
 ## Normal CI orchestration
 
-Normal pull-request and `main` production uses the released Migration-005 lifecycle from `tool.scad-project v0.14.2`.
+Normal pull-request and `main` production uses the released Migration-005 lifecycle from `tool.scad-project v0.14.3`.
 
 The library exposes only two real capabilities:
 
