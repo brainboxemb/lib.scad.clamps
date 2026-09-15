@@ -6,7 +6,7 @@ runtime/cache planning and production/release lifecycle mechanics are owned by
 project-specific source-impact boundaries and OpenSCAD/PythonSCAD consumer
 verification.
 
-The current SCAD tool dependency is `tool.scad-project v0.14.2`, locked by the
+The current SCAD tool dependency is `tool.scad-project v0.14.3`, locked by the
 `tools/tool.scad-project` gitlink and exact reusable Production/Release workflow
 SHA. Generic PR-preview cleanup comes from released `tool.git-project v0.2.8`.
 
@@ -15,7 +15,7 @@ SHA. Generic PR-preview cleanup comes from released `tool.git-project v0.2.8`.
 `.github/workflows/scad.yml` is intentionally a thin caller of:
 
 ```text
-brainboxemb/tool.scad-project/.github/workflows/project-production.yml@5712324ea9e3a7c81ba1b79013f2758f52b219cf
+brainboxemb/tool.scad-project/.github/workflows/project-production.yml@b86b2be325f64847b8d91b7f2596bfd4e4ffb7f2
 ```
 
 Normal production resolves exact source/base state and runs one Moon affected
@@ -84,10 +84,10 @@ The active contract is:
 
 ```text
 project.yml
-    dependency ref: v0.14.2
+    dependency ref: v0.14.3
 
 tools/tool.scad-project
-    exact gitlink: 5712324ea9e3a7c81ba1b79013f2758f52b219cf
+    exact gitlink: b86b2be325f64847b8d91b7f2596bfd4e4ffb7f2
 
 .github/workflows/scad.yml
 .github/workflows/release.yml
