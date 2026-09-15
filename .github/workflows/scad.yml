@@ -13,10 +13,6 @@ permissions:
 
 jobs:
   scad:
-    uses: brainboxemb/tool.scad-project/.github/workflows/project-production.yml@28661fc040c4994e9c1d391285b7425c7a55252b
+    uses: brainboxemb/tool.scad-project/.github/workflows/project-production.yml@5712324ea9e3a7c81ba1b79013f2758f52b219cf
     with:
-      affected_task: consumer:scad.production-impact
-      aggregate_task: consumer:scad.ci
-      cache_namespace: lib-scad-clamps-production-v1
-      build_artifact_name: lib-scad-clamps-build-publication
-      verification_artifact_name: lib-scad-clamps-verification-publication
+      cache_namespace: lib-scad-clamps-production-v2
