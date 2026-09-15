@@ -4,7 +4,7 @@ This repository keeps thin GitHub Actions callers. Shared SCAD workflow mechanic
 are owned by `tool.scad-project`; this library owns its Moon task graph and its
 OpenSCAD/PythonSCAD consumer verification.
 
-The current SCAD tool dependency is `tool.scad-project v0.13.0`, locked by the
+The current SCAD tool dependency is `tool.scad-project v0.13.1`, locked by the
 `tools/tool.scad-project` gitlink and exact reusable-workflow SHA.
 
 ## Normal production
@@ -12,28 +12,32 @@ The current SCAD tool dependency is `tool.scad-project v0.13.0`, locked by the
 `.github/workflows/scad.yml` calls the released common production workflow:
 
 ```text
-brainboxemb/tool.scad-project/.github/workflows/project-production.yml@<exact-v0.13.0-commit>
+brainboxemb/tool.scad-project/.github/workflows/project-production.yml@<exact-v0.13.1-commit>
 ```
 
-Normal CI is no longer split into separate heavy Build and Verify jobs. Instead:
+Normal CI is no longer split into separate heavy Build and Verify jobs. Instead
+one GitHub-hosted orchestrator job owns the lifecycle:
 
 ```text
 host Moon preflight
     |
-    +-- unaffected -> stop before the SCAD container
+    +-- unaffected -> stop before image pull / SCAD container
     |
     `-- affected
-          -> one SCAD container
+          -> restore caches on the host
+          -> pull the immutable SCAD image
+          -> one explicit SCAD Docker process
                - generated design/documentation producer
                - OpenSCAD + PythonSCAD consumer verification producer
                - publication-ready aggregate
-          -> lightweight Build publication
-          -> lightweight Verification publication
+          -> validate and stage after the container exits
+          -> publish Build from the same host job
+          -> publish Verification from the same host job
 ```
 
 `moon.yml` keeps the source-impact gate (`scad.production-impact`) separate from
 the publication-ready execution aggregate (`scad.ci`). CI-context inputs used by
-index/provenance tasks therefore do not force a heavy container for a README-only
+index/provenance tasks therefore do not force the SCAD runtime for a README-only
 change.
 
 ## Library-specific graph
@@ -59,8 +63,9 @@ accepts as verification.
 
 ## Publication
 
-The heavy production job stages prepared trees only. Publication happens in
-lightweight host jobs outside the SCAD container:
+The explicit SCAD Docker process never receives generated-output write credentials.
+After it exits, the same host job validates and stages the prepared trees and then
+publishes them through the released `tool.git-project` same-job publisher:
 
 ```text
 bld       -> dev/pr-N/build or prod/build
@@ -76,10 +81,10 @@ These representations must resolve to the same `tool.scad-project` release:
 
 ```text
 project.yml
-    dependency ref: v0.13.0
+    dependency ref: v0.13.1
 
 tools/tool.scad-project
-    exact gitlink behind v0.13.0
+    exact gitlink behind v0.13.1
 
 .github/workflows/scad.yml
 .github/workflows/release.yml
