@@ -23,7 +23,7 @@ permissions:
 jobs:
   release-dispatch:
     if: github.event_name == 'workflow_dispatch'
-    uses: brainboxemb/tool.scad-project/.github/workflows/project-release.yml@v0.14.8
+    uses: brainboxemb/tool.scad-project/.github/workflows/project-release.yml@v0.14.9
     with:
       version: ${{ inputs.version }}
       source_sha: ${{ inputs.source_sha }}
@@ -32,7 +32,7 @@ jobs:
 
   release-request:
     if: github.event_name == 'push'
-    uses: brainboxemb/tool.scad-project/.github/workflows/project-release.yml@v0.14.8
+    uses: brainboxemb/tool.scad-project/.github/workflows/project-release.yml@v0.14.9
     with:
       build_path: bld
       verification_path: vrf/out

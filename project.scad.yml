@@ -28,8 +28,8 @@ verification:
 publication:
   production:
     source_branch: main
-    build_branch: prod/build
-    verification_branch: prod/verification
+    build_branch: prod/bld
+    verification_branch: prod/vrf
 
   development:
     pr_branch_prefix: dev/pr

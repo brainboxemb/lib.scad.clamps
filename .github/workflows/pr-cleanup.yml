@@ -13,6 +13,6 @@ jobs:
     with:
       pr_number: ${{ github.event.pull_request.number }}
       preview_suffixes: |
-        build
-        verification
+        bld
+        vrf
       delete_source_branch: true
