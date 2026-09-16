@@ -1,0 +1,16 @@
+{
+  "base_revision": "11f804c5087c2b5ec06af11603af4508d5c1db43",
+  "event_name": "push",
+  "publication_family": "build",
+  "repository": "brainboxemb/lib.scad.clamps",
+  "run_attempt": "1",
+  "run_id": "35122676804",
+  "schema": "brainboxemb.scad-orchestration-run-context",
+  "schema_version": 1,
+  "snapshot_preparation": {
+    "duration_ms": 4,
+    "finished_at": "2026-09-16T16:34:22.546Z",
+    "started_at": "2026-09-16T16:34:22.542Z"
+  },
+  "source_revision": "cfba8d71c43408d01eb1a099afebe983c3d976c6"
+}

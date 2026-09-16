@@ -1,0 +1,190 @@
+[ WARN 2026-09-16 16:34:14.168] moon_app::queries::changed_files  Detected a shallow checkout, unable to run Git commands to determine changed files. 
+[ WARN 16:34:14.168] moon_app::queries::changed_files  A full Git history is required for affected checks, falling back to an empty files list. 
+▮▮▮▮ consumer:scad.docs (f0b72f2d)
++ xvfb-run -a openscad --enable=object-function --render --camera=0.0,0.0,0.0,65.0,0.0,35.0,0.0 --autocenter --viewall --imgsize=640,480 -o /tmp/scad-project-design-build-l1x4f1ae/design/project/openscad/tube-clamp/design/img/01-outer-ring.png /tmp/scad-project-design-build-l1x4f1ae/entrypoints/render-0001.scad
+Geometries in cache: 2
+Geometry cache size in bytes: 40688
+CGAL Polyhedrons in cache: 0
+CGAL cache size in bytes: 0
+Total rendering time: 0:00:00.167
+Top level object is a 3D object (PolySet):
+   Convex:       yes
+   Facets:       122
++ xvfb-run -a openscad --enable=object-function --render --camera=0.0,0.0,0.0,65.0,0.0,35.0,0.0 --autocenter --viewall --imgsize=640,480 -o /tmp/scad-project-design-build-l1x4f1ae/design/project/openscad/tube-clamp/design/img/02-base.png /tmp/scad-project-design-build-l1x4f1ae/entrypoints/render-0002.scad
+Geometries in cache: 6
+Geometry cache size in bytes: 63600
+CGAL Polyhedrons in cache: 1
+CGAL cache size in bytes: 55750
+Total rendering time: 0:00:00.081
+   Top level object is a 3D object (manifold):
+   Status:     NoError
+   Genus:      0
+   Vertices:      223
+   Facets:        442
++ xvfb-run -a openscad --enable=object-function --render --camera=0.0,0.0,0.0,65.0,0.0,35.0,0.0 --autocenter --viewall --imgsize=640,480 -o /tmp/scad-project-design-build-l1x4f1ae/design/project/openscad/tube-clamp/design/img/03-transition.png /tmp/scad-project-design-build-l1x4f1ae/entrypoints/render-0003.scad
+Geometries in cache: 7
+Geometry cache size in bytes: 44352
+CGAL Polyhedrons in cache: 2
+CGAL cache size in bytes: 96000
+Total rendering time: 0:00:00.084
+   Top level object is a 3D object (manifold):
+   Status:     NoError
+   Genus:      0
+   Vertices:      161
+   Facets:        318
++ xvfb-run -a openscad --enable=object-function --render --camera=0.0,0.0,0.0,65.0,0.0,35.0,0.0 --autocenter --viewall --imgsize=640,480 -o /tmp/scad-project-design-build-l1x4f1ae/design/project/openscad/tube-clamp/design/img/04-bore.png /tmp/scad-project-design-build-l1x4f1ae/entrypoints/render-0004.scad
+Geometries in cache: 9
+Geometry cache size in bytes: 104480
+CGAL Polyhedrons in cache: 3
+CGAL cache size in bytes: 240750
+Total rendering time: 0:00:00.094
+   Top level object is a 3D object (manifold):
+   Status:     NoError
+   Genus:      0
+   Vertices:      641
+   Facets:       1278
++ xvfb-run -a openscad --enable=object-function --render --camera=0.0,0.0,0.0,65.0,0.0,35.0,0.0 --autocenter --viewall --imgsize=640,480 -o /tmp/scad-project-design-build-l1x4f1ae/design/project/openscad/tube-clamp/design/img/05-opening.png /tmp/scad-project-design-build-l1x4f1ae/entrypoints/render-0005.scad
+Geometries in cache: 12
+Geometry cache size in bytes: 86400
+CGAL Polyhedrons in cache: 4
+CGAL cache size in bytes: 326500
+Total rendering time: 0:00:00.092
+   Top level object is a 3D object (manifold):
+   Status:     NoError
+   Genus:      1
+   Vertices:      335
+   Facets:        670
++ xvfb-run -a openscad --enable=object-function --render --camera=0.0,0.0,0.0,65.0,0.0,35.0,0.0 --autocenter --viewall --imgsize=640,480 -o /tmp/scad-project-design-build-l1x4f1ae/design/project/openscad/tube-clamp/design/img/06-final.png /tmp/scad-project-design-build-l1x4f1ae/entrypoints/render-0006.scad
+Geometries in cache: 11
+Geometry cache size in bytes: 85688
+CGAL Polyhedrons in cache: 2
+CGAL cache size in bytes: 122500
+Total rendering time: 0:00:00.086
+   Top level object is a 3D object (manifold):
+   Status:     NoError
+   Genus:      0
+   Vertices:      329
+   Facets:        654
++ xvfb-run -a openscad --enable=object-function --render --camera=0.0,0.0,0.0,0.0,0.0,0.0,0.0 --autocenter --viewall --imgsize=640,480 -o /tmp/scad-project-design-build-l1x4f1ae/design/project/openscad/tube-clamp/design/img/07-profile.png /tmp/scad-project-design-build-l1x4f1ae/entrypoints/render-0007.scad
+Geometries in cache: 11
+Geometry cache size in bytes: 85688
+CGAL Polyhedrons in cache: 2
+CGAL cache size in bytes: 122500
+Total rendering time: 0:00:00.088
+   Top level object is a 3D object (manifold):
+   Status:     NoError
+   Genus:      0
+   Vertices:      329
+   Facets:        654
++ xvfb-run -a pythonscad --trust-python --render --camera=0.0,0.0,0.0,65.0,0.0,35.0,0.0 --autocenter --viewall --imgsize=640,480 -D design_view="Outer ring" -o /tmp/scad-project-design-build-l1x4f1ae/design/project/pythonscad/tube-clamp/design/img/01-outer-ring.png /work/pythonscad/tube-clamp/tube_clamp_render.py
+Python Code globally trusted
+Geometries in cache: 13
+Geometry cache size in bytes: 67192
+CGAL Polyhedrons in cache: 5
+CGAL cache size in bytes: 157750
+Total rendering time: 0:00:00.085
+   Top level object is a 3D object (manifold):
+   Status:     NoError
+   Genus:      0
+   Vertices:      289
+   Facets:        574
+Measurements:
+   Surface: 3074.20
+   Volume: 11305.73
++ xvfb-run -a pythonscad --trust-python --render --camera=0.0,0.0,0.0,65.0,0.0,35.0,0.0 --autocenter --viewall --imgsize=640,480 -D design_view="Compact base" -o /tmp/scad-project-design-build-l1x4f1ae/design/project/pythonscad/tube-clamp/design/img/02-compact-base.png /work/pythonscad/tube-clamp/tube_clamp_render.py
+Python Code globally trusted
+Geometries in cache: 15
+Geometry cache size in bytes: 88536
+CGAL Polyhedrons in cache: 6
+CGAL cache size in bytes: 216250
+Total rendering time: 0:00:00.090
+   Top level object is a 3D object (manifold):
+   Status:     NoError
+   Genus:      0
+   Vertices:      300
+   Facets:        596
+Measurements:
+   Surface: 3074.20
+   Volume: 11305.73
++ xvfb-run -a pythonscad --trust-python --render --camera=0.0,0.0,0.0,65.0,0.0,35.0,0.0 --autocenter --viewall --imgsize=640,480 -D design_view="Base transition" -o /tmp/scad-project-design-build-l1x4f1ae/design/project/pythonscad/tube-clamp/design/img/03-base-transition.png /work/pythonscad/tube-clamp/tube_clamp_render.py
+Python Code globally trusted
+Geometries in cache: 18
+Geometry cache size in bytes: 90888
+CGAL Polyhedrons in cache: 6
+CGAL cache size in bytes: 188500
+Total rendering time: 0:00:00.082
+   Top level object is a 3D object (manifold):
+   Status:     NoError
+   Genus:      0
+   Vertices:      251
+   Facets:        498
+Measurements:
+   Surface: 3074.20
+   Volume: 11305.73
++ xvfb-run -a pythonscad --trust-python --render --camera=0.0,0.0,0.0,65.0,0.0,35.0,0.0 --autocenter --viewall --imgsize=640,480 -D design_view="Tube bore" -o /tmp/scad-project-design-build-l1x4f1ae/design/project/pythonscad/tube-clamp/design/img/04-tube-bore.png /work/pythonscad/tube-clamp/tube_clamp_render.py
+Python Code globally trusted
+Geometries in cache: 18
+Geometry cache size in bytes: 129816
+CGAL Polyhedrons in cache: 9
+CGAL cache size in bytes: 562750
+Total rendering time: 0:00:00.114
+   Top level object is a 3D object (manifold):
+   Status:     NoError
+   Genus:      0
+   Vertices:      723
+   Facets:       1442
+Measurements:
+   Surface: 3080.48
+   Volume: 11337.14
++ xvfb-run -a pythonscad --trust-python --render --camera=0.0,0.0,0.0,65.0,0.0,35.0,0.0 --autocenter --viewall --imgsize=640,480 -D design_view="Snap opening" -o /tmp/scad-project-design-build-l1x4f1ae/design/project/pythonscad/tube-clamp/design/img/05-snap-opening.png /work/pythonscad/tube-clamp/tube_clamp_render.py
+Python Code globally trusted
+Geometries in cache: 21
+Geometry cache size in bytes: 112128
+CGAL Polyhedrons in cache: 10
+CGAL cache size in bytes: 531750
+Total rendering time: 0:00:00.097
+   Top level object is a 3D object (manifold):
+   Status:     NoError
+   Genus:      1
+   Vertices:      256
+   Facets:        512
+Measurements:
+   Surface: 4791.80
+   Volume: 10649.57
++ xvfb-run -a pythonscad --trust-python --render --camera=0.0,0.0,0.0,65.0,0.0,35.0,0.0 --autocenter --viewall --imgsize=640,480 -D design_view="Final clamp" -o /tmp/scad-project-design-build-l1x4f1ae/design/project/pythonscad/tube-clamp/design/img/06-final-clamp.png /work/pythonscad/tube-clamp/tube_clamp_render.py
+Python Code globally trusted
+Geometries in cache: 20
+Geometry cache size in bytes: 111344
+CGAL Polyhedrons in cache: 9
+CGAL cache size in bytes: 427500
+Total rendering time: 0:00:00.098
+   Top level object is a 3D object (manifold):
+   Status:     NoError
+   Genus:      0
+   Vertices:      250
+   Facets:        496
+Measurements:
+   Surface: 3093.71
+   Volume: 5732.34
++ xvfb-run -a pythonscad --trust-python --render --camera=0.0,0.0,0.0,0.0,0.0,0.0,0.0 --autocenter --viewall --imgsize=640,480 -D design_view="Profile view" -o /tmp/scad-project-design-build-l1x4f1ae/design/project/pythonscad/tube-clamp/design/img/07-profile-view.png /work/pythonscad/tube-clamp/tube_clamp_render.py
+Python Code globally trusted
+Geometries in cache: 20
+Geometry cache size in bytes: 111344
+CGAL Polyhedrons in cache: 9
+CGAL cache size in bytes: 427500
+Total rendering time: 0:00:00.104
+   Top level object is a 3D object (manifold):
+   Status:     NoError
+   Genus:      0
+   Vertices:      250
+   Facets:        496
+Measurements:
+   Surface: 3093.71
+   Volume: 5732.34
+Generated design documentation: bld/design
+design build: OK
+▮▮▮▮ consumer:scad.docs (3s 995ms, f0b72f2d)
+
+Tasks: 1 completed
+ Time: 4s 49ms
+

@@ -1,0 +1,59 @@
+[ WARN 2026-09-16 16:34:19.639] moon_app::queries::changed_files  Detected a shallow checkout, unable to run Git commands to determine changed files. 
+[ WARN 16:34:19.639] moon_app::queries::changed_files  A full Git history is required for affected checks, falling back to an empty files list. 
+▮▮▮▮ consumer:scad.verify (8acee9c3)
++ openscad-docsgen -m -T /work/openscad/tube-clamp/tube_clamp_render.scad
+Parsing...
+  /work/openscad/tube-clamp/tube_clamp_render.scad
+No log requests to process
++ bash scripts/run-verification.sh
+-- OpenSCAD tube-clamp API PNG
+Compiling design (CSG Products normalization)...
+Normalized CSG tree has 18 elements
+Geometries in cache: 21
+Geometry cache size in bytes: 130296
+CGAL Polyhedrons in cache: 0
+CGAL cache size in bytes: 0
+Total rendering time: 0:00:00.306
+-- OpenSCAD tube-clamp API STL
+Geometries in cache: 33
+Geometry cache size in bytes: 257064
+CGAL Polyhedrons in cache: 9
+CGAL cache size in bytes: 794750
+Total rendering time: 0:00:00.028
+   Top level object is a 3D object (manifold):
+   Status:     NoError
+   Genus:      -2
+   Vertices:     1003
+   Facets:       1994
+-- PythonSCAD tube-clamp API PNG
+Python Code globally trusted
+Compiling design (CSG Products normalization)...
+Normalized CSG tree has 24 elements
+Geometries in cache: 27
+Geometry cache size in bytes: 146016
+CGAL Polyhedrons in cache: 0
+CGAL cache size in bytes: 0
+Total rendering time: 0:00:00.183
+-- PythonSCAD tube-clamp API STL
+Python Code globally trusted
+Geometries in cache: 42
+Geometry cache size in bytes: 285024
+CGAL Polyhedrons in cache: 20
+CGAL cache size in bytes: 1585250
+Total rendering time: 0:00:00.039
+   Top level object is a 3D object (manifold):
+   Status:     NoError
+   Genus:      -2
+   Vertices:      924
+   Facets:       1836
+Measurements:
+   Surface: 10627.66
+   Volume: 22111.22
+Verification output written to /work/vrf/out
++ bash scripts/build-verification-index.sh
+verify: OK
+▮▮▮▮ consumer:scad.verify (1s 800ms, 8acee9c3)
+
+Tasks: 1 completed
+ Time: 1s 870ms
+
