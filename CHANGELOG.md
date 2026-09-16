@@ -2,6 +2,14 @@
 
 Functional changes to released `lib.scad.clamps` versions.
 
+## v0.1.5
+
+### Changed
+
+- Align the final Migration-005 consumer baseline to released `tool.scad-project v0.14.8` with exact tool gitlink `85781a6b21a0f6a06d37be154fd9eb475ecaa2a4`.
+- Use semantic `v0.14.8` Production and thin split Release callers while retaining the existing full/dual runtime and `build_engine.engine: direct` policy with no SCons cache transport.
+- Requalify the affected PR (`35101169850`), merged main (`35101626924`) and README-only zero-runtime (`35101816174`) paths without changing clamp API, geometry or functional verification behaviour.
+
 ## v0.1.4
 
 ### Changed
