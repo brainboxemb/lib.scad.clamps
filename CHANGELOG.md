@@ -2,6 +2,14 @@
 
 Functional changes to released `lib.scad.clamps` versions.
 
+## v0.1.6
+
+### Changed
+
+- Align the library with released `tool.scad-project v0.14.9` and exact tool gitlink `a140b22858ac1899e7f2fa71b679639a70d819c3`.
+- Normalize persistent generated-output publication to the canonical technical `bld` / `vrf` namespaces: `dev/pr-N/{bld,vrf}`, `prod/{bld,vrf}` and `rel/vX.Y.Z/{bld,vrf}` while retaining human-facing Build/Verification terminology.
+- Requalify the full/dual direct-engine library on affected PR run `35122513993` and merged-main run `35122676804` without changing clamp API, geometry, functional verification or SCons policy.
+
 ## v0.1.5
 
 ### Changed
