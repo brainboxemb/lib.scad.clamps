@@ -173,3 +173,5 @@ Normal checkout initializes direct dependencies only. When this library is consu
 Repository-specific agent guidance is in [`AGENTS.md`](AGENTS.md). Workflow-specific notes are in [`.github/workflows/README.md`](.github/workflows/README.md).
 
 The model, code and documentation were developed with the assistance of ChatGPT.
+
+<!-- Migration 005 qualification probe: README-only change; close this PR without merge. -->
