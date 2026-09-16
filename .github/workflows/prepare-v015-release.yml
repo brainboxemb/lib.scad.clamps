@@ -1,22 +1,20 @@
 name: Prepare clamps v0.1.5 release
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
-    types: [opened]
+      - feature/release-v0.1.5
 
 permissions:
   contents: write
 
 jobs:
   prepare:
-    if: github.head_ref == 'feature/release-v0.1.5'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Checkout release-prep branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: feature/release-v0.1.5
           fetch-depth: 1
@@ -64,10 +62,14 @@ jobs:
           PY
           git diff --check
 
-      - name: Commit release preparation
+      - name: Commit release preparation when needed
         shell: bash
         run: |
           set -euo pipefail
+          if git diff --quiet -- CHANGELOG.md README.md; then
+            echo 'Release preparation already applied.'
+            exit 0
+          fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add CHANGELOG.md README.md
