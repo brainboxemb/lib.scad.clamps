@@ -74,7 +74,7 @@ Design documentation should explain the physical feature first, then the geometr
 
 Consumer-level tests under `test/` exercise the public OpenSCAD and native PythonSCAD APIs. They create multiple parameter sets, verify derived calculations, render PNG evidence and export STL geometry.
 
-Functional verification also checks the repository/tooling boundary: the split configuration, direct `tool.git-project` and `tool.scad-project` gitlinks, exact reusable-workflow pinning and canonical bootstrap/update launchers.
+Functional verification stays focused on those library behaviours. Repository/tooling alignment—dependency refs, exact gitlinks, reusable-workflow pins, inherited Moon capabilities and runtime/cache selection—is qualified by the shared tooling and PR CI evidence instead of being reimplemented as configuration-string checks in the product verification script.
 
 Successful functional evidence is published separately to `prod/verification`. A failed verification must not replace the previous successful snapshot.
 
@@ -89,11 +89,9 @@ The release also creates an annotated source tag, deterministic bundles and SHA-
 
 ## Normal CI orchestration
 
-Normal pull-request and `main` production uses the released common SCAD lifecycle from `tool.scad-project v0.13.1`.
+Normal pull-request and `main` production uses the released Migration-005 lifecycle from `tool.scad-project v0.14.3`.
 
-A lightweight Moon preflight runs on the host before any SCAD image pull. If neither generated design/documentation nor consumer verification is affected, the single host job stops there. If production is required, the same host job restores caches, pulls the immutable SCAD image and starts exactly one explicit Docker process for both independent producer domains. After that process exits, the host validates current materialization, stages Build and Verification trees and publishes both snapshots sequentially through released `tool.git-project` publication tooling. Publication credentials are never passed into the SCAD container.
-
-The library-specific graph is intentionally smaller than the reference project graph:
+The library exposes only two real capabilities:
 
 ```text
 scad.docs
@@ -101,15 +99,22 @@ scad.docs
 
 scad.verify
     OpenSCAD + PythonSCAD public-consumer PNG/STL verification
-
-scad.production-impact
-    source-impact aggregate for the pre-container gate
-
-scad.ci
-    publication-ready aggregate
 ```
 
-There is no dummy `scad.build` task: this repository currently has no normal configured render/export targets. The shared orchestration is used because runner/container setup and publication mechanics are generic; source layout, public API tests and release contents remain library-owned.
+Root `moon.yml` selects those capabilities and contains only project-specific source-impact inputs. Shared task implementation comes from `.moon/tasks/scad.yml`, which extends the exact-pinned `tool.scad-project` policy. Consumer-authored build-index/provenance tasks and the old `scad.production-impact` / `scad.ci` lifecycle roots are gone.
+
+One host-side Moon affected query decides whether CAD work is needed. README-only or unrelated changes can therefore stop before the CAD runtime. When one or both capabilities are affected, the shared planner chooses the runtime and cache policy from `project.scad.yml` and materializes the required output in at most one CAD process.
+
+This repository deliberately keeps both OpenSCAD and PythonSCAD configuration, so it is the Migration-005 **full/dual runtime** canary. It also explicitly selects:
+
+```yaml
+build_engine:
+  engine: direct
+```
+
+so no normal or Verification SCons cache transport should occur. Moon still provides coarse capability impact and whole-capability reuse; there is simply no SCons layer inside these direct capabilities.
+
+Normal successful CI publishes the changed Build/Verification families and retains compact orchestration evidence instead of uploading another full copy of those trees as Actions artifacts.
 
 ## Implementation direction
 
@@ -129,7 +134,10 @@ project.scad.yml
     SCAD paths, engines, verification and publication policy
 
 moon.yml
-    repository production/affected graph
+    visible capabilities + library-specific source-impact boundaries
+
+.moon/tasks/scad.yml
+    inherited shared SCAD capability implementation
 ```
 
 The direct tooling layout is:
@@ -142,7 +150,7 @@ tools/tool.scad-project
     SCAD tooling and reusable production/release workflows, declared in project.yml
 ```
 
-`tool.git-project` is not recursively listed in `project.yml` because it must exist before that configuration can be processed. `tool.scad-project` is declared in `project.yml`, locked by its gitlink and matched by the exact reusable Production/Release/cleanup workflow commit pins. Keep those representations aligned.
+`tool.git-project` is not recursively listed in `project.yml` because it must exist before that configuration can be processed. `tool.scad-project` is declared in `project.yml`, locked by its gitlink and matched by the exact reusable Production/Release workflow commit pins. PR preview cleanup is supplied by released `tool.git-project v0.2.8`. Keep those representations aligned.
 
 Bootstrap and dependency updates remain simple from the consumer repository:
 
