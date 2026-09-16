@@ -6,16 +6,18 @@ runtime/cache planning and production/release lifecycle mechanics are owned by
 project-specific source-impact boundaries and OpenSCAD/PythonSCAD consumer
 verification.
 
-The current SCAD tool dependency is `tool.scad-project v0.14.3`, locked by the
-`tools/tool.scad-project` gitlink and exact reusable Production/Release workflow
-SHA. Generic PR-preview cleanup comes from released `tool.git-project v0.2.8`.
+The current SCAD tool dependency is `tool.scad-project v0.14.8`, locked by the
+`tools/tool.scad-project` gitlink at exact source
+`85781a6b21a0f6a06d37be154fd9eb475ecaa2a4`. Production and Release callers use
+the same immutable semantic release ref `v0.14.8`. Generic PR-preview cleanup
+comes from released `tool.git-project v0.2.8`.
 
 ## Normal production
 
 `.github/workflows/scad.yml` is intentionally a thin caller of:
 
 ```text
-brainboxemb/tool.scad-project/.github/workflows/project-production.yml@b86b2be325f64847b8d91b7f2596bfd4e4ffb7f2
+brainboxemb/tool.scad-project/.github/workflows/project-production.yml@v0.14.8
 ```
 
 Normal production resolves exact source/base state and runs one Moon affected
@@ -84,14 +86,14 @@ The active contract is:
 
 ```text
 project.yml
-    dependency ref: v0.14.3
+    dependency ref: v0.14.8
 
 tools/tool.scad-project
-    exact gitlink: b86b2be325f64847b8d91b7f2596bfd4e4ffb7f2
+    exact gitlink: 85781a6b21a0f6a06d37be154fd9eb475ecaa2a4
 
 .github/workflows/scad.yml
 .github/workflows/release.yml
-    exact reusable-workflow commit matching that gitlink
+    semantic released workflow ref: v0.14.8
 
 tools/tool.git-project
     exact gitlink: 7c43f37e7b07cfb57638a1d1dad2501de09ba7eb
@@ -100,6 +102,7 @@ tools/tool.git-project
     generic cleanup workflow v0.2.8
 ```
 
-The exact pins and capability/runtime/cache contract are qualified by the shared
-planner, reusable workflows and PR CI evidence. `scripts/run-verification.sh`
-stays focused on the library's public OpenSCAD/PythonSCAD behaviour.
+The released workflow ref and exact committed tool gitlink form the qualified
+identity contract. The shared planner and reusable workflows validate alignment;
+`scripts/run-verification.sh` stays focused on the library's public
+OpenSCAD/PythonSCAD behaviour.
