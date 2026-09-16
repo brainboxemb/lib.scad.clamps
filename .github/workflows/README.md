@@ -6,10 +6,10 @@ runtime/cache planning and production/release lifecycle mechanics are owned by
 project-specific source-impact boundaries and OpenSCAD/PythonSCAD consumer
 verification.
 
-The current SCAD tool dependency is `tool.scad-project v0.14.8`, locked by the
+The current SCAD tool dependency is `tool.scad-project v0.14.9`, locked by the
 `tools/tool.scad-project` gitlink at exact source
-`85781a6b21a0f6a06d37be154fd9eb475ecaa2a4`. Production and Release callers use
-the same immutable semantic release ref `v0.14.8`. Generic PR-preview cleanup
+`a140b22858ac1899e7f2fa71b679639a70d819c3`. Production and Release callers use
+the same immutable semantic release ref `v0.14.9`. Generic PR-preview cleanup
 comes from released `tool.git-project v0.2.8`.
 
 ## Normal production
@@ -17,7 +17,7 @@ comes from released `tool.git-project v0.2.8`.
 `.github/workflows/scad.yml` is intentionally a thin caller of:
 
 ```text
-brainboxemb/tool.scad-project/.github/workflows/project-production.yml@v0.14.8
+brainboxemb/tool.scad-project/.github/workflows/project-production.yml@v0.14.9
 ```
 
 Normal production resolves exact source/base state and runs one Moon affected
@@ -70,15 +70,15 @@ After capability materialization, host-side finishing adds current-run index and
 provenance information and publishes changed output families:
 
 ```text
-bld       -> dev/pr-N/build or prod/build
-vrf/out   -> dev/pr-N/verification or prod/verification
+bld       -> dev/pr-N/bld or prod/bld
+vrf/out   -> dev/pr-N/vrf or prod/vrf
 ```
 
 Normal successful production retains compact orchestration evidence rather than
 duplicating complete Build/Verification trees as Actions artifacts. Coordinated
 releases remain different because their separate Build/Verify/finalize jobs need
 exact-source artifact hand-off; release output is published under immutable
-`rel/vX.Y.Z/*` branches and attached bundles.
+`rel/vX.Y.Z/bld` and `rel/vX.Y.Z/vrf` branches and attached bundles.
 
 ## Version alignment
 
@@ -86,20 +86,20 @@ The active contract is:
 
 ```text
 project.yml
-    dependency ref: v0.14.8
+    dependency ref: v0.14.9
 
 tools/tool.scad-project
-    exact gitlink: 85781a6b21a0f6a06d37be154fd9eb475ecaa2a4
+    exact gitlink: a140b22858ac1899e7f2fa71b679639a70d819c3
 
 .github/workflows/scad.yml
 .github/workflows/release.yml
-    semantic released workflow ref: v0.14.8
+    semantic released workflow ref: v0.14.9
 
 tools/tool.git-project
     exact gitlink: 7c43f37e7b07cfb57638a1d1dad2501de09ba7eb
 
 .github/workflows/pr-cleanup.yml
-    generic cleanup workflow v0.2.8
+    generic cleanup workflow v0.2.8 with bld/vrf preview suffixes
 ```
 
 The released workflow ref and exact committed tool gitlink form the qualified

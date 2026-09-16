@@ -6,9 +6,9 @@ Reusable parametric clamp designs. OpenSCAD is the primary library implementatio
 
 - [OpenSCAD tube clamp design source](openscad/tube-clamp/design/design.md)
 - [PythonSCAD tube clamp design source](pythonscad/tube-clamp/design/design.md)
-- [Latest generated build](../../tree/prod/build)
-- [Generated design documentation](../../blob/prod/build/design/README.md)
-- [Functional verification](../../tree/prod/verification)
+- [Latest generated build](../../tree/prod/bld)
+- [Generated design documentation](../../blob/prod/bld/design/README.md)
+- [Functional verification](../../tree/prod/vrf)
 - [Changelog](CHANGELOG.md)
 
 ## Tube clamp
@@ -66,7 +66,7 @@ pythonscad/tube-clamp/design/design.md
 
 Both use the shared `scad-render-defaults` / `scad-render` authoring model. `tool.scad-project design-build` produces the generated readable tree below `bld/design`; generated PNGs are not committed to `main`.
 
-Successful production builds publish generated design documentation to `prod/build`.
+Successful production builds publish generated design documentation to `prod/bld`.
 
 Design documentation should explain the physical feature first, then the geometric operation, then use an image and source excerpt as supporting evidence. It should remain understandable to a reader who does not know OpenSCAD or PythonSCAD.
 
@@ -76,20 +76,20 @@ Consumer-level tests under `test/` exercise the public OpenSCAD and native Pytho
 
 Functional verification stays focused on those library behaviours. Repository/tooling alignment—dependency refs, exact gitlinks, reusable-workflow pins, inherited Moon capabilities and runtime/cache selection—is qualified by the shared tooling and PR CI evidence instead of being reimplemented as configuration-string checks in the product verification script.
 
-Successful functional evidence is published separately to `prod/verification`. A failed verification must not replace the previous successful snapshot.
+Successful functional evidence is published separately to `prod/vrf`. A failed verification must not replace the previous successful snapshot.
 
 A version release reruns Build-side design/documentation production and Verify against the exact release source and publishes immutable snapshots under:
 
 ```text
-rel/vX.Y.Z/build
-rel/vX.Y.Z/verification
+rel/vX.Y.Z/bld
+rel/vX.Y.Z/vrf
 ```
 
 The release also creates an annotated source tag, deterministic bundles and SHA-256 checksums.
 
 ## Normal CI orchestration
 
-Normal pull-request and `main` production uses the final released Migration-005 lifecycle from `tool.scad-project v0.14.8`.
+Normal pull-request and `main` production uses the final released Migration-005 lifecycle from `tool.scad-project v0.14.9`.
 
 The library exposes only two real capabilities:
 
@@ -114,7 +114,7 @@ build_engine:
 
 so no normal or Verification SCons cache transport should occur. Moon still provides coarse capability impact and whole-capability reuse; there is simply no SCons layer inside these direct capabilities.
 
-Normal successful CI publishes the changed Build/Verification families and retains compact orchestration evidence instead of uploading another full copy of those trees as Actions artifacts.
+Normal successful CI publishes the changed Build/Verification families under the stable technical `bld`/`vrf` namespaces and retains compact orchestration evidence instead of uploading another full copy of those trees as Actions artifacts.
 
 ## Implementation direction
 
@@ -150,7 +150,7 @@ tools/tool.scad-project
     SCAD tooling and reusable production/release workflows, declared in project.yml
 ```
 
-`tool.git-project` is not recursively listed in `project.yml` because it must exist before that configuration can be processed. `tool.scad-project` is declared in `project.yml`, locked by its exact gitlink, while Production/Release callers use the matching immutable semantic release ref `v0.14.8`. PR preview cleanup is supplied by released `tool.git-project v0.2.8`. Keep those representations aligned.
+`tool.git-project` is not recursively listed in `project.yml` because it must exist before that configuration can be processed. `tool.scad-project` is declared in `project.yml`, locked by its exact gitlink, while Production/Release callers use the matching immutable semantic release ref `v0.14.9`. PR preview cleanup is supplied by released `tool.git-project v0.2.8`. Keep those representations aligned.
 
 Bootstrap and dependency updates remain simple from the consumer repository:
 
