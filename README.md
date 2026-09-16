@@ -89,7 +89,7 @@ The release also creates an annotated source tag, deterministic bundles and SHA-
 
 ## Normal CI orchestration
 
-Normal pull-request and `main` production uses the released Migration-005 lifecycle from `tool.scad-project v0.14.3`.
+Normal pull-request and `main` production uses the final released Migration-005 lifecycle from `tool.scad-project v0.14.8`.
 
 The library exposes only two real capabilities:
 
@@ -150,7 +150,7 @@ tools/tool.scad-project
     SCAD tooling and reusable production/release workflows, declared in project.yml
 ```
 
-`tool.git-project` is not recursively listed in `project.yml` because it must exist before that configuration can be processed. `tool.scad-project` is declared in `project.yml`, locked by its gitlink and matched by the exact reusable Production/Release workflow commit pins. PR preview cleanup is supplied by released `tool.git-project v0.2.8`. Keep those representations aligned.
+`tool.git-project` is not recursively listed in `project.yml` because it must exist before that configuration can be processed. `tool.scad-project` is declared in `project.yml`, locked by its exact gitlink, while Production/Release callers use the matching immutable semantic release ref `v0.14.8`. PR preview cleanup is supplied by released `tool.git-project v0.2.8`. Keep those representations aligned.
 
 Bootstrap and dependency updates remain simple from the consumer repository:
 
@@ -166,7 +166,7 @@ bash ./bootstrap.sh
 bash ./update-repo.sh
 ```
 
-The root bootstrap launchers are canonical copies from `tool.git-project`. The root update launchers are thin SCAD wrappers from `tool.scad-project`; generic Git/ref handling still belongs to `tool.git-project`, while the SCAD wrapper additionally aligns SCAD reusable-workflow refs to the exact SCAD-tool gitlink.
+The root bootstrap launchers are canonical copies from `tool.git-project`. The root update launchers are thin SCAD wrappers from `tool.scad-project`; generic Git/ref handling still belongs to `tool.git-project`, while the SCAD wrapper additionally aligns SCAD reusable-workflow refs with the released SCAD-tool dependency policy.
 
 Normal checkout initializes direct dependencies only. When this library is consumed as a submodule, the parent project does not recursively initialize this library's own development-tooling submodules.
 
