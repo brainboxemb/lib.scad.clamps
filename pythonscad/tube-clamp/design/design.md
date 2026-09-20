@@ -14,6 +14,20 @@ base clip.
 The flat back is deliberately compact. Its width is exactly
 `transition_width`; it is not an extended mounting plate.
 
+The fit model now distinguishes the nominal/visual functional bore from an
+optional smaller printed tension bore:
+
+```python
+tube_diameter: float = 10
+clearance: float = 0.0
+tension_diameter: float | None = 9.6
+extra: float = 0.01
+```
+
+`extra` is Boolean tolerance only. It replaces the old strategy of moving the
+complete circular body into the base and therefore does not shift the nominal
+circle datum.
+
 ```python
 base_thickness: float = 4
 transition_width: float = 30
@@ -48,7 +62,7 @@ The new base is transparent red. Its width comes directly from
 ```python
 def _flat_base(self):
     return cube([
-        self.base_thickness,
+        self.base_thickness + self.extra,
         self.transition_width,
         self.clamp_width,
     ])
@@ -81,7 +95,7 @@ view: Base transition
 The tube cavity is removed once from the completed outside.
 
 ```python
-self._outer_shape() - self._inner_bore_cutter()
+self._outer_shape() - self._inner_bore_cutter(use_tension_bore)
 ```
 
 <!-- scad-render
@@ -99,10 +113,10 @@ view: Snap opening
 ## 6. Final base clip
 
 ```python
-def build(self):
+def build(self, use_tension_bore=True):
     return (
         self._outer_shape()
-        - self._inner_bore_cutter()
+        - self._inner_bore_cutter(use_tension_bore)
         - self._opening_cutter()
     )
 ```
@@ -114,7 +128,10 @@ view: Final clamp
 ## 7. Profile view
 
 This view removes perspective and is intended for judging the base and
-transition geometry.
+transition geometry. The OpenSCAD implementation additionally exposes a
+`high_resolution` build/render switch for interactive performance; PythonSCAD
+remains the retained comparison implementation at its existing render
+resolution.
 
 <!-- scad-render
 view: Profile view

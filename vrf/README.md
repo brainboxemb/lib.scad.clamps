@@ -12,7 +12,7 @@ test/
     └── tube_clamp_api.py
 ```
 
-Both files act as external consumers of the library. Each creates three clamps with different dimensions and checks derived radius values.
+Both files act as external consumers of the library. They create several clamps with different dimensions, including a nominal/tension-bore pair, and check the public derived geometry values.
 
 ## CI execution and publication
 

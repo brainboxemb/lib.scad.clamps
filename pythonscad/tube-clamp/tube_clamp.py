@@ -6,9 +6,8 @@ from pythonscad import *
 
 fn = 120
 
-# Boolean tolerance / intentional overlap.
-EPS = 0.05
-BASE_OVERLAP = 1.0
+# Boolean tolerance / intentional overlap. It must not move nominal datums.
+DEFAULT_EXTRA = 0.01
 
 
 @dataclass(frozen=True)
@@ -27,6 +26,7 @@ class TubeClamp:
     # Tube and snap-fit geometry.
     tube_diameter: float = 20
     clearance: float = 0.0
+    tension_diameter: float | None = None
     wall_thickness: float = 3
     clamp_width: float = 16
     opening_angle: float = 60
@@ -39,50 +39,82 @@ class TubeClamp:
     base_thickness: float = 4
     transition_width: float = 30
     transition_depth: float = 8
+    extra: float = DEFAULT_EXTRA
 
     def __post_init__(self):
         assert self.tube_diameter > 0
         assert self.clearance >= 0
+        assert (
+            self.tension_diameter is None
+            or 0 < self.tension_diameter <= self.functional_diameter
+        )
+        assert self.extra >= 0
         assert self.wall_thickness > 0
         assert self.clamp_width > 0
         assert 0 < self.opening_angle < 180
         assert self.base_thickness > 0
         assert self.transition_width > 0
         assert self.transition_depth > 0
-        assert self.outer_radius > BASE_OVERLAP
+
+    @property
+    def functional_diameter(self):
+        """Nominal/visual bore diameter."""
+        return self.tube_diameter + self.clearance
+
+    @property
+    def resolved_tension_diameter(self):
+        """Printed clamping bore diameter, or functional diameter if unset."""
+        return (
+            self.functional_diameter
+            if self.tension_diameter is None
+            else self.tension_diameter
+        )
+
+    def bore_diameter(self, use_tension_bore=True):
+        """Selected bore diameter for visual or printed geometry."""
+        return (
+            self.resolved_tension_diameter
+            if use_tension_bore
+            else self.functional_diameter
+        )
 
     @property
     def inner_radius(self):
-        """Radius of the free tube cavity."""
-        return (self.tube_diameter + self.clearance) / 2
+        """Backward-compatible functional/visual bore radius."""
+        return self.functional_diameter / 2
+
+    @property
+    def tension_radius(self):
+        """Printed clamping bore radius."""
+        return self.resolved_tension_diameter / 2
+
+    def bore_radius(self, use_tension_bore=True):
+        """Selected bore radius for visual or printed geometry."""
+        return self.bore_diameter(use_tension_bore) / 2
 
     @property
     def outer_radius(self):
-        """Outside radius of the circular clip body."""
+        """Outside radius based on functional bore plus wall thickness."""
         return self.inner_radius + self.wall_thickness
 
     @property
     def _center_x(self):
         """Circle position relative to the rear surface.
 
-        BASE_OVERLAP makes the circle and base genuinely overlap instead of
-        merely touching at a tangent.
+        Boolean overlap is created locally with extra so this nominal
+        physical datum is not shifted.
         """
-        return (
-            self.base_thickness
-            + self.outer_radius
-            - BASE_OVERLAP
-        )
+        return self.base_thickness + self.outer_radius
 
-    def build(self):
-        """Build outside first, then subtract the two functional cutouts."""
+    def build(self, use_tension_bore=True):
+        """Build outside first, then subtract the selected bore and opening."""
         return (
             self._outer_shape()
-            - self._inner_bore_cutter()
+            - self._inner_bore_cutter(use_tension_bore)
             - self._opening_cutter()
         )
 
-    def render(self, view=View.FINAL):
+    def render(self, view=View.FINAL, use_tension_bore=True):
         """Return final geometry or one documented construction step."""
         view = self.View(view)
 
@@ -105,17 +137,23 @@ class TubeClamp:
         if view == self.View.BORE:
             return [
                 self._outer_shape().color("lightgray", alpha=0.50),
-                self._inner_bore_cutter().color("red", alpha=0.45),
+                self._inner_bore_cutter(
+                    use_tension_bore
+                ).color("red", alpha=0.45),
             ]
 
         if view == self.View.OPENING:
             return [
-                self._hollow_body().color("lightgray"),
+                self._hollow_body(
+                    use_tension_bore
+                ).color("lightgray"),
                 self._opening_cutter().color("red", alpha=0.35),
             ]
 
         # PROFILE uses final geometry; the workflow only changes camera.
-        return self.build()
+        return self.build(
+            use_tension_bore=use_tension_bore
+        )
 
     # ------------------------------------------------------------------
     # Construction geometry
@@ -143,7 +181,7 @@ class TubeClamp:
     def _flat_base(self):
         """Compact rear face, exactly as wide as transition_width."""
         return cube([
-            self.base_thickness,
+            self.base_thickness + self.extra,
             self.transition_width,
             self.clamp_width,
         ]).translate([
@@ -156,7 +194,7 @@ class TubeClamp:
         """Trapezoidal transition from compact base to circular outside."""
         attach_x = min(
             self.base_thickness + self.transition_depth,
-            self._center_x + self.outer_radius - EPS,
+            self._center_x + self.outer_radius - self.extra,
         )
 
         dx = attach_x - self._center_x
@@ -178,22 +216,22 @@ class TubeClamp:
             height=self.clamp_width
         )
 
-    def _inner_bore_cutter(self):
+    def _inner_bore_cutter(self, use_tension_bore=True):
         """Cylinder removed once from the completed outside shape."""
         return cylinder(
-            h=self.clamp_width + 2 * EPS,
-            r=self.inner_radius,
+            h=self.clamp_width + 2 * self.extra,
+            r=self.bore_radius(use_tension_bore),
         ).translate([
             self._center_x,
             0,
-            -EPS,
+            -self.extra,
         ])
 
-    def _hollow_body(self):
-        """Outside after the tube bore but before the snap opening."""
+    def _hollow_body(self, use_tension_bore=True):
+        """Outside after the selected tube bore, before the snap opening."""
         return (
             self._outer_shape()
-            - self._inner_bore_cutter()
+            - self._inner_bore_cutter(use_tension_bore)
         )
 
     def _opening_cutter(self):
@@ -210,11 +248,11 @@ class TubeClamp:
         ]
 
         return polygon(points).linear_extrude(
-            height=self.clamp_width + 2 * EPS
+            height=self.clamp_width + 2 * self.extra
         ).translate([
             self._center_x,
             0,
-            -EPS,
+            -self.extra,
         ])
 
 
