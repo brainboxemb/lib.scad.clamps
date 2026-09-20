@@ -24,6 +24,18 @@ small = TubeClamp(
 
 medium = TubeClamp()
 
+tension = TubeClamp(
+    tube_diameter=10,
+    tension_diameter=9.6,
+    wall_thickness=2,
+    clamp_width=16,
+    opening_angle=60,
+    base_thickness=2,
+    transition_width=12,
+    transition_depth=3,
+    extra=0.01,
+)
+
 large = TubeClamp(
     tube_diameter=32,
     clearance=0.4,
@@ -39,8 +51,21 @@ assert abs(small.inner_radius - 6.1) < 0.001
 assert abs(medium.outer_radius - 13) < 0.001
 assert abs(large.outer_radius - 20.2) < 0.001
 
+assert abs(tension.functional_diameter - 10) < 0.001
+assert abs(tension.resolved_tension_diameter - 9.6) < 0.001
+assert abs(tension.bore_diameter(False) - 10) < 0.001
+assert abs(tension.bore_diameter(True) - 9.6) < 0.001
+assert abs(tension.outer_radius - 7) < 0.001
+assert abs(tension.extra - 0.01) < 0.0001
+
 show([
     small.build().translate([-32, 0, 0]),
     medium.build(),
+    tension.build(
+        use_tension_bore=False
+    ).translate([24, 28, 0]),
+    tension.build(
+        use_tension_bore=True
+    ).translate([44, 28, 0]),
     large.build().translate([42, 0, 0]),
 ])

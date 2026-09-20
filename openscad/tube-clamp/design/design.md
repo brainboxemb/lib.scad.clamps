@@ -32,10 +32,27 @@ Tube geometry:
 ```scad
 tube_diameter = 20;
 clearance = 0.0;
+tension_diameter = undef;
 wall_thickness = 3;
 clamp_width = 16;
 opening_angle = 60;
+extra = 0.01;
 ```
+
+The nominal/visual bore is the **functional diameter**:
+
+```text
+functional_diameter = tube_diameter + clearance
+```
+
+For a real clamping print an optional smaller `tension_diameter` can be supplied.
+The public build/render call selects which bore is cut. The outside of the ring
+does not shrink with the tension bore; it remains based on the functional
+diameter plus `wall_thickness`.
+
+`extra` is only a tiny Boolean overlap/extension used to make unions and
+differences robust. It is not fit clearance and does not move the nominal tube
+or ring centre.
 
 Compact back geometry:
 
@@ -53,6 +70,12 @@ transition_depth = 8;
   circular body before the transition meets the circle.
 
 The base width is deliberately derived from `transition_width`.
+
+The circular body is positioned from the nominal base thickness. Earlier
+versions moved the complete circle 1 mm into the base to force a Boolean
+overlap. That changed the visible profile. The current geometry keeps the
+physical datum clean and uses only `extra` for the tiny overlap needed by the
+union.
 
 ## Construction order
 
@@ -106,7 +129,7 @@ module _flat_base(clamp) {
         0
     ])
         cube([
-            clamp.base_thickness,
+            clamp.base_thickness + clamp.extra,
             clamp.transition_width,
             clamp.clamp_width
         ]);
@@ -155,16 +178,23 @@ view: transition
 
 Now the cylindrical space for the tube is removed from that completed outside.
 
-The outside is shown semi-transparent gray and the cutter is red.
+The outside is shown semi-transparent gray and the cutter is red. The same
+outside can use either the nominal/visual bore or the smaller print-clamping
+bore:
 
 ```scad
-difference() {
-    _outer_shape(clamp);
-    _inner_bore_cutter(clamp);
-}
+tube_clamp_build(
+    clamp,
+    use_tension_bore = false
+); // functional/visual diameter
+
+tube_clamp_build(
+    clamp,
+    use_tension_bore = true
+); // tension diameter when configured
 ```
 
-This is the only tube-bore subtraction in the construction.
+This remains the only tube-bore subtraction in the construction.
 
 <!-- scad-render
 view: bore
@@ -190,11 +220,18 @@ view: opening
 The public build is now a direct expression of the design sequence:
 
 ```scad
-module tube_clamp_build(clamp) {
+module tube_clamp_build(
+    clamp,
+    use_tension_bore = true,
+    high_resolution = true
+) {
     difference() {
         _outer_shape(clamp);
 
-        _inner_bore_cutter(clamp);
+        _inner_bore_cutter(
+            clamp,
+            use_tension_bore
+        );
         _opening_cutter(clamp);
     }
 }
@@ -215,7 +252,8 @@ judging:
 - `base_thickness`;
 - `transition_width`;
 - `transition_depth`;
-- the overlap between the circular body and the compact base.
+- the nominal relationship between the circular body and compact base;
+- the tiny `extra` overlap used only for robust Boolean construction.
 
 <!-- scad-render
 view: profile
@@ -226,21 +264,31 @@ vpr: [0, 0, 0]
 
 ```scad
 clamp = tube_clamp_create(
-    tube_diameter = 20,
+    tube_diameter = 10,
     clearance = 0.0,
-    wall_thickness = 3,
+    tension_diameter = 9.6,
+    wall_thickness = 2,
     clamp_width = 16,
     opening_angle = 60,
-    base_thickness = 4,
-    transition_width = 30,
-    transition_depth = 8
+    base_thickness = 2,
+    transition_width = 12,
+    transition_depth = 3,
+    extra = 0.01
 );
 
-tube_clamp_build(clamp);
+tube_clamp_build(
+    clamp,
+    use_tension_bore = true,
+    high_resolution = false
+);
 ```
 
 OpenSCAD `object()` remains the preferred struct-like API for reusable
 components in this repository.
+
+`high_resolution` is intentionally a build/render option rather than part of
+the clamp object. It changes only curved-surface tessellation: high resolution
+uses 120 fragments; low resolution uses 48 for faster interactive assemblies.
 
 CLI rendering therefore still requires:
 

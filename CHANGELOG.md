@@ -2,6 +2,27 @@
 
 Functional changes to released `lib.scad.clamps` versions.
 
+## Unreleased
+
+### Added
+
+- Add an optional explicit `tension_diameter` for tube clamps and public
+  functional/tension/selected bore accessors.
+- Add `use_tension_bore` to the OpenSCAD and PythonSCAD build/render paths so
+  the same clamp can show the nominal tube bore or produce the smaller
+  clamping-print bore.
+- Add OpenSCAD `high_resolution` build/render control, retaining 120 fragments
+  for normal output and using 48 for faster interactive assembly work.
+- Add public `extra = 0.01` Boolean tolerance for robust unions/differences.
+
+### Changed
+
+- Stop moving the complete circular clamp body 1 mm into the compact base.
+  Nominal circle placement is now independent of Boolean overlap; `extra`
+  supplies only the tiny local overlap/extension needed for robust geometry.
+- Keep the outside ring envelope based on the functional/nominal bore plus wall
+  thickness even when a smaller tension bore is selected.
+
 ## v0.1.6
 
 ### Changed
