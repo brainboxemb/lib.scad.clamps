@@ -2,7 +2,7 @@
 
 Functional changes to released `lib.scad.clamps` versions.
 
-## Unreleased
+## v0.1.7
 
 ### Added
 
