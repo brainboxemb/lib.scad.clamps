@@ -94,8 +94,15 @@ class TubeClamp:
 
     @property
     def outer_radius(self):
-        """Outside radius based on functional bore plus wall thickness."""
+        """Backward-compatible functional outside radius."""
         return self.inner_radius + self.wall_thickness
+
+    def active_outer_radius(self, use_tension_bore=True):
+        """Selected outside radius while preserving wall_thickness."""
+        return (
+            self.bore_radius(use_tension_bore)
+            + self.wall_thickness
+        )
 
     @property
     def _center_x(self):
@@ -109,9 +116,9 @@ class TubeClamp:
     def build(self, use_tension_bore=True):
         """Build outside first, then subtract the selected bore and opening."""
         return (
-            self._outer_shape()
+            self._outer_shape(use_tension_bore)
             - self._inner_bore_cutter(use_tension_bore)
-            - self._opening_cutter()
+            - self._opening_cutter(use_tension_bore)
         )
 
     def render(self, view=View.FINAL, use_tension_bore=True):
@@ -119,24 +126,32 @@ class TubeClamp:
         view = self.View(view)
 
         if view == self.View.OUTER_RING:
-            return self._outer_ring_solid()
+            return self._outer_ring_solid(use_tension_bore)
 
         if view == self.View.BASE:
             return [
-                self._outer_ring_solid().color("lightgray"),
+                self._outer_ring_solid(
+                    use_tension_bore
+                ).color("lightgray"),
                 self._flat_base().color("red", alpha=0.45),
             ]
 
         if view == self.View.TRANSITION:
             return [
-                self._outer_ring_solid().color("lightgray"),
+                self._outer_ring_solid(
+                    use_tension_bore
+                ).color("lightgray"),
                 self._flat_base().color("lightgray"),
-                self._base_transition().color("red", alpha=0.45),
+                self._base_transition(
+                    use_tension_bore
+                ).color("red", alpha=0.45),
             ]
 
         if view == self.View.BORE:
             return [
-                self._outer_shape().color("lightgray", alpha=0.50),
+                self._outer_shape(
+                    use_tension_bore
+                ).color("lightgray", alpha=0.50),
                 self._inner_bore_cutter(
                     use_tension_bore
                 ).color("red", alpha=0.45),
@@ -159,19 +174,19 @@ class TubeClamp:
     # Construction geometry
     # ------------------------------------------------------------------
 
-    def _outer_shape(self):
+    def _outer_shape(self, use_tension_bore=True):
         """One complete solid outside before the bore/opening cuts."""
         return (
-            self._outer_ring_solid()
+            self._outer_ring_solid(use_tension_bore)
             | self._flat_base()
-            | self._base_transition()
+            | self._base_transition(use_tension_bore)
         )
 
-    def _outer_ring_solid(self):
+    def _outer_ring_solid(self, use_tension_bore=True):
         """Solid circular outside; the bore is intentionally a later step."""
         return cylinder(
             h=self.clamp_width,
-            r=self.outer_radius,
+            r=self.active_outer_radius(use_tension_bore),
         ).translate([
             self._center_x,
             0,
@@ -190,17 +205,20 @@ class TubeClamp:
             0,
         ])
 
-    def _base_transition(self):
+    def _base_transition(self, use_tension_bore=True):
         """Trapezoidal transition from compact base to circular outside."""
+        outer_radius = self.active_outer_radius(
+            use_tension_bore
+        )
         attach_x = min(
             self.base_thickness + self.transition_depth,
-            self._center_x + self.outer_radius - self.extra,
+            self._center_x + outer_radius - self.extra,
         )
 
         dx = attach_x - self._center_x
         attach_y = sqrt(max(
             0.01,
-            self.outer_radius * self.outer_radius - dx * dx,
+            outer_radius * outer_radius - dx * dx,
         ))
 
         base_half_width = self.transition_width / 2
@@ -230,13 +248,16 @@ class TubeClamp:
     def _hollow_body(self, use_tension_bore=True):
         """Outside after the selected tube bore, before the snap opening."""
         return (
-            self._outer_shape()
+            self._outer_shape(use_tension_bore)
             - self._inner_bore_cutter(use_tension_bore)
         )
 
-    def _opening_cutter(self):
+    def _opening_cutter(self, use_tension_bore=True):
         """Simple triangular cutter that creates the snap opening."""
-        cutter_length = self.outer_radius + 10
+        cutter_length = (
+            self.active_outer_radius(use_tension_bore)
+            + 10
+        )
         cutter_half_width = cutter_length * tan(
             radians(self.opening_angle / 2)
         )
