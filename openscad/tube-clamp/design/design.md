@@ -46,9 +46,17 @@ functional_diameter = tube_diameter + clearance
 ```
 
 For a real clamping print an optional smaller `tension_diameter` can be supplied.
-The public build/render call selects which bore is cut. The outside of the ring
-does not shrink with the tension bore; it remains based on the functional
-diameter plus `wall_thickness`.
+The public build/render call selects functional or tension geometry.
+
+Tension keeps the configured wall thickness constant. When the tension diameter
+is smaller, both the inner and outer ring radii shrink by the same amount:
+
+```text
+active_outer_radius = active_bore_radius + wall_thickness
+```
+
+The ring centre stays on the functional/nominal design datum, so enabling tension
+does not move the intended tube centre.
 
 `extra` is only a tiny Boolean overlap/extension used to make unions and
 differences robust. It is not fit clearance and does not move the nominal tube
@@ -178,20 +186,19 @@ view: transition
 
 Now the cylindrical space for the tube is removed from that completed outside.
 
-The outside is shown semi-transparent gray and the cutter is red. The same
-outside can use either the nominal/visual bore or the smaller print-clamping
-bore:
+The outside is shown semi-transparent gray and the cutter is red. The build can
+use either the nominal/visual geometry or the smaller print-clamping geometry:
 
 ```scad
 tube_clamp_build(
     clamp,
     use_tension_bore = false
-); // functional/visual diameter
+); // functional/visual ring geometry
 
 tube_clamp_build(
     clamp,
     use_tension_bore = true
-); // tension diameter when configured
+); // tension ring geometry with constant wall thickness
 ```
 
 This remains the only tube-bore subtraction in the construction.

@@ -139,6 +139,21 @@ function tube_clamp_outer_radius(clamp) =
     tube_clamp_inner_radius(clamp)
     + clamp.wall_thickness;
 
+// Selected outside radius for the geometry being built.
+//
+// The functional/visual outside remains available through
+// tube_clamp_outer_radius().  Tension geometry shrinks both the bore and the
+// outside by the same radial amount, preserving wall_thickness.
+function tube_clamp_active_outer_radius(
+    clamp,
+    use_tension_bore = true
+) =
+    tube_clamp_bore_radius(
+        clamp,
+        use_tension_bore
+    )
+    + clamp.wall_thickness;
+
 
 // ----------------------------------------------------------------------
 // Derived construction dimensions
@@ -187,13 +202,19 @@ module tube_clamp_build(
     // This keeps the construction easy to reason about: the bore is not
     // repeatedly cut from separate pieces.
     difference() {
-        _outer_shape(clamp);
+        _outer_shape(
+            clamp,
+            use_tension_bore
+        );
 
         _inner_bore_cutter(
             clamp,
             use_tension_bore
         );
-        _opening_cutter(clamp);
+        _opening_cutter(
+            clamp,
+            use_tension_bore
+        );
     }
 }
 
@@ -213,11 +234,17 @@ module tube_clamp_render(
             ? TUBE_CLAMP_RENDER_FN_HIGH
             : TUBE_CLAMP_RENDER_FN_LOW;
     if (view == TUBE_CLAMP_VIEW_OUTER_RING) {
-        _outer_ring_solid(clamp);
+        _outer_ring_solid(
+            clamp,
+            use_tension_bore
+        );
 
     } else if (view == TUBE_CLAMP_VIEW_BASE) {
         color("lightgray")
-            _outer_ring_solid(clamp);
+            _outer_ring_solid(
+                clamp,
+                use_tension_bore
+            );
 
         // Red = geometry introduced by this design step.
         color([1, 0, 0, 0.45])
@@ -225,18 +252,27 @@ module tube_clamp_render(
 
     } else if (view == TUBE_CLAMP_VIEW_TRANSITION) {
         color("lightgray") {
-            _outer_ring_solid(clamp);
+            _outer_ring_solid(
+                clamp,
+                use_tension_bore
+            );
             _flat_base(clamp);
         }
 
         // Still solid here: the tube bore is deliberately a later step.
         color([1, 0, 0, 0.45])
-            _base_transition(clamp);
+            _base_transition(
+                clamp,
+                use_tension_bore
+            );
 
     } else if (view == TUBE_CLAMP_VIEW_BORE) {
         // Semi-transparent outside lets the red bore cutter remain visible.
         color([0.75, 0.75, 0.75, 0.50])
-            _outer_shape(clamp);
+            _outer_shape(
+                clamp,
+                use_tension_bore
+            );
 
         color([1, 0, 0, 0.45])
             _inner_bore_cutter(
@@ -270,21 +306,36 @@ module tube_clamp_render(
 // ----------------------------------------------------------------------
 
 // Complete outside before any functional material is removed.
-module _outer_shape(clamp) {
+module _outer_shape(
+    clamp,
+    use_tension_bore = true
+) {
     union() {
-        _outer_ring_solid(clamp);
+        _outer_ring_solid(
+            clamp,
+            use_tension_bore
+        );
         _flat_base(clamp);
-        _base_transition(clamp);
+        _base_transition(
+            clamp,
+            use_tension_bore
+        );
     }
 }
 
 // Solid cylinder defining the outside of the circular clip.
 // It is intentionally NOT a ring yet: the bore is cut later.
-module _outer_ring_solid(clamp) {
+module _outer_ring_solid(
+    clamp,
+    use_tension_bore = true
+) {
     translate([_tube_clamp_center_x(clamp), 0, 0])
         cylinder(
             h = clamp.clamp_width,
-            r = tube_clamp_outer_radius(clamp)
+            r = tube_clamp_active_outer_radius(
+                clamp,
+                use_tension_bore
+            )
         );
 }
 
@@ -309,8 +360,15 @@ module _flat_base(clamp) {
 //
 // transition_width = full width where the transition leaves the base.
 // transition_depth = distance in X before it meets the circular body.
-module _base_transition(clamp) {
-    outer_r = tube_clamp_outer_radius(clamp);
+module _base_transition(
+    clamp,
+    use_tension_bore = true
+) {
+    outer_r =
+        tube_clamp_active_outer_radius(
+            clamp,
+            use_tension_bore
+        );
     center_x = _tube_clamp_center_x(clamp);
 
     attach_x = min(
@@ -364,7 +422,10 @@ module _hollow_body(
     use_tension_bore = true
 ) {
     difference() {
-        _outer_shape(clamp);
+        _outer_shape(
+            clamp,
+            use_tension_bore
+        );
         _inner_bore_cutter(
             clamp,
             use_tension_bore
@@ -374,8 +435,15 @@ module _hollow_body(
 
 // Simple triangular cutter for the snap opening.
 // Keep this simple unless a later requirement gives a reason to change it.
-module _opening_cutter(clamp) {
-    outer_r = tube_clamp_outer_radius(clamp);
+module _opening_cutter(
+    clamp,
+    use_tension_bore = true
+) {
+    outer_r =
+        tube_clamp_active_outer_radius(
+            clamp,
+            use_tension_bore
+        );
     cutter_length = outer_r + 10;
     cutter_half_width =
         cutter_length * tan(clamp.opening_angle / 2);

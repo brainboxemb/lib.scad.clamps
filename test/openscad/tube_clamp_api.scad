@@ -71,4 +71,13 @@ assert(abs(tube_clamp_tension_diameter(tension) - 9.6) < 0.001);
 assert(abs(tube_clamp_bore_diameter(tension, false) - 10) < 0.001);
 assert(abs(tube_clamp_bore_diameter(tension, true) - 9.6) < 0.001);
 assert(abs(tube_clamp_outer_radius(tension) - 7) < 0.001);
+assert(abs(tube_clamp_active_outer_radius(tension, false) - 7) < 0.001);
+assert(abs(tube_clamp_active_outer_radius(tension, true) - 6.8) < 0.001);
+assert(
+    abs(
+        tube_clamp_active_outer_radius(tension, true)
+        - tube_clamp_bore_radius(tension, true)
+        - tension.wall_thickness
+    ) < 0.001
+);
 assert(abs(tension.extra - 0.01) < 0.0001);
