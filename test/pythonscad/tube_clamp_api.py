@@ -56,6 +56,13 @@ assert abs(tension.resolved_tension_diameter - 9.6) < 0.001
 assert abs(tension.bore_diameter(False) - 10) < 0.001
 assert abs(tension.bore_diameter(True) - 9.6) < 0.001
 assert abs(tension.outer_radius - 7) < 0.001
+assert abs(tension.active_outer_radius(False) - 7) < 0.001
+assert abs(tension.active_outer_radius(True) - 6.8) < 0.001
+assert abs(
+    tension.active_outer_radius(True)
+    - tension.bore_radius(True)
+    - tension.wall_thickness
+) < 0.001
 assert abs(tension.extra - 0.01) < 0.0001
 
 show([
