@@ -2,6 +2,15 @@
 
 Functional changes to released `lib.scad.clamps` versions.
 
+## v0.1.8
+
+### Changed
+
+- Keep the configured tube-clamp wall thickness constant when tension geometry
+  is selected by shrinking the outside radius together with the tension bore.
+- Keep the ring centre on the functional/nominal datum, so switching between
+  functional and tension geometry does not move the intended tube centre.
+
 ## v0.1.7
 
 ### Added
