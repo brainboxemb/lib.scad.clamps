@@ -4,6 +4,8 @@
 
 ### Changed
 
+- Refresh root `update-repo.sh` and `update-repo.ps1` to the canonical `tool.scad-project v0.15.6` consumer wrappers so future repository updates use the released Migration 009 path.
+
 - Adopt released `tool.scad-project v0.15.6` with exact tool gitlink `8ea81a0c3483770bedda75ccf80fb72797097c0a` for Migration 009, preserving existing clamp geometry/API while correcting production-run concurrency.
 - Requalify exact main `2cb73a1a4f3b5a75ac5c3f606a37f1a91ccfd835` through production run `35728856721`; both `prod/bld` and `prod/vrf` identify the v0.15.6 stack.
 
