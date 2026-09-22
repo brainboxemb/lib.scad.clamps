@@ -4,6 +4,8 @@
 
 ### Changed
 
+- Preserve executable mode on `update-repo.sh`; the Migration 009 wrapper refresh keeps the canonical v0.15.6 content and remains directly invokable on Unix-like systems.
+
 - Refresh root `update-repo.sh` and `update-repo.ps1` to the canonical `tool.scad-project v0.15.6` consumer wrappers so future repository updates use the released Migration 009 path.
 
 - Adopt released `tool.scad-project v0.15.6` with exact tool gitlink `8ea81a0c3483770bedda75ccf80fb72797097c0a` for Migration 009, preserving existing clamp geometry/API while correcting production-run concurrency.
