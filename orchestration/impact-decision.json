@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "tool": "tool.git-project/moon-affected",
+  "moon_version": "moon 2.5.4",
+  "task": "consumer:scad.docs",
+  "base": "ba6c5e5e89dcfc2d246b2610692ef3db0d10fbb0",
+  "head": "30b985d294eeb5db714889a908b9ee33623d2652",
+  "affected": true,
+  "status": "success",
+  "reason": "target-or-upstream-affected"
+}
