@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.9
+
 ### Changed
 
 - Adopt the Migration-011 tooling baseline: tool.git-project v0.2.14 and tool.scad-project v0.15.11, managed bootstrap/update launchers, self-scoped workflow filenames and current reusable CI/release APIs; align the repository documentation with the shared numbered families and publish `50-00-verification.md` with generated verification evidence without changing clamp geometry or public API.
