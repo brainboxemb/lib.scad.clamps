@@ -1,0 +1,23 @@
+Publication context : production
+Publication kind    : build
+Publication branch  : prod/bld
+
+Source
+------
+Repository          : brainboxemb/lib.scad.clamps
+Ref type            : branch
+Ref                 : main
+Commit              : 30b985d294eeb5db714889a908b9ee33623d2652
+Triggered by        : brainboxemb
+Workflow run        : https://github.com/brainboxemb/lib.scad.clamps/actions/runs/35903258232
+
+Tooling
+-------
+SCAD toolchain image: ghcr.io/brainboxemb/scad-toolchain:v0.6.1
+SCAD toolchain ver. : v0.6.1
+tool.scad-project   : v0.15.11
+
+Git submodules
+--------------
+tools/tool.git-project : d1ed47c7d85524cfcb2a8f7e1ea81ba106ae9c60
+tools/tool.scad-project : 8d167ad17dbfa798d68f46d871aaeed2e2e09857
