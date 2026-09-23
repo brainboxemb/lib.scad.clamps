@@ -1,0 +1,21 @@
+name: CI
+
+# Purpose: run normal clamps PR/main SCAD integration and publication.
+# Scope: repository self-entry workflow; delegates orchestration to the released reusable CI API.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  scad:
+    uses: brainboxemb/tool.scad-project/.github/workflows/reusable-ci.yml@v0.15.11
+    with:
+      cache_namespace: lib-scad-clamps-ci-v2
