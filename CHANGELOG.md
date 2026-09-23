@@ -4,6 +4,8 @@
 
 ### Changed
 
+- Adopt the Migration-011 tooling baseline: tool.git-project v0.2.14 and tool.scad-project v0.15.11, managed bootstrap/update launchers, self-scoped workflow filenames and current reusable CI/release APIs; align the repository documentation with the shared numbered families and publish `50-00-verification.md` with generated verification evidence without changing clamp geometry or public API.
+
 - Align repository documentation and agent guidance with Migration 010: add numbered plan/specification/design/verification authorities, route shared workflow through `brainboxemb.meta`, publish the verification strategy with generated evidence, add source design breadcrumbs, and remove stale copied tooling/publication guidance without changing clamp geometry or API.
 
 - Preserve executable mode on `update-repo.sh`; the Migration 009 wrapper refresh keeps the canonical v0.15.6 content and remains directly invokable on Unix-like systems.

@@ -9,6 +9,8 @@ mkdir -p \
   "${OUT_DIR}/openscad" \
   "${OUT_DIR}/pythonscad"
 
+cp "${ROOT_DIR}/doc/50-00-verification.md" "${OUT_DIR}/50-00-verification.md"
+
 run_checked() {
   local label="$1"
   shift

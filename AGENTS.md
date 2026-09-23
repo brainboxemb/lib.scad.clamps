@@ -1,6 +1,6 @@
 # Repository agent guidance
 
-Start with [doc/00-plan.md](doc/00-plan.md).
+Start with [doc/10-00-plan.md](doc/10-00-plan.md), then use [doc/README.md](doc/README.md) to route to the repository manuals, specification, design and verification.
 
 For shared BrainboxEmb working conventions, read
 [brainboxemb.meta/AGENTS.md](https://github.com/brainboxemb/brainboxemb.meta/blob/main/AGENTS.md).
