@@ -4,12 +4,12 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT_DIR="${ROOT_DIR}/vrf/out"
 
-cp "${ROOT_DIR}/doc/30-verification.md" "${OUT_DIR}/30-verification.md"
+cp "${ROOT_DIR}/doc/50-00-verification.md" "${OUT_DIR}/50-00-verification.md"
 
 cat > "${OUT_DIR}/index.md" <<'EOF'
 # lib.scad.clamps verification
 
-Repository-level strategy/status: [30-verification.md](30-verification.md).
+Repository-level strategy/status: [50-00-verification.md](50-00-verification.md).
 
 The verification tests use the public library APIs from separate consumer files
 and build three clamps with different dimensions.
