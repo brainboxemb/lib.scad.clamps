@@ -4,6 +4,30 @@ Reusable parametric clamp designs. OpenSCAD is the primary implementation
 direction; the existing PythonSCAD implementation remains a maintained
 comparison and consumer-verification path.
 
+## Preview
+
+<table>
+  <tr>
+    <th align="center">OpenSCAD</th>
+    <th align="center">PythonSCAD</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="../../blob/prod/bld/design/project/openscad/tube-clamp/design/img/06-final.png">
+        <img src="../../raw/prod/bld/design/project/openscad/tube-clamp/design/img/06-final.png" alt="OpenSCAD tube clamp final design" width="100%">
+      </a>
+    </td>
+    <td align="center">
+      <a href="../../blob/prod/bld/design/project/pythonscad/tube-clamp/design/img/06-final-clamp.png">
+        <img src="../../raw/prod/bld/design/project/pythonscad/tube-clamp/design/img/06-final-clamp.png" alt="PythonSCAD tube clamp final design" width="100%">
+      </a>
+    </td>
+  </tr>
+</table>
+
+These are generated from the current design documentation; images are not
+duplicated on `main`.
+
 ## Start here
 
 - [Plan](doc/00-plan.md)
