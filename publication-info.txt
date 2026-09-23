@@ -1,0 +1,47 @@
+Publication context : release
+Publication kind    : verification
+Publication branch  : rel/v0.1.9/vrf
+
+Source
+------
+Repository          : brainboxemb/lib.scad.clamps
+Ref type            : tag
+Ref                 : v0.1.9
+Commit              : e9f2fe0039a5f1cb6e2a0386a736767d95e627e7
+Triggered by        : brainboxemb
+Workflow run        : https://github.com/brainboxemb/lib.scad.clamps/actions/runs/35903841225
+
+Tooling
+-------
+SCAD toolchain image: ghcr.io/brainboxemb/scad-toolchain:v0.6.1
+SCAD toolchain ver. : v0.6.1
+tool.scad-project   : v0.15.11
+
+Git submodules
+--------------
+tools/tool.git-project : d1ed47c7d85524cfcb2a8f7e1ea81ba106ae9c60
+tools/tool.scad-project : 8d167ad17dbfa798d68f46d871aaeed2e2e09857
+
+Runtime components
+------------------
+SCAD toolchain
+==============
+Profile    : full
+Toolchain  : v0.6.1
+OpenSCAD   : OpenSCAD version 2026.09.17.nightly
+PythonSCAD : PythonSCAD version 1.1.2
+Python     : Python 3.12.3
+Git        : git version 2.43.0
+SCons      : 4.11.1
+Inkscape   : not installed
+drawsvg    : not installed
+BOSL2      : v2.0.752
+pybosl2    : 0.6.7
+Shapely    : 2.1.2
+docsgen    : 2.0.55
+Pillow     : 12.3.0
+OPENSCADPATH: /opt/openscad-libraries
+BOSL2_ROOT  : /opt/openscad-libraries/BOSL2
+PYTHONPATH : /__w/lib.scad.clamps/lib.scad.clamps/tools/tool.scad-project/src:/opt/python-libs
+Acknowledgments TXT: /usr/share/doc/scad-toolchain/OPEN_SOURCE_ACKNOWLEDGMENTS.txt
+Acknowledgments PDF: /usr/share/doc/scad-toolchain/OPEN_SOURCE_ACKNOWLEDGMENTS.pdf
