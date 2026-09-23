@@ -1,3 +1,6 @@
+# Design: design/design.md
+# Design review: tube_clamp_render.py
+
 from dataclasses import dataclass
 from enum import StrEnum
 from math import radians, sqrt, tan

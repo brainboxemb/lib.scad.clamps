@@ -4,10 +4,12 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT_DIR="${ROOT_DIR}/vrf/out"
 
+cp "${ROOT_DIR}/doc/30-verification.md" "${OUT_DIR}/30-verification.md"
+
 cat > "${OUT_DIR}/index.md" <<'EOF'
 # lib.scad.clamps verification
 
-This branch contains generated functional verification output for the library.
+Repository-level strategy/status: [30-verification.md](30-verification.md).
 
 The verification tests use the public library APIs from separate consumer files
 and build three clamps with different dimensions.
@@ -24,14 +26,12 @@ and build three clamps with different dimensions.
 
 - [STL export](pythonscad/tube-clamp-api.stl)
 
-
-
 ## What is verified
 
-- the OpenSCAD and PythonSCAD libraries can be consumed from separate source files;
-- three independent parametrized clamp instances can be created;
-- the public build API produces geometry;
-- derived radius calculations return the expected values;
-- PNG rendering succeeds;
-- STL export succeeds.
+- separate external consumption of both implementations;
+- independent parametrized clamp instances;
+- public build API geometry;
+- derived radius calculations;
+- PNG rendering;
+- STL export.
 EOF

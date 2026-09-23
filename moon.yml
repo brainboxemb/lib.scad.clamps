@@ -15,6 +15,7 @@ tasks:
 
   scad.verify:
     inputs:
+      - 'doc/30-verification.md'
       - 'openscad/**/*.scad'
       - 'pythonscad/**/*.py'
       - 'test/**'
