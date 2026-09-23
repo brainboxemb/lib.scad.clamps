@@ -1,3 +1,6 @@
+// - Design: design/design.md
+// - Design review: tube_clamp_render.scad
+//
 $fn = 120;
 
 TUBE_CLAMP_RENDER_FN_HIGH = 120;

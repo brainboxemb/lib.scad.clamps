@@ -4,6 +4,8 @@
 
 ### Changed
 
+- Align repository documentation and agent guidance with Migration 010: add numbered plan/specification/design/verification authorities, route shared workflow through `brainboxemb.meta`, publish the verification strategy with generated evidence, add source design breadcrumbs, and remove stale copied tooling/publication guidance without changing clamp geometry or API.
+
 - Preserve executable mode on `update-repo.sh`; the Migration 009 wrapper refresh keeps the canonical v0.15.6 content and remains directly invokable on Unix-like systems.
 
 - Refresh root `update-repo.sh` and `update-repo.ps1` to the canonical `tool.scad-project v0.15.6` consumer wrappers so future repository updates use the released Migration 009 path.
